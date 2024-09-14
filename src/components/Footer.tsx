@@ -1,29 +1,30 @@
 import Image from "next/image";
 
 const Footer = () => (
-    <div className="row-start-3 flex gap-6 flex-wrap items-center justify-center md:container-xl sm:mx-auto bg-beige relative h-70 w-full md:pt-10 pt-7 pb-10 px-7">
+    <div className="fixed bottom-0 row-start-3 flex gap-6 flex-wrap items-center justify-center md:container-xl sm:mx-auto bg-beige relative h-70 w-full md:pt-10 pt-7 pb-10 px-7">
         <div className='flex flex-col gap-2 md:gap-4 place-content-center py-4 md:py-8 item-top divide-y md:mx-20 md:divide-y-0 md:divide-x md:flex-row divide-dashed divide-mainBlack'>
 
             {/* Column 1: Contact Us */}
             <div className='md:w-1/2 pl-3'>
                 <p className='font-normal text-base md:text-2xl text-darkRed align-top'>Contact Us</p>
                 {/* <p className='font-extrabold text-base md:text-2xl text-mainBlack leading-10 py-4 md:py-8'>Nanyang Technological University</p> */}
-                <Image src="/NTU_logo.png"
+                <Image src="/icons/favicon.svg"
                         width={400}
                         height={100}
-                        alt="Picture of the author" />
+                        alt="Picture of the author" 
+                        className="py-5" />
                 <div className='flex flex-col gap-2 md:gap-4 place-content-left py-2 md:py-4 item-top'>
                     
                     {/* Row 1 */}
                     <div className='flex flex-row leading-3 md:leading-9 gap-8'>
-                        <p className='font-bold text-xs sm:text-sm md:text-lg text-darkRed tracking-wider flex-none w-14'>Address</p>
-                        <a title='address' target='_blank' className='font-semibold text-xs sm:text-sm md:text-lg text-mainBlack hover:text-darkRed hover:underline' href='https://maps.app.goo.gl/T3azDsJLWwQbqFS87'>North Spine Plaza, 50 Nanyang Avenue, NS3-01-09, Singapore 639798 Drive</a>
+                        <p className='font-bold text-xs sm:text-sm md:text-md text-darkRed tracking-wider flex-none w-14'>Address</p>
+                        <a title='address' target='_blank' className='font-semibold text-xs sm:text-sm md:text-md text-mainBlack hover:text-darkRed hover:underline' href='https://maps.app.goo.gl/T3azDsJLWwQbqFS87'>North Spine Plaza, 50 Nanyang Avenue, NS3-01-09, Singapore 639798 Drive</a>
                     </div>
 
                     {/* Row 2 */}    
                     <div className='flex flex-row leading-3 md:leading-9 gap-8'>
-                        <p className='font-bold text-xs sm:text-sm md:text-lg text-darkRed tracking-wider flex-none w-14'>Email</p>
-                        <a title='email' className='font-semibold text-xs sm:text-sm md:text-lg text-mainBlack hover:text-darkRed hover:underline' href='mailto:enquires@UShop.com'>UShop@e.ntu.edu.sg</a>
+                        <p className='font-bold text-xs sm:text-sm md:text-md text-darkRed tracking-wider flex-none w-14'>Email</p>
+                        <a title='email' className='font-semibold text-xs sm:text-sm md:text-md text-mainBlack hover:text-darkRed hover:underline' href='mailto:enquires@UShop.com'>UShop@e.ntu.edu.sg</a>
                     </div>
                 </div>
             </div>
