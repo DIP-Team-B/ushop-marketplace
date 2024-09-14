@@ -9,6 +9,12 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		fontWeight: {
+		  normal: '400', 
+		  semibold: '600',    
+		  bold: '700',  
+		  extrabold: '800',  
+		},
   		colors: {
 			mainBlack: '#000000',
 			mainGrey: '#626262',

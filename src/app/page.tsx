@@ -9,11 +9,13 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar"
 
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <div className='justify-center'>
+    <div className='justify-center py-6'>
+      <Navbar />
       <Menubar>
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
