@@ -11,12 +11,14 @@ import {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/ui/Navbar";
 
 export default function Home() {
   return (
-    <div className='justify-center py-6'>
-      <Navbar />
-      <Menubar>
+    <div className='justify-center'>
+      <Navbar></Navbar>
+
+      {/* <Menubar>
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
             <MenubarContent>
@@ -32,7 +34,7 @@ export default function Home() {
           </MenubarMenu>
         </Menubar>
 
-        <Button>Click here</Button>
+        <Button>Click here</Button> */}
 
       
       <Footer />
