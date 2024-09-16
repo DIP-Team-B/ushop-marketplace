@@ -10,11 +10,14 @@ import {
 } from "@/components/ui/menubar"
 
 import Footer from "@/components/Footer";
+import Navbar from "@/components/ui/Navbar";
 
 export default function Home() {
   return (
     <div className='justify-center'>
-      <Menubar>
+      <Navbar></Navbar>
+
+      {/* <Menubar>
           <MenubarMenu>
             <MenubarTrigger>File</MenubarTrigger>
             <MenubarContent>
@@ -30,7 +33,7 @@ export default function Home() {
           </MenubarMenu>
         </Menubar>
 
-        <Button>Click here</Button>
+        <Button>Click here</Button> */}
 
       
       <Footer />
