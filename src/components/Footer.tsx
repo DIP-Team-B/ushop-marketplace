@@ -6,7 +6,7 @@ const Footer = () => (
 
             {/* Column 1: Contact Us */}
             <div className='md:w-1/2 pl-3'>
-                <p className='font-normal text-base md:text-2xl text-darkRed align-top'>Contact Us</p>
+                <p className='font-normal text-base md:text-2xl text-mainBlack align-top'>Contact Us</p>
                 {/* <p className='font-extrabold text-base md:text-2xl text-mainBlack leading-10 py-4 md:py-8'>Nanyang Technological University</p> */}
                 <Image src="/icons/favicon.svg"
                         width={400}
@@ -33,7 +33,7 @@ const Footer = () => (
 
             {/* Column 2: Locate Us */}
             <div className='min-h-full pl-3 md:w-1/2 gap-2 md:gap-4 pt-5 space-y-3 md:pb-16 pr-3 md:pt-0 md:pl-7'>
-                <span className='font-normal text-base md:text-2xl text-darkRed align-top'>Locate Us</span>
+                <span className='font-normal text-base md:text-2xl text-mainBlack align-top'>Locate Us</span>
                 <iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d997.178919723111!2d103.6808217!3d1.3470639999999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da0f0ac6affff9%3A0x31f01545f2a58d3f!2sNTU%20North%20Spine%20Plaza!5e0!3m2!1sen!2ssg!4v1726248504860!5m2!1sen!2ssg'
                 className='min-h-[200px] lg:min-h-[300px] w-full md:h-full rounded-2xl' title='Shop Location'>
                 </iframe>
