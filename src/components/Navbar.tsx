@@ -109,7 +109,7 @@ const Navbar = () => {
 
       {/* category navbar */}
       <div className="flex py-2 justify-center items-center gap-3 shadow-md z-0">
-        <Link title='all page' href="./all"><Button variant="ghost">View All</Button></Link>
+        <Link title='view all page' href="./all"><Button variant="ghost">View All</Button></Link>
         <Link title='tops page' href="./tops"><Button variant="ghost">Tops</Button></Link>
         <Link title='bottoms page' href="./bottoms"><Button variant="ghost">Bottoms</Button></Link>
         <Link title='accessories page' href="./accessories"><Button variant="ghost">Accessories</Button></Link>
