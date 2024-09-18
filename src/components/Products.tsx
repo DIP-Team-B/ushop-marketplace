@@ -19,7 +19,7 @@ type ProductsProps = {
 const Products: React.FC<ProductsProps> = ({ title, products }) => {
     return (
         <div className="justify-center">
-            <div className="text-center p-5 text-3xl text-darkRed">{title}</div>
+            <div className="text-center p-5 text-2xl font-bold text-darkRed">{title}</div>
             <hr />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 m-10">
                 {products.map((product) => (
