@@ -13,7 +13,9 @@ const Navbar = () => {
     <div className="flex flex-col gap-0">
       {/* top navbar */}
       <div className="flex px-16 py-3 justify-between items-center bg-beige z-10">
+        <Link href="./">
         <Image src={'/images/logo.png'} alt="Logo" height={48} width={100}></Image>
+        </Link>
         <div className="flex gap-0 rounded-sm overflow-hidden border-mainBlack border-[1px]">
           <Input
             type="email"
@@ -107,6 +109,7 @@ const Navbar = () => {
 
       {/* category navbar */}
       <div className="flex py-2 justify-center items-center gap-3 shadow-md z-0">
+        <Link title='view all page' href="./all"><Button variant="ghost">View All</Button></Link>
         <Link title='tops page' href="./tops"><Button variant="ghost">Tops</Button></Link>
         <Link title='bottoms page' href="./bottoms"><Button variant="ghost">Bottoms</Button></Link>
         <Link title='accessories page' href="./accessories"><Button variant="ghost">Accessories</Button></Link>

@@ -4,12 +4,10 @@ import Products from "@/components/Products";
 import { products } from "../productsData";
 
 export default function Page() {
-  const others = products.filter(product => product.category === "others");
-
   return (
     <div className='justify-center'>
         <Navbar/>
-        <Products title="Others" products={others} />
+        <Products title="All Products" products={products} />;
         <Footer />
     </div>
   );
