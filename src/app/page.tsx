@@ -1,15 +1,8 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import HomepageCategoryCards from "@/components/HomepageCategoryCard";
-import Image from "next/image";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
+import PromoBanner from "@/components/PromoBanner";
+import PromoCardCarousel from "@/components/PromoCardCarousel";
 
 export default function Home() {
   const categoryItems = [
@@ -22,39 +15,10 @@ export default function Home() {
   return (
     <div className="justify-center">
       <Navbar />
-      {/* Category Cards */}
-      {/* <div className="flex p-4 gap-4 bg-secondBG w-screen">
-        {categoryItems.map((item, index) => (
-          <HomepageCategoryCards
-            key={index}
-            title={item.title}
-            id={item.id}
-          />
-        ))}
-        
-      </div> */}
       {/* screen size */}
-      <div className="screen-size-wrapper w-screen px-40 py-8 gap-6 flex flex-col items-center">
+      <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center">
         {/* promotion */}
-        <Carousel className="w-full h-64 relative">
-          <CarouselContent>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <CarouselItem key={index}>
-                <div className="p-1">
-                  <Card className="h-64">
-                    <CardContent className="flex w-full h-full items-center justify-center p-6">
-                      <span className="text-4xl font-semibold">
-                        {index + 1}
-                      </span>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute left-6" />
-          <CarouselNext className="absolute right-6" />
-        </Carousel>
+        <PromoBanner></PromoBanner>
 
         {/* category cards */}
         <div className="flex flex-col gap-2 w-full items-center pt-6">
@@ -69,6 +33,9 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* promo */}
+        <PromoCardCarousel></PromoCardCarousel>
       </div>
       <Footer />
     </div>

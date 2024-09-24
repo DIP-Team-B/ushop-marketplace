@@ -82,7 +82,7 @@ const Navbar = () => {
                 stroke-linejoin="round"
               />
             </svg>
-            <div className="text-sm font-medium">{cartCount}</div>
+            <div className="text-sm font-medium text-mainBlack">{cartCount}</div>
           </Button>
           <Button
             variant="special"
@@ -102,7 +102,7 @@ const Navbar = () => {
                 fill-opacity="0.87"
               />
             </svg>
-            <div className="text-sm font-medium">{wishlistCount}</div>
+            <div className="text-sm font-medium text-mainBlack">{wishlistCount}</div>
           </Button>
         </div>
       </div>
