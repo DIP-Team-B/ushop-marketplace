@@ -99,7 +99,7 @@ const Page = () => {
             </Link> */}
             <Link
               className={buttonVariants({ variant: "link" })}
-              href="/sign-up"
+              href="/log-in"
             >
               Have an account? Log in!
             </Link>
