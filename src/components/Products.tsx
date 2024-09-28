@@ -7,6 +7,11 @@ type Product = {
   name: string;
   price: number;
   image: string;
+  category: string;
+  stock: number;
+  sizes: string[];
+  colours: string[];
+  description: string[],
 }
 
 type ProductsProps = {
@@ -28,21 +33,25 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
       <hr />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 m-10">
         {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden">
-            <Link href={`/${product.id}`}>
+          <Card key={product.id} className="overflow-hidden w-80">
+            <Link href={`/${product.category?.toLowerCase()}/${product.id}`}>
+            
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-30 h-full object-cover cursor-pointer"
+                className="w-full h-80 object-cover cursor-pointer"
               />
               <CardContent className="p-4">
                 <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                  <Button variant="outline" size="sm">
+                  <Button variant="destructive" size="sm">
                     Add to Cart
                   </Button>
               </div>
+                <p className="text-sm mt-2 text-darkRed">
+                  Stock left: {product.stock}
+                </p>
               </CardContent>
             </Link>
           </Card>

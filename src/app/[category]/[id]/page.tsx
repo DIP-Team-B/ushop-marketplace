@@ -1,24 +1,32 @@
 // app/products/[id]/page.tsx
-import { use } from "react";
-import { products } from "../productsData"; // Import product data (or fetch from API)
+import { use, useState } from "react";
+import { products } from "../../productsData"; // Import product data (or fetch from API)
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 type ProductPageProps = {
-  params: { id: string };
+  params: { category: string; id: string };
 };
 
 const ProductPage = ({ params }: ProductPageProps) => {
   const productId = params.id;
+  const productCat = params.category;
   
   // Find the product by ID
-  const product = products.find((p) => p.id.toString() === productId);
+  const product = products.find(
+    (p) => p.id.toString() === productId && p.category?.toLowerCase() === productCat
+  );
+  // const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
+  // const [selectedColour, setSelectedColour] = useState(product.colours[0]);
 
   if (!product) {
     return <div>
         <Navbar />
-        Product not found
+        <div className="justify-center text-center text-mainGrey p-10">
+          <h1>Product not found</h1>
+        </div>
         <Footer />
         </div>;
   }
@@ -57,22 +65,40 @@ const ProductPage = ({ params }: ProductPageProps) => {
           </p>
 
           {/* Add to Cart Button */}
-          <button className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
-            Add to Cart
-          </button>
+          <Button variant="destructive">Add to Cart</Button>
 
-          {/* Additional Product Information */}
+          {/* Product Information */}
           <div className="mt-6">
             <h2 className="text-xl font-bold mb-2">Product Description</h2>
             <p className="text-gray-600">
               {/* Add dynamic description or other info based on the product */}
-              This is a detailed description of {product.name}, providing insight into the quality and features.
+              {product.description}
             </p>
+          </div>
+
+          {/* Stock left, Size, Colours */}
+          <div className="mt-2">
+            <strong>Available Sizes:</strong> 
+            {product.sizes.map((size, index) => (
+              <span key={index} className="ml-2">{size}</span>
+            ))}
+          </div>
+
+          {/* Display colours */}
+          <div className="mt-2">
+            <strong>Available Colours:</strong> 
+            {product.colours.map((colour, index) => (
+              <span key={index} className="ml-2">{colour}</span>
+            ))}
+          </div>
+          
+          <div className="mt-2">
+            <p className="text-md font-bold mb-2 text-darkRed">Stock: {product.stock}</p>
           </div>
         </div>
       </div>
 
-      {/* Related Products Section (Optional) */}
+      {/* Related Products Section */}
       <div className="mt-10">
         <h2 className="text-2xl font-bold mb-6">Related Products</h2>
         {/* Add a carousel or grid of related products */}
