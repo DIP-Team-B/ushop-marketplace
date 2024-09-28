@@ -3,6 +3,7 @@ import { use } from "react";
 import { products } from "../productsData"; // Import product data (or fetch from API)
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Link from "next/link";
 
 type ProductPageProps = {
   params: { id: string };
@@ -27,6 +28,17 @@ const ProductPage = ({ params }: ProductPageProps) => {
     <Navbar /> 
     <div className="container mx-auto p-6">
       {/* Header Section */}
+      <div className="text-left py-9 pl-16 text-sm text-mainGrey">
+        <Link href="./" className="underline hover:color-darkRed">Home</Link> 
+        &nbsp;&nbsp;
+        &gt; 
+        &nbsp;&nbsp;
+        <Link href={`/${product.category?.toLowerCase()}`} className="underline hover:color-darkRed">{product.category}</Link> 
+        &nbsp;&nbsp;
+        &gt; 
+        &nbsp;&nbsp;
+        <Link href="#" className="underline hover:color-darkRed">{product.name}</Link> 
+      </div>
       <div className="flex flex-col lg:flex-row mb-6">
         {/* Product Image */}
         <div className="w-full lg:w-1/2">

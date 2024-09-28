@@ -17,7 +17,14 @@ type ProductsProps = {
 const Products: React.FC<ProductsProps> = ({ title, products }) => {
   return (
     <div className="justify-center">
-      <div className="text-center p-5 text-2xl font-bold text-darkRed">{title}</div>
+      <div className="text-left py-9 pl-16 text-sm text-mainGrey">
+        <Link href="./" className="underline hover:color-darkRed">Home</Link> 
+        &nbsp;&nbsp;
+        &gt; 
+        &nbsp;&nbsp;
+        <Link href="" className="underline hover:color-darkRed">{title}</Link> 
+      </div>
+      <div className="text-left pb-9 pl-16 text-5xl font-bold text-darkRed">{title}</div>
       <hr />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 m-10">
         {products.map((product) => (
@@ -26,7 +33,7 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-48 object-cover cursor-pointer"
+                className="w-30 h-full object-cover cursor-pointer"
               />
               <CardContent className="p-4">
                 <h2 className="font-semibold text-lg mb-2">{product.name}</h2>

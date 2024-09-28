@@ -4,7 +4,7 @@ import Products from "@/components/Products";
 import { products } from "../productsData";
 
 export default function Page() {
-  const accessories = products.filter(product => product.category === "accessories");
+  const accessories = products.filter(product => product.category === "Accessories");
  
   return (
     <div className='justify-center'>
