@@ -84,7 +84,7 @@ const Navbar = () => {
             </svg>
             <div className="text-sm font-medium">{cartCount}</div>
           </Button>
-          <Link href="./wishlist">
+          <Link href="/wishlist">
             <Button
               variant="special"
               className="flex gap-2 items-center px-[10px] rounded-full"

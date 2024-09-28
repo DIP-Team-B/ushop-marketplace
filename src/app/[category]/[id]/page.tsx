@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
 
 type ProductPageProps = {
   params: { category: string; id: string };
@@ -34,7 +35,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
   return (
     <>
     <Navbar /> 
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 mb-20">
       {/* Header Section */}
       <div className="text-left py-9 pl-16 text-sm text-mainGrey">
         <Link href="./" className="underline hover:color-darkRed">Home</Link> 
@@ -51,7 +52,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
         {/* Product Image */}
         <div className="w-full lg:w-1/2">
           <img
-            src={product.image}
+            src={product.images[0]}
             alt={product.name}
             className="w-full h-96 object-cover"
           />
@@ -67,7 +68,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
           {/* Add to Cart Button */}
           <Button variant="destructive">Add to Cart</Button>
 
-          {/* Product Information */}
+          {/* Product Description */}
           <div className="mt-6">
             <h2 className="text-xl font-bold mb-2">Product Description</h2>
             <p className="text-gray-600">
@@ -76,7 +77,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             </p>
           </div>
 
-          {/* Stock left, Size, Colours */}
+          {/* Stock left, Size, Colours, Like Button */}
           <div className="mt-2">
             <strong>Available Sizes:</strong> 
             {product.sizes.map((size, index) => (
@@ -84,7 +85,6 @@ const ProductPage = ({ params }: ProductPageProps) => {
             ))}
           </div>
 
-          {/* Display colours */}
           <div className="mt-2">
             <strong>Available Colours:</strong> 
             {product.colours.map((colour, index) => (
@@ -94,6 +94,20 @@ const ProductPage = ({ params }: ProductPageProps) => {
           
           <div className="mt-2">
             <p className="text-md font-bold mb-2 text-darkRed">Stock: {product.stock}</p>
+          </div>
+          
+          <div className="mt-2">
+            <p className="text-md font-bold mb-2 text-darkRed">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="bg-white bg-opacity-50 hover:bg-opacity-75 transition-colors"
+                // aria-label={product.liked ? "Unlike" : "Like"}
+              >
+                {/* <Heart className={`w-5 h-5 ${product.liked ? "text-red-500 fill-current" : "text-gray-600"}`} /> */}
+                <Heart />
+              </Button>
+            </p>
           </div>
         </div>
       </div>
@@ -107,7 +121,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             .filter((p) => p.category === product.category && p.id !== product.id)
             .map((relatedProduct) => (
               <div key={relatedProduct.id} className="card">
-                <img src={relatedProduct.image} alt={relatedProduct.name} />
+                <img src={relatedProduct.images[0]} alt={relatedProduct.name} />
                 <h3>{relatedProduct.name}</h3>
               </div>
             ))}
