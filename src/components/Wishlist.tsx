@@ -32,14 +32,14 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [] }) => {
   const [wishlistProducts, setWishlistProducts] = useState(products);
 
   // Handler to toggle the liked status
-  const handleLikeToggle = (id: number, category: string) => {
+  const handleLikeToggle = (user: number, id: number, category: string) => {
     // Update the wishlistProducts array when a product is liked/unliked
     const updatedProducts = wishlistProducts.map((product) => 
       product.id === id ? { ...product, liked: !product.liked } : product
     );
     setWishlistProducts(updatedProducts);
 
-    router.push(`/wishlist/wishlist_reload?id=1&removeItemId=${id}&category=${category}`);
+    router.push(`/wishlist/wishlist_reload?id=${user}&removeItemId=${id}&category=${category}`);
   };
 
   return (
@@ -85,7 +85,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [] }) => {
                   size="icon"
                   className="bg-white bg-opacity-50 hover:bg-opacity-75 transition-colors"
                   aria-label={product.liked ? "Unlike" : "Like"}
-                  onClick={() => handleLikeToggle(product.id, product.category)}
+                  onClick={() => handleLikeToggle(product.user, product.id, product.category)}
                 >
                   <Heart className={`w-5 h-5 ${product.liked ? "text-red-500 fill-current" : "text-gray-600"}`} />
                 </Button>

@@ -39,6 +39,32 @@ export async function POST(request: Request) {
 
         await connection.execute(update_bottom_sql, [JSON.stringify(BottomList), id]);
     }
+
+    //Update Accessories_list
+    if (category === "accessories") {
+      const update_accessories_sql = `
+        UPDATE favourite_table 
+        SET AccessoriesList = ?
+        WHERE ID = ?;
+      `;
+      let AccessoriesList = JSON.parse(rows[0].AccessoriesList || '[]');
+      AccessoriesList = AccessoriesList.filter((item: number) => item !== removeItemId);
+
+      await connection.execute(update_accessories_sql, [JSON.stringify(AccessoriesList), id]);
+    }
+
+    //Update Others_list
+    if (category === "others") {
+      const update_others_sql = `
+        UPDATE favourite_table 
+        SET OthersList = ?
+        WHERE ID = ?;
+      `;
+      let OthersList = JSON.parse(rows[0].OthersList || '[]');
+      OthersList = OthersList.filter((item: number) => item !== removeItemId);
+
+      await connection.execute(update_others_sql, [JSON.stringify(OthersList), id]);
+    }
     
     console.log('remove Done');
     await connection.end();

@@ -26,11 +26,23 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
       FROM bottom_table
       JOIN favourite_table
       ON JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$')
+      WHERE favourite_table.ID = ?
+      UNION
+      SELECT accessories_table.*
+      FROM accessories_table
+      JOIN favourite_table
+      ON JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$')
+      WHERE favourite_table.ID = ?
+      UNION
+      SELECT others_table.*
+      FROM others_table
+      JOIN favourite_table
+      ON JSON_CONTAINS(favourite_table.OthersList, CAST(others_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?;
     `;
     const [rows_length] = await connection.execute(length_sql, [id]);
 
-    const [rows] = await connection.execute(sql, [id, id]);
+    const [rows] = await connection.execute(sql, [id, id, id, id]);
 
     await connection.end();
 
@@ -49,6 +61,18 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
           row.Image_URL = 'bottoms/' + row.Image_URL ;
           row.category = 'bottoms';
         }
+        //Accessories List
+        else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 && 
+        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2) {
+          row.Image_URL = 'accessories/' + row.Image_URL ;
+          row.category = 'accessories';
+        }
+        //Others List
+        else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 && 
+        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 +(rows_length[0].OthersList.length-1)/2) {
+          row.Image_URL = 'others/' + row.Image_URL ;
+          row.category = 'others';
+        }
         num++;
       }
     }
@@ -56,7 +80,7 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
 
     if (Array.isArray(rows) && rows.length > 0) {
       wishlistItems = rows.map((row) => ({
-
+        user: id,
         id: row.ID,
         name: row.Name,
         price: row.Price,
