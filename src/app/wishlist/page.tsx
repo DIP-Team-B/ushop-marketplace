@@ -2,16 +2,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Wishlist from "@/components/Wishlist";
 import { createConnection } from '@/lib/db';
-
-// Define an interface for the wishlist item
-interface wishlistItems {
-  id: number;         // Assuming ID is a number
-  name: string;       // Assuming name is a string
-  price: number;      // Assuming price is a number
-  images: string;     // Assuming image is a string (or array of strings if multiple images)
-  category: string;   // Assuming category is a string
-  stock: number;      // Assuming stock is a number
-}
+import { RowDataPacket } from 'mysql2';
 
 // Fetch wishlist items directly in the component
 const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
@@ -20,31 +11,62 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
   try {
     const connection = await createConnection();
 
+    const length_sql = `
+      SELECT * FROM favourite_table WHERE ID = ?
+    `;
+
     const sql = `
       SELECT top_table.*
       FROM top_table
       JOIN favourite_table
       ON JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$')
+      WHERE favourite_table.ID = ?
+      UNION
+      SELECT bottom_table.*
+      FROM bottom_table
+      JOIN favourite_table
+      ON JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?;
     `;
-    const [rows] = await connection.execute(sql, [id]);
+    const [rows_length] = await connection.execute(length_sql, [id]);
 
-    // Log the data for debugging
-    console.log("Rows data:", rows);
+    const [rows] = await connection.execute(sql, [id, id]);
 
     await connection.end();
 
+    let num: number = 0;
+    if (Array.isArray(rows) && rows.length > 0) {
+      while (num < rows.length) {
+        const row = rows[num] as RowDataPacket; // Type assertion to RowDataPacket
+        //Top List
+        if (num < (rows_length[0].TopList.length-1)/2) {
+          row.Image_URL = 'tops/' + row.Image_URL ;
+          row.category = 'tops';
+        }
+        //Bottom List
+        else if (num >= (rows_length[0].TopList.length-1)/2 && 
+        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2) {
+          row.Image_URL = 'bottoms/' + row.Image_URL ;
+          row.category = 'bottoms';
+        }
+        num++;
+      }
+    }
+    //console.log("Updated Rows data:", rows);
+
     if (Array.isArray(rows) && rows.length > 0) {
       wishlistItems = rows.map((row) => ({
+
         id: row.ID,
         name: row.Name,
         price: row.Price,
-        images: '/images/products/tops/'+[row.Image_URL],
-        category: 'tops',
+        images: '/images/products/'+[row.Image_URL],
+        category: row.category,
         stock: row.Quantity,
+        liked: true,
       }));
     }
-    console.log("WishList data:", wishlistItems);
+    //console.log("WishList data:", wishlistItems);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -69,4 +91,3 @@ export default async function Page({ searchParams }) {
     </div>
   );
 };
-

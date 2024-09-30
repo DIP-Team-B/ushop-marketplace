@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
@@ -25,17 +26,20 @@ type ProductsProps = {
 };
 
 const Wishlist: React.FC<ProductsProps> = ({ title, products = [] }) => {
-
+  
+  const router = useRouter();  // Initialize the router
   // Local state to track the liked status for each product
   const [wishlistProducts, setWishlistProducts] = useState(products);
 
   // Handler to toggle the liked status
-  const handleLikeToggle = (id: number) => {
+  const handleLikeToggle = (id: number, category: string) => {
     // Update the wishlistProducts array when a product is liked/unliked
     const updatedProducts = wishlistProducts.map((product) => 
       product.id === id ? { ...product, liked: !product.liked } : product
     );
     setWishlistProducts(updatedProducts);
+
+    router.push(`/wishlist/wishlist_reload?id=1&removeItemId=${id}&category=${category}`);
   };
 
   return (
@@ -81,7 +85,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [] }) => {
                   size="icon"
                   className="bg-white bg-opacity-50 hover:bg-opacity-75 transition-colors"
                   aria-label={product.liked ? "Unlike" : "Like"}
-                  onClick={() => handleLikeToggle(product.id)}
+                  onClick={() => handleLikeToggle(product.id, product.category)}
                 >
                   <Heart className={`w-5 h-5 ${product.liked ? "text-red-500 fill-current" : "text-gray-600"}`} />
                 </Button>
