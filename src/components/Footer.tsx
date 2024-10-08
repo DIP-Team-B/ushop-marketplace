@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const Footer = () => (
-    <div className="fixed bottom-0 row-start-3 flex gap-6 flex-wrap items-center justify-center md:container-xl sm:mx-auto bg-beige relative h-70 w-full md:pt-10 pt-7 pb-10 px-7">
+    <div className="relative bottom-0 row-start-3 flex gap-6 flex-wrap items-center justify-center md:container-xl sm:mx-auto bg-beige h-70 w-full md:pt-10 pt-7 pb-10 px-7">
         <div className='flex flex-col gap-2 md:gap-4 place-content-center py-4 md:py-8 item-top divide-y md:mx-20 md:divide-y-0 md:divide-x md:flex-row divide-dashed divide-mainBlack'>
 
             {/* Column 1: Contact Us */}
