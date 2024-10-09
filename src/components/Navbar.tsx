@@ -111,11 +111,11 @@ const Navbar = () => {
 
       {/* category navbar */}
       <div className="flex py-2 justify-center items-center gap-3 shadow-md z-0">
-        <Link title='view all page' href="./all"><Button className="text-mainBlack" variant="ghost">View All</Button></Link>
-        <Link title='tops page' href="./tops"><Button className="text-mainBlack" variant="ghost">Tops</Button></Link>
-        <Link title='bottoms page' href="./bottoms"><Button className="text-mainBlack" variant="ghost">Bottoms</Button></Link>
-        <Link title='accessories page' href="./accessories"><Button className="text-mainBlack" variant="ghost">Accessories</Button></Link>
-        <Link title='others page' href="./others"><Button className="text-mainBlack" variant="ghost">Others</Button></Link>
+        <Link title='view all page' href="/all"><Button className="text-mainBlack" variant="ghost">View All</Button></Link>
+        <Link title='tops page' href="/tops"><Button className="text-mainBlack" variant="ghost">Tops</Button></Link>
+        <Link title='bottoms page' href="/bottoms"><Button className="text-mainBlack" variant="ghost">Bottoms</Button></Link>
+        <Link title='accessories page' href="/accessories"><Button className="text-mainBlack" variant="ghost">Accessories</Button></Link>
+        <Link title='others page' href="/others"><Button className="text-mainBlack" variant="ghost">Others</Button></Link>
       </div>
     </div>
   );
