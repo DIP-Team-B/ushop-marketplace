@@ -1,3 +1,5 @@
+"use client"
+
 // app/products/[id]/page.tsx
 import { use, useState } from "react";
 import { products } from "../../productsData"; // Import product data (or fetch from API)
@@ -10,6 +12,8 @@ import { Heart } from "lucide-react";
 type ProductPageProps = {
   params: { category: string; id: string };
 };
+
+export var cartNum = 0;
 
 const ProductPage = ({ params }: ProductPageProps) => {
   const productId = params.id;
@@ -66,7 +70,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
           </p>
 
           {/* Add to Cart Button */}
-          <Button variant="destructive">Add to Cart</Button>
+          <Button variant="destructive" onClick={() => cartNum++}>Add to Cart</Button>
 
           {/* Product Description */}
           <div className="mt-6">

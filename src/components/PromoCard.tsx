@@ -7,24 +7,24 @@ import { Button } from "./ui/button";
 
 interface PromoCardsProps {
   name: string;
-  image1: string;
-  image2: string;
-  id: string;
+  images: string[];
+  id: string | number;
   price: number;
   disc: string;
+  category: string;
 }
 
 const PromoCards: React.FC<PromoCardsProps> = ({
   name,
   id,
-  image1,
-  image2,
+  images,
   price,
   disc,
+  category
 }) => {
   const [isHovered, setHovered] = useState(false);
   return (
-    <Link className="w-[192px] overflow-hidden block" href={`/${id}`}>
+    <Link className="w-[192px] overflow-hidden block" href={`/${category?.toLowerCase()}/${id}`}>
       <div className="flex flex-col gap-1">
         <div
           className="w-full aspect-[2/3] relative"
@@ -32,7 +32,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
           onMouseLeave={() => setHovered(false)}
         >
           <Image
-            src={`/images/${image1}.png`}
+            src={images[1]}
             alt={name}
             fill={true}
             style={{ objectFit: "cover" }}
@@ -41,7 +41,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
             }`}
           ></Image>
           <Image
-            src={`/images/${image2}.png`}
+            src={images[0]}
             alt={name}
             fill={true}
             style={{ objectFit: "cover" }}
@@ -54,7 +54,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <p className="text-primaryRed-600 font-semibold text-md">
-              ${price}
+              ${price.toFixed(2)}
             </p>
             <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
               -{disc}
