@@ -13,7 +13,7 @@ const Navbar = () => {
     <div className="flex flex-col gap-0">
       {/* top navbar */}
       <div className="flex px-16 py-3 justify-between items-center bg-beige z-10">
-        <Link href="./">
+        <Link href="/">
         <Image src={'/images/logo.png'} alt="Logo" height={48} width={100}></Image>
         </Link>
         <div className="flex gap-0 rounded-sm overflow-hidden border-mainBlack border-[1px]">
