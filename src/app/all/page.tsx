@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Products from "@/components/Products";
 import { products } from "../productsData";
 
+// make max 8-10 products per page
 export default function Page() {
   return (
     <div className='justify-center'>
