@@ -41,7 +41,7 @@ const Navbar = () => {
                 stroke="black"
                 strokeOpacity="0.87"
                 strokeWidth="2"
-                stroke-linecap="round"
+                strokeLinecap="round"
                 stroke-linejoin="round"
               />
               <path
@@ -49,7 +49,7 @@ const Navbar = () => {
                 stroke="black"
                 strokeOpacity="0.87"
                 strokeWidth="2"
-                stroke-linecap="round"
+                strokeLinecap="round"
                 stroke-linejoin="round"
               />
             </svg>
@@ -78,7 +78,7 @@ const Navbar = () => {
                 stroke="black"
                 strokeOpacity="0.87"
                 strokeWidth="2"
-                stroke-linecap="round"
+                strokeLinecap="round"
                 stroke-linejoin="round"
               />
             </svg>

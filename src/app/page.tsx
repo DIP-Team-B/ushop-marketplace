@@ -38,8 +38,13 @@ export default function Home() {
 
         {/* promo */}
         <div className="flex flex-col gap-2 w-full items-center pt-6">
-          <div className="flex items-center gap-1"><p className="animate-bounce mr-1 font-semibold text-xl text-mainBlack">🔥</p><p className="font-semibold text-xl text-mainBlack ">SuperDealz</p></div>
-          
+          <div className="flex items-center gap-1">
+            <p className="animate-bounce mr-1 font-semibold text-xl text-mainBlack">
+              🔥
+            </p>
+            <p className="font-semibold text-xl text-mainBlack ">SuperDealz</p>
+          </div>
+
           <PromoCardCarousel></PromoCardCarousel>
         </div>
       </div>

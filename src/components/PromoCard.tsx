@@ -24,7 +24,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
 }) => {
   const [isHovered, setHovered] = useState(false);
   return (
-    <Link className="w-[200px] overflow-hidden block" href={`/${id}`}>
+    <Link className="w-[192px] overflow-hidden block" href={`/${id}`}>
       <div className="flex flex-col gap-1">
         <div
           className="w-full aspect-[2/3] relative"
@@ -60,6 +60,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
               -{disc}
             </div>
           </div>
+          {/* add to cart button */}
           <Button className="h-[26px] flex rounded-full" variant="outline">
             <svg
               width="16"
@@ -78,7 +79,7 @@ const PromoCards: React.FC<PromoCardsProps> = ({
                 d="M3.33333 4.66667L2.79333 2.50467C2.75722 2.3605 2.67397 2.23254 2.5568 2.1411C2.43964 2.04967 2.29528 2 2.14667 2H1.33333M5.33333 14H6.66667M10.6667 14H12"
                 stroke="black"
                 stroke-width="1.33333"
-                stroke-linecap="round"
+                strokeLinecap="round"
                 stroke-linejoin="round"
               />
               <path
