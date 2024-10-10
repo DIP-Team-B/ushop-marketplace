@@ -74,39 +74,40 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          {/* icon account */}=
+          {/* icon account */}
           <DropdownMenu>
-            <DropdownMenuTrigger
-              className={`${buttonVariants({
-                variant: "special",
-              })} px-[10px] rounded-[200px]`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="20"
-                viewBox="0 0 18 20"
-                fill="none"
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="special"
+                className="flex gap-2 items-center px-[10px] rounded-full"
               >
-                <path
-                  d="M1 19V18C1 14.69 3.69 12 7 12H11C14.31 12 17 14.69 17 18V19"
-                  stroke="black"
-                  strokeOpacity="0.87"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M8.99988 9C6.78988 9 4.99988 7.21 4.99988 5C4.99988 2.79 6.78988 1 8.99988 1C11.2099 1 12.9999 2.79 12.9999 5C12.9999 7.21 11.2099 9 8.99988 9Z"
-                  stroke="black"
-                  strokeOpacity="0.87"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="20"
+                  viewBox="0 0 18 20"
+                  fill="none"
+                >
+                  <path
+                    d="M1 19V18C1 14.69 3.69 12 7 12H11C14.31 12 17 14.69 17 18V19"
+                    stroke="black"
+                    strokeOpacity="0.87"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8.99988 9C6.78988 9 4.99988 7.21 4.99988 5C4.99988 2.79 6.78988 1 8.99988 1C11.2099 1 12.9999 2.79 12.9999 5C12.9999 7.21 11.2099 9 8.99988 9Z"
+                    stroke="black"
+                    strokeOpacity="0.87"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-36 bg-mainWhite mt-2 flex flex-col p-2 rounded-lg shadow-sm">
+            <DropdownMenuContent className="w-36 bg-mainWhite mt-2 flex flex-col p-2 rounded-lg shadow-md">
               {isLoggedIn ? (
                 <>
                   <Link
@@ -202,56 +203,60 @@ const Navbar = () => {
             <SheetContent className="bg-mainWhite text-mainBlack rounded-tl-xl rounded-bl-xl">
               <SheetTitle className="text-xl">My Cart</SheetTitle>
               {cartItems.length > 0 ? (
-                <div className="pt-4 flex flex-col gap-2">
-                  {cartItems.map((product) => (
-                    <div className="relative">
-                      <Link
-                        href={`/${product.category?.toLowerCase()}/${
-                          product.id
-                        }`}
-                        className="flex gap-3 w-full p-3 bg-mainWhite rounded-lg border-[1px] border-gray-100 hover:border-gray-200 hover:bg-gray-100"
-                      >
-                        <Image
-                          src={product.images[0]}
-                          alt="product image"
-                          width={80}
-                          height={80}
-                          className="aspect-square object-cover rounded-sm"
-                        ></Image>
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <div className="flex flex-col justify-between h-full w-[170px] ">
-                            <div className="flex flex-col gap-1 overflow-hidden">
-                              <p className="font-medium text-sm">
-                                {product.name}
-                              </p>
-                              <p className="font-light text-xs text-muted-foreground truncate overflow-hidden ">
-                                {product.description}
-                              </p>
-                            </div>
+                <div className="pt-4 flex flex-col gap-4 items-center">
+                  <div className="flex flex-col w-full gap-2">
+                    {cartItems.map((product) => (
+                      <div className="relative">
+                        <Link
+                          href={`/${product.category?.toLowerCase()}/${
+                            product.id
+                          }`}
+                          className="flex gap-3 w-full p-3 bg-mainWhite rounded-lg border-[1px] border-gray-100 hover:border-gray-200 hover:bg-gray-100"
+                        >
+                          <Image
+                            src={product.images[0]}
+                            alt="product image"
+                            width={80}
+                            height={80}
+                            className="aspect-square object-cover rounded-sm"
+                          ></Image>
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <div className="flex flex-col justify-between h-full w-[170px] ">
+                              <div className="flex flex-col gap-1 overflow-hidden">
+                                <p className="font-medium text-sm">
+                                  {product.name}
+                                </p>
+                                <p className="font-light text-xs text-muted-foreground truncate overflow-hidden ">
+                                  {product.description}
+                                </p>
+                              </div>
 
-                            <div className="flex gap-2 items-center">
-                              <p
-                                className={`${
-                                  product.disc === "0%"
-                                    ? "text-mainBlack"
-                                    : "text-primaryRed-600"
-                                } font-semibold text-lg`}
-                              >
-                                ${product.price.toFixed(2)}
-                              </p>
-                              {product.disc === "0%" ? null : (
-                                <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
-                                  -{product.disc}
-                                </div>
-                              )}
+                              <div className="flex gap-2 items-center">
+                                <p
+                                  className={`${
+                                    product.disc === "0%"
+                                      ? "text-mainBlack"
+                                      : "text-primaryRed-600"
+                                  } font-semibold text-lg`}
+                                >
+                                  ${product.price.toFixed(2)}
+                                </p>
+                                {product.disc === "0%" ? null : (
+                                  <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
+                                    -{product.disc}
+                                  </div>
+                                )}
+                                <p className="text-xs text-muted-foreground">x 1</p>
+                              </div>
                             </div>
+                            <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
                           </div>
-                          <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
-                        </div>
-                      </Link>
-                      <Trash className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
-                    </div>
-                  ))}
+                        </Link>
+                        <Trash className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
+                      </div>
+                    ))}
+                  </div>
+                  <Link href="/checkout" className={`${buttonVariants({ variant: "default" })} w-full h-12`}>Checkout</Link>
                 </div>
               ) : (
                 <div className="h-full flex flex-col gap-5 items-center justify-center">

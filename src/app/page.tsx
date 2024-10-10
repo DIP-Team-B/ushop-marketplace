@@ -82,10 +82,10 @@ export default function Home() {
           </div>
           {visibleProducts < products.length && (
             <div
-              className="flex w-full items-center justify-center mb-6"
+              className="flex items-center justify-center mb-6"
               onClick={handleShowMore}
             >
-              <div className="flex w-16 h-16 items-center justify-center">
+              <div className="flex w-16 h-16 items-center justify-center cursor-pointer">
                 <ArrowDown className="text-mainBlack animate-bounce-slow"></ArrowDown>
                 <Image
                   src="/icons/circular-show-more.svg"
