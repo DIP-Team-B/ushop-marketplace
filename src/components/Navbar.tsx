@@ -6,7 +6,7 @@ import { Button, buttonVariants } from "./ui/button";
 import { Input } from "./ui/input";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DropdownMenu, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import {
   DropdownMenuContent,
@@ -14,12 +14,20 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 
+export var globalIsBannerClosed: boolean;
+
 const Navbar = () => {
   const wishlistCount = 0;
   const isStudentStaff = true;
   const isLoggedIn = true;
 
   const [isBannerClosed, setBannerClosed] = useState(false);
+
+  // Sync the global variable whenever isBannerClosed changes
+  useEffect(() => {
+    globalIsBannerClosed = isBannerClosed;
+  }, [isBannerClosed]);
+
 
   const cartItems = [
     {
@@ -246,7 +254,9 @@ const Navbar = () => {
                                     -{product.disc}
                                   </div>
                                 )}
-                                <p className="text-xs text-muted-foreground">x 1</p>
+                                <p className="text-xs text-muted-foreground">
+                                  x 1
+                                </p>
                               </div>
                             </div>
                             <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
@@ -256,7 +266,14 @@ const Navbar = () => {
                       </div>
                     ))}
                   </div>
-                  <Link href="/checkout" className={`${buttonVariants({ variant: "default" })} w-full h-12`}>Checkout</Link>
+                  <Link
+                    href="/checkout"
+                    className={`${buttonVariants({
+                      variant: "default",
+                    })} w-full h-12`}
+                  >
+                    Checkout
+                  </Link>
                 </div>
               ) : (
                 <div className="h-full flex flex-col gap-5 items-center justify-center">
@@ -344,7 +361,9 @@ const Navbar = () => {
           </p>
           <XIcon
             className="w-3 h-3"
-            onClick={() => setBannerClosed(true)}
+            onClick={() => {
+              setBannerClosed(true);
+            }}
           ></XIcon>
         </div>
       )}
