@@ -3,7 +3,8 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Container, Trash, Truck, XIcon } from "lucide-react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ArrowLeft, Container, Trash, Truck, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -61,36 +62,36 @@ function totalPrice(items: any) {
 }
 
 const Page = () => {
+    const [navbarHeight, setNavbarHeight] = useState(0);
+
+  useEffect(() => {
+    // Get the height of the navbar dynamically
+    const navbarElement = document.querySelector("nav");
+    if (navbarElement) {
+      setNavbarHeight(navbarElement.offsetHeight);
+    }
+  }, []);
+
   return (
     <div className="justify-center">
       <div className="flex flex-col h-screen">
-        <div className="">
-          <Navbar></Navbar>
-        </div>
-        <div className="flex w-full h-full">
+        <Navbar></Navbar>
+        <div className="flex w-full h-full bg-gray-50">
           {/* left side */}
 
-          <div className="w-7/12 h-full flex items-center justify-center bg-gray-50 overflow-hidden">
+          <div className="w-7/12 h-full flex items-center justify-center overflow-hidden">
             <img
               src={`/images/checkout.svg`}
-              className="h-4/6"
+              className="w-8/12"
               alt="checkout"
             ></img>
-            
           </div>
           {/* right side */}
-          <div className=" w-5/12 h-full text-mainBlack bg-mainWhite shadow-sm">
-            <div className="flex flex-col gap-4 py-6 px-12">
-              <div className="flex justify-between items-center">
-                <h1 className="text-2xl text-mainBlack font-bold">Checkout</h1>
-                <Link href="./">
-                  <XIcon className="w-5 h-5"></XIcon>
-                </Link>
-              </div>
-              <hr />
-              <div className="w-full flex flex-col gap-2">
+        <div className={`relative w-5/12 text-mainBlack bg-mainWhite shadow-sm m-4 rounded-2xl overflow-hidden border-[1px] border-gray-100`}>
+            <ScrollArea className="absolute z-0 mt-16 flex flex-col px-8 h-[calc(100%-185px)]">
+              <div className="flex flex-col gap-2 pt-3">
                 {checkoutItems.length > 0 ? (
-                  <div className="flex flex-col w-full ">
+                  <div className=" ">
                     {checkoutItems.map((product) => (
                       <div className="relative">
                         <Link
@@ -163,7 +164,7 @@ const Page = () => {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full pt-3 pb-5">
                 <h3 className="text-mainBlack text-md font-semibold">
                   Shipping Options
                 </h3>
@@ -192,15 +193,21 @@ const Page = () => {
                   </div>
                 </div>
               </div>
+            </ScrollArea>
+            <div className="absolute top-0 z-10 flex gap-3 items-center borden-b-[1px] shadow-sm w-full px-4 h-16">
+              <Link href="./">
+                <ArrowLeft className="w-6 h-6"></ArrowLeft>
+              </Link>
+              <h1 className="text-2xl text-mainBlack font-bold">Checkout</h1>
             </div>
-            <div className="absolute bottom-0 w-5/12 px-6 py-8 bg-mainWhite border-t-[1px] flex items-center justify-between">
+            <div className="absolute bottom-0 z-20 w-full px-8 py-8 bg-mainWhite border-t-[1px] flex items-center justify-between">
               <div className="flex flex-col text-mainBlack">
                 <p className="font-normal">Total Price</p>
                 <h2 className="font-bold text-2xl">
                   ${totalPrice(checkoutItems)}
                 </h2>
               </div>
-              <Button>Agree and Pay</Button>
+              <Link href="/pay"><Button className="py-6 px-5 rounded-full">Agree and Pay</Button></Link>
             </div>
           </div>
         </div>
