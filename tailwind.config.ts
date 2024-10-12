@@ -15,6 +15,10 @@ const config: Config = {
         bold: "700",
         extrabold: "800",
       },
+      animation: {
+        'spin-slow': 'spin 4s linear infinite',
+        'bounce-slow': 'bounce 1.5s infinite'
+      },
       colors: {
         mainBlack: "#000000",
         mainGrey: "#626262",

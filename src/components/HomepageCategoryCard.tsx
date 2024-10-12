@@ -17,7 +17,7 @@ const HomepageCategoryCards: React.FC<HomepageCategoryCardsProps> = ({
   return (
     <Link className="w-full overflow-hidden" href={`/${id}`}>
       <div
-        className={`h-96 relative transition-shadow duration-200 ease-in ${
+        className={`h-[420px] relative transition-shadow duration-200 ease-in ${
           isHovered ? "shadow-sm" : ""
         }`}
         onMouseEnter={() => setHovered(true)}
