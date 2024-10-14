@@ -12,7 +12,7 @@ public class DeleteItemServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "1201"); // Updated password
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "xxxx"); // Updated password
 
             // Modify the SQL statement to delete from the correct table
             String sql = "DELETE FROM " + table + " WHERE ID=?";

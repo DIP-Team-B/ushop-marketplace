@@ -18,7 +18,7 @@ public class UpdateItemServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "1201"); // Updated password
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "xxxx"); // Updated password
 
             // Modify the SQL statement to update the correct table
             String sql = "UPDATE " + table + " SET Name=?, Size=?, Price=?, Quantity=?, Image_URL=?, Description=? WHERE ID=?";

@@ -17,7 +17,7 @@ public class AddItemServlet extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "1201");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/ntushop", "root", "xxxx");
 
             String sql = "INSERT INTO " + table + " (Name, Size, Price, Quantity, Image_URL, Description) VALUES (?, ?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
