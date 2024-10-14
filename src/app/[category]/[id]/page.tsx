@@ -31,7 +31,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
       <div>
         <div className="h-screen">
           <Navbar />
-          <div className="flex flex-col gap-8 items-center justify-center h-full pb-32">
+          <div className="flex flex-col gap-8 items-center justify-center h-full pb-32 pt-32">
             <Image
               src="/images/page-not-found.svg"
               width="500"
@@ -58,7 +58,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto p-6 mb-20">
+      <div className="container mx-auto p-6 mb-20 py-32">
         {/* Header Section */}
         <div className="text-left py-9 pl-16 text-sm text-mainGrey">
           <Link href="./" className="underline hover:color-darkRed">

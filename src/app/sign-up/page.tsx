@@ -34,9 +34,9 @@ const Page = () => {
 
   return (
     <div>
-      <div className="w-full h-screen">
+      <div className="w-full h-screen z-10">
         <Navbar></Navbar>
-        <div className="flex flex-col items-center w-full py-40">
+        <div className="flex flex-col items-center w-full py-56">
           <div className="flex flex-col items-center gap-8 w-[500px]">
             <h1 className="font-bold text-3xl">Sign Up</h1>
             <form

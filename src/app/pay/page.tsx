@@ -64,9 +64,9 @@ function totalPrice(items: any) {
 const Page = () => {
   return (
     <div className="justify-center">
-      <div className="flex flex-col h-screen ">
-        <Navbar></Navbar>
-        <div className="flex w-full h-full items-center justify-center my-16 ">
+      <div className="flex flex-col h-screen z-10 pb-28"> // or min-h-screen
+        <Navbar/>
+        <div className="flex w-full h-full items-center justify-center my-16 relative z-10 top-[100px]">
           <div className="flex h-full bg-mainWhite rounded-2xl overflow-hidden border-[1px] border-gray-200 shadow-sm mx-36">
             {/* left side */}
             <div className=" justify-between min-w-[500px] h-full flex flex-col gap-4 overflow-hidden p-8 max-w-xl">

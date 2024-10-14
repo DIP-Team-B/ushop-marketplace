@@ -150,9 +150,9 @@ export default function Page({ searchParams }) {
   };
 
   return (
-    <div className="justify-center">
+    <div className="justify-center z-10">
       <Navbar id={id}/>
-      <div className="flex flex-col gap-5 w-full py-8 px-36 text-mainBlack">
+      <div className="flex flex-col gap-5 w-full py-8 px-36 text-mainBlack relative z-10 top-[150px]">
         <h1 className="text-2xl text-mainBlack font-bold">My purchase</h1>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">

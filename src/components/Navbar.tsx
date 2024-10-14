@@ -87,9 +87,9 @@ const Navbar = ({ id }: { id: string }) => {
   ];
 
   return (
-    <div className="flex flex-col gap-0">
+    <div className="flex flex-col gap-0 fixed z-50 w-[100%] top-0">
       {/* top navbar */}
-      <div className="flex px-16 py-3 justify-between items-center bg-beige z-10">
+      <div className="flex px-16 py-3 justify-between items-center bg-beige z-50">
         <Link href="./">
           <Image
             src={"/images/logo.png"}
@@ -109,7 +109,7 @@ const Navbar = ({ id }: { id: string }) => {
           </Button>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-6 z-50">
           {/* icon account */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -143,7 +143,7 @@ const Navbar = ({ id }: { id: string }) => {
                 </svg>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-36 bg-mainWhite mt-2 flex flex-col p-2 rounded-lg shadow-md">
+            <DropdownMenuContent className="w-36 bg-mainWhite mt-2 flex flex-col p-2 rounded-lg shadow-md z-[70]">
               {isLoggedIn ? (
                 <>
                   <Link
@@ -351,7 +351,7 @@ const Navbar = ({ id }: { id: string }) => {
       </div>
 
       {/* category navbar */}
-      <div className="flex py-2 justify-center items-center gap-3 shadow-md z-0">
+      <div className="flex py-2 justify-center items-center gap-3 shadow-md z-40 bg-white">
         <Link title="view all page" href="/all">
           <Button className="text-mainBlack" variant="ghost">
             View All
@@ -379,9 +379,9 @@ const Navbar = ({ id }: { id: string }) => {
         </Link>
       </div>
 
-      {/* Announcment that the price shown is promo fro student/staff */}
+      {/* Announcment that the price shown is promo for student/staff */}
       {isStudentStaff && !isBannerClosed && (
-        <div className="flex justify-between items-center bg-emerald-400 text-mainBlack py-2 px-6">
+        <div className="flex justify-between items-center bg-emerald-400 text-mainBlack py-2 px-6 z-40">
           <XIcon className="w-3 h-3 opacity-0"></XIcon>
           <p className="text-center text-xs">
             The price shown is promo for{" "}

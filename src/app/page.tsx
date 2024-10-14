@@ -28,10 +28,10 @@ export default function Home() {
   };
 
   return (
-    <div className="justify-center">
+    <div className="justify-center z-10">
       <Navbar />
       {/* screen size */}
-      <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center">
+      <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center relative z-10 top-[148px]">
         {/* promotion */}
         <PromoBanner></PromoBanner>
 
@@ -62,7 +62,7 @@ export default function Home() {
         </div>
 
         {/* show all items */}
-        <div className="flex flex-col gap-2 w-full items-center pt-6">
+        <div className="flex flex-col gap-2 w-full items-center pt-6 mb-[150px]">
           <p className="font-semibold text-xl text-mainBlack ">
             Find Your Style!
           </p>
@@ -82,10 +82,10 @@ export default function Home() {
           </div>
           {visibleProducts < products.length && (
             <div
-              className="flex items-center justify-center mb-6"
+              className="flex items-center justify-center"
               onClick={handleShowMore}
             >
-              <div className="flex w-16 h-16 items-center justify-center cursor-pointer">
+              <div className="flex w-16 h-16 items-center justify-center cursor-pointer m-8">
                 <ArrowDown className="text-mainBlack animate-bounce-slow"></ArrowDown>
                 <Image
                   src="/icons/circular-show-more.svg"

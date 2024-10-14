@@ -7,9 +7,9 @@ import Link from "next/link";
 export default function Page() {
 
   return (
-    <div className="justify-center">
+    <div className="justify-center z-10">
       <Navbar />
-      <div className="w-[1350px] px-40 gap-4 flex flex-col py-6">
+      <div className="w-[1350px] px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
         <div className="text-left text-sm text-mainGrey">
           <Link href="./" className="underline hover:color-darkRed">
             Home
@@ -25,7 +25,7 @@ export default function Page() {
       </div>
 
       <hr />
-      <div className="screen-size-wrapper w-[1350px] px-40 py-6 gap-2 grid grid-cols-4">
+      <div className="screen-size-wrapper w-[1350px] px-40 py-36 gap-2 grid grid-cols-4">
         {products.map((product) => (
           <ProductCards
             key={product.id}
