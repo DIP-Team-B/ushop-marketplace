@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, RotateCcw } from "lucide-react";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -45,52 +45,83 @@ const months = [
   "December",
 ];
 
-const invoices = [
-  {
-    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-    name: "Seasonal Tee - Black",
-    invoice: "N7UU5001",
-    category: "Tops",
-    id: "promo-seasonal-black",
-    date: "2024-01-01",
-    status: "Confirmed",
-    quantity: 1,
-    price: 10.99,
-  },
-  {
-    images: ["/images/seasonal-pink-1.png", "/images/seasonal-pink-2.png"],
-    name: "Seasonal Tee - Pink",
-    invoice: "N7UU5002",
-    category: "Tops",
-    id: "promo-seasonal-pink",
-    date: "2024-01-02",
-    status: "Pending",
-    quantity: 1,
-    price: 10.99,
-  },
-  {
-    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-    name: "Seasonal Tee - Black",
-    invoice: "N7UU5003",
-    category: "Tops",
-    id: "promo-seasonal-black",
-    date: "2024-02-01",
-    status: "Cancelled",
-    quantity: 1,
-    price: 10.99,
-  },
-];
+
+//const invoices = [
+//  {
+//    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
+//    name: "Seasonal Tee - Black",
+//    invoice: "N7UU5001",
+//    category: "Tops",
+//    id: "promo-seasonal-black",
+//    date: "2024-01-01",
+//    status: "Confirmed",
+//    quantity: 1,
+//    price: 10.99,
+//  },
+//  {
+//    images: ["/images/seasonal-pink-1.png", "/images/seasonal-pink-2.png"],
+//    name: "Seasonal Tee - Pink",
+//    invoice: "N7UU5002",
+//    category: "Tops",
+//    id: "promo-seasonal-pink",
+//    date: "2024-01-02",
+//    status: "Pending",
+//    quantity: 1,
+//    price: 10.99,
+//  },
+//  {
+//    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
+//    name: "Seasonal Tee - Black",
+//    invoice: "N7UU5003",
+//    category: "Tops",
+//    id: "promo-seasonal-black",
+//    date: "2024-02-01",
+//    status: "Cancelled",
+//    quantity: 1,
+//    price: 10.99,
+//  },
+//];
 
 const ITEMS_PER_PAGE = 8;
 
-const Page = () => {
+export default function Page({ searchParams }) {
+
+  const { id  } = searchParams;
+
   const [Month, setMonth] = useState("Month");
   const [Year, setYear] = useState("Year");
   const [currentPage, setCurrentPage] = useState(1);
   const [filterUp, setFilterUp] = useState(false);
+  const [invoicesData, setInvoices] = useState([]);
+
+  useEffect(() => {
+    // Fetching data from API endpoint
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/order_history`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+          }),
+        });
+        const data = await response.json();
+        console.log("Fetched Data:", data);
+        setInvoices(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  console.log("Data: ", invoicesData);
 
   // Filter and sort the invoices based on the selected month, year, and sorting order.
-  const filteredInvoices = invoices
+  const filteredInvoices = [...invoicesData]
     .filter((invoice) => {
       const invoiceDate = new Date(invoice.date);
       const selectedMonthIndex = months.indexOf(Month);
@@ -120,7 +151,7 @@ const Page = () => {
 
   return (
     <div className="justify-center">
-      <Navbar />
+      <Navbar id={id}/>
       <div className="flex flex-col gap-5 w-full py-8 px-36 text-mainBlack">
         <h1 className="text-2xl text-mainBlack font-bold">My purchase</h1>
         <div className="flex items-center justify-between">
@@ -202,7 +233,8 @@ const Page = () => {
                 <ArrowUpNarrowWide className="w-4 h-4" />
                 <span className="text-xs text-mainBlack">Oldest</span>
               </>
-            )}
+            )
+            }
           </Button>
         </div>
         <div className="p-5 rounded-2xl overflow-hidden border-[1px] border-gray-200 shadow-sm">
@@ -225,7 +257,7 @@ const Page = () => {
                         width={48}
                         height={48}
                         alt="image"
-                        src={invoice.images[0]}
+                        src={invoice.images}
                         className="object-cover aspect-square rounded-md"
                       />
                       <div className="flex flex-col gap-0">
@@ -240,7 +272,7 @@ const Page = () => {
                     </div>
                   </TableCell>
                   <TableCell className="font-light">
-                    {invoice.invoice}
+                    {invoice.invoice.slice(0,7)}
                   </TableCell>
                   <TableCell className="font-light">{invoice.date}</TableCell>
                   <TableCell
@@ -253,7 +285,7 @@ const Page = () => {
                     {invoice.status}
                   </TableCell>
                   <TableCell className="text-right font-light">
-                    ${invoice.quantity * invoice.price}
+                    ${roundToFixed(invoice.quantity * invoice.price, 2).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </TableCell>
                 </TableRow>
               ))}
@@ -302,6 +334,8 @@ const Page = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Page;
+function roundToFixed(num, decimals) {
+  return Number(num.toFixed(decimals));
+}

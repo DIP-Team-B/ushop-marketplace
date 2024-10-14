@@ -16,8 +16,36 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 export var globalIsBannerClosed: boolean;
 
-const Navbar = () => {
-  const wishlistCount = 0;
+const Navbar = ({ id }: { id: string }) => {
+  const [wishlistCount, setwishlistCount] = useState([]);
+  useEffect(() => {
+    // Fetching data from API endpoint
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/wishlist_length`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+          }),
+        });
+        const data = await response.json();
+        // Assuming data is in the format { success: true, count: 5 }
+        if (data.success) {
+          setwishlistCount(data.count); // Extracting the count from the response
+        } else {
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+  console.log(wishlistCount);
   const isStudentStaff = true;
   const isLoggedIn = true;
 
@@ -139,7 +167,7 @@ const Navbar = () => {
                     </DropdownMenuItem>
                   </Link>
                   <Link
-                    href="/history"
+                    href={`/history?id=${id}`}
                     className={`${buttonVariants({
                       variant: "ghost",
                     })} w-full `}
@@ -295,7 +323,7 @@ const Navbar = () => {
               )}
             </SheetContent>
           </Sheet>
-          <Link href="/wishlist">
+          <Link href={`/wishlist?id=${id}`}>
             <Button
               variant="special"
               className="flex gap-2 items-center px-[10px] rounded-full"
@@ -315,7 +343,7 @@ const Navbar = () => {
                 />
               </svg>
               <div className="text-sm font-medium text-mainBlack">
-                {wishlistCount}
+                {wishlistCount ?? 0}
               </div>
             </Button>
           </Link>
