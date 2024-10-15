@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <div className="justify-center z-10">
       <Navbar />
-      <div className="w-[1350px] px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
+      <div className="px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
         <div className="text-left text-sm text-mainGrey">
           <Link href="./" className="underline hover:color-darkRed">
             Home
@@ -25,8 +25,7 @@ export default function Page() {
       </div>
 
       <hr />
-      <div className="screen-size-wrapper w-[1350px] px-40 py-36 gap-2 grid grid-cols-4">
-        {products.map((product) => (
+      <div className="screen-size-wrapper w-full px-40 py-36 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:space-x-5">        {products.map((product) => (
           <ProductCards
             key={product.id}
             name={product.name}

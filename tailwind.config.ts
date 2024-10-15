@@ -15,10 +15,10 @@ const config: Config = {
   			bold: '700',
   			extrabold: '800'
   		},
-      animation: {
-        'spin-slow': 'spin 4s linear infinite',
-        'bounce-slow': 'bounce 1.5s infinite'
-      },
+  		animation: {
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
   		colors: {
   			mainBlack: '#000000',
   			mainGrey: '#626262',
@@ -104,10 +104,6 @@ const config: Config = {
   					height: '0'
   				}
   			}
-  		},
-  		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
   		}
   	}
   },
