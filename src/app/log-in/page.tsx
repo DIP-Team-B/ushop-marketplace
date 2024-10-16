@@ -1,5 +1,3 @@
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -8,9 +6,8 @@ import Link from "next/link";
 
 const Page = () => {
   return (
-    <div>
+    <>
       <div className="w-full h-screen z-10">
-        <Navbar/>
         <div className="flex flex-col items-center w-full py-56">
           <div className="flex flex-col items-center gap-8 w-[500px]">
             <h1 className="font-bold text-3xl">Log In as Guest</h1>
@@ -56,8 +53,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <Footer></Footer>
-    </div>
+    </>
   );
 };
 

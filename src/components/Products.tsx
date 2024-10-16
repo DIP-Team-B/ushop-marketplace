@@ -4,8 +4,6 @@ import ProductCards from "@/components/ProductCards";
 import Link from "next/link";
 import React, { useState } from "react";
 import Filter from "@/components/Filter";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 
 type Product = {
   id: number;
@@ -51,8 +49,7 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
   });
 
   return (
-    <div className="justify-center z-10">
-      <Navbar />
+    <>
       <div className="w-[1350px] px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
         {/* Breadcrumb */}
         <div className="text-left text-sm text-mainGrey">
@@ -90,13 +87,9 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
             ))}
         </div>
       </div>
-  
-      <Footer />
-    </div>
+    </>
 
   );
 }
 
 export default Products;
-
-

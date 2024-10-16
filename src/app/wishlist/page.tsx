@@ -1,5 +1,3 @@
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import Wishlist from "@/components/Wishlist";
 import { createConnection } from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
@@ -104,14 +102,12 @@ export default async function Page({ searchParams }) {
 
   const wishlistItems = await fetchWishlistItems(id);
   return (
-    <div className='justify-center z-10'>
-      <Navbar id={id}/>
+    <>
       <div className="container mx-auto p-6 pb-36 relative z-10 top-[100px]">
         <Wishlist title="Your Wishlist" products={wishlistItems} />
         <hr />
         
       </div>
-      <Footer />
-    </div>
+    </>
   );
 };

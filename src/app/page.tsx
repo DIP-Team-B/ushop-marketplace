@@ -1,7 +1,5 @@
 "use client";
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import HomepageCategoryCards from "@/components/HomepageCategoryCard";
 import PromoBanner from "@/components/PromoBanner";
 import PromoCardCarousel from "@/components/PromoCardCarousel";
@@ -28,8 +26,7 @@ export default function Home() {
   };
 
   return (
-    <div className="justify-center z-10">
-      <Navbar />
+    <>
       {/* screen size */}
       <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center relative z-10 top-[148px]">
         {/* promotion */}
@@ -99,7 +96,6 @@ export default function Home() {
           )}
         </div>
       </div>
-      <Footer />
-    </div>
+    </>
   );
 }
