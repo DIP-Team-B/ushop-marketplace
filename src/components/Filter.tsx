@@ -23,14 +23,16 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
   const [maxPrice, setMaxPrice] = useState(100)
 
   const handleSliderChange = (newValues: number[]) => {
-    setMaxPrice(newValues[0])
-    setSelectedPrice(newRange)
+    const newMaxPrice = newValues[0];
+    setMaxPrice(newMaxPrice);
+    setSelectedPrice([0, newMaxPrice]);
   }
 
   const handleInputChange = (value: string) => {
-    const newValue = parseInt(value, 10)
+    const newValue = parseInt(value, 10);
     if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
-      setMaxPrice(newValue)
+      setMaxPrice(newValue);
+      setSelectedPrice([0, newValue]); 
     }
   }
 
@@ -49,6 +51,8 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
   return (
     <div className="w-full lg:w-64 p-4">
       <Accordion type="multiple" className="space-y-4">
+
+        {/* Price Filter */}
         <AccordionItem value="price">
           <AccordionTrigger>Price</AccordionTrigger>
           <AccordionContent>
@@ -88,10 +92,8 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
                 Showing items priced $0 - ${maxPrice}
               </p>
             </div>
-       </AccordionContent>
-     </AccordionItem>
-
-
+        </AccordionContent>
+        </AccordionItem>
 
         {/* Size Filter */}
         <AccordionItem value="size">
