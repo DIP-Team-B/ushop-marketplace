@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import { products } from "../../productsData"; 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   CarouselContent,
   CarouselItem
 } from "@/components/ui/carousel";
+import ProductCards from "@/components/ProductCards";
 
 type ProductPageProps = {
   params: { category: string; id: string };
@@ -207,28 +208,24 @@ const ProductPage = ({ params }: ProductPageProps) => {
         </div>
 
         {/* Related Products Section */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-6">Related Products</h2>
-
-          {/* Add a carousel or grid of related products */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products
-              .filter(
-                (p) => p.category === product.category && p.id !== product.id
-              )
-              .map((relatedProduct) => (
-                <div key={relatedProduct.id} className="card">
-                  <img
-                    src={relatedProduct.images[0]}
-                    alt={relatedProduct.name}
-                  />                  
-                  <h3>{relatedProduct.name}</h3>
-                </div>
-              ))}
-          </div>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* {products.slice(0, relatedProduct).map((product) => ( */}
+          {products
+            .filter(
+              (p) => p.category === product.category && p.id !== product.id
+            )
+            .map((relatedProduct) => (
+            <ProductCards
+              key={relatedProduct.id}
+              name={relatedProduct.name}
+              id={relatedProduct.id}
+              images={relatedProduct.images}
+              price={relatedProduct.price}
+              disc={relatedProduct.disc}
+              category={relatedProduct.category}
+            />
+          ))}
         </div>
-
- 
       </div>
     </>
   );
