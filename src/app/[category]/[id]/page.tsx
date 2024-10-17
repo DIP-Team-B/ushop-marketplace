@@ -25,6 +25,8 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoveIconClicked, setLoveIconClicked] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(""); 
+  const [selectedColour, setSelectedColour] = useState("");
 
   // Find the product by ID
   const product = products.find(
@@ -82,11 +84,6 @@ const ProductPage = ({ params }: ProductPageProps) => {
         <div className="flex flex-col lg:flex-row mb-6">
           {/* Product Image */}
           <div className="w-full lg:w-3/5">
-            {/* <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-96 object-cover"
-            /> */}
             <Carousel className="w-full max-w-4xl">
               <div className="flex space-x-4">
                 {/* Carousel Thumbnails */}
@@ -181,27 +178,63 @@ const ProductPage = ({ params }: ProductPageProps) => {
                 {product.description}
               </p>
             </div>
-
+            
             {/* Stock left, Size, Colours, Like Button */}
-            <div className="mt-2">
+            <div className="mt-4">
               <strong>Available Sizes:</strong>
-              {product.sizes.map((size, index) => (
-                <span key={index} className="ml-2">
-                  {size}
-                </span>
-              ))}
+              <div className="flex space-x-2 mt-1">
+                {product.sizes.map((size, index) => (
+                  <Button
+                    variant="selection"
+                    key={index}
+                    className={`text-black ${
+                      selectedSize === size ? "bg-darkGrey text-black" : "bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedSize(size)} // Handles size selection
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Selected Size: {selectedSize}
+              </p>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-4">
               <strong>Available Colours:</strong>
-              {product.colours.map((colour, index) => (
-                <span key={index} className="ml-2">
-                  {colour}
-                </span>
-              ))}
+              {/* <div className="flex space-x-2 mt-1">
+                {product.colours.map((colour, index) => (
+                  <Button
+                    variant="selection"
+                    key={index}
+                    className={`text-black ${
+                      selectedColour === colour ? "bg-darkGrey text-black" : "bg-gray-200"
+                    }`}
+                    onClick={() => setSelectedColour(colour)} 
+                    value={selectedColour}
+                  >
+                    {colour}
+                  </Button> */}
+                  <div className="flex space-x-2 mt-1">
+                    {product.colours.map((colour, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedColour(colour)}
+                        className={`w-8 h-8 rounded-full border border-gray-300 transition ${
+                          selectedColour === colour ? "ring-2 ring-offset-2 ring-gray-500" : ""
+                        }`}
+                        style={{ backgroundColor: colour.toLowerCase() }} 
+                        aria-label={colour} 
+                      />
+                ))}
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Selected Colour: {selectedColour}
+              </p>
             </div>
 
-            <div className="mt-2">
+            <div className="mt-4">
               <p className="text-md font-bold mb-2 text-darkRed">
                 Stock: {product.stock}
               </p>
@@ -219,7 +252,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
             {/* size chart */}
             <div className="mt-4">
-              <Accordion type="single" className="space-y-4">
+              <Accordion type="single" collapsible className="space-y-4">
                 <AccordionItem value="sizechart">
                   <AccordionTrigger><span className="font-bold text-base">Size Chart</span></AccordionTrigger>
                   <AccordionContent>
