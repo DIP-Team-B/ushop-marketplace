@@ -6,6 +6,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "./
 import { useState, useEffect } from "react";
 import { Slider } from "./ui/slider";
 import { Checkbox } from "./ui/checkbox";
+import { Button } from "./ui/button";
 
 type FilterState = {
   price: [number, number];
@@ -101,7 +102,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
           <AccordionTrigger>Size</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col space-y-2">
-              {["XS", "S", "M", "L", "XL"].map((size) => (
+              {["XS", "S", "M", "L", "XL", "One Size"].map((size) => (
                 <label key={size}>
                 <Checkbox
                   checked={selectedSize.includes(size)}
@@ -143,16 +144,17 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
         </AccordionItem>
 
         {/* Clear Filter Button */}
-        <button
-          className="mt-4 p-2 border-black bg-beige text-black rounded-md"
+        <Button 
+          className="mt-10 bg-beige"
+          variant="outline"
           onClick={() => {
             setSelectedPrice([0, 100]);
-            setSelectedSize(["XS", "S", "M", "L", "XL"]);
+            setSelectedSize(["XS", "S", "M", "L", "XL", "One Size"]);
             setSelectedColor(["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
           }}
         >
-          Clear Filters
-        </button>
+          Clear Filter
+        </Button>
       </Accordion>
     </div>
   );
