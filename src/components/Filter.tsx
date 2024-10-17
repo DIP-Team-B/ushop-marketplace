@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "./ui/accordion";
 import { useState, useEffect } from "react";
 import { Slider } from "./ui/slider";
+import { Checkbox } from "./ui/checkbox";
 
 type FilterState = {
   price: [number, number];
@@ -102,20 +103,17 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
             <div className="flex flex-col space-y-2">
               {["XS", "S", "M", "L", "XL"].map((size) => (
                 <label key={size}>
-                  <input
-                    type="checkbox"
-                    name="size"
-                    value={size}
-                    checked={selectedSize.includes(size)}
-                    onChange={() => {
-                      const newSizeSelection = selectedSize.includes(size)
-                        ? selectedSize.filter((s) => s !== size)
-                        : [...selectedSize, size];
-                      setSelectedSize(newSizeSelection);
-                    }}
-                  />{" "}
-                  {size}
-                </label>
+                <Checkbox
+                  checked={selectedSize.includes(size)}
+                  onCheckedChange={() => {
+                    const newSizeSelection = selectedSize.includes(size)
+                    ? selectedSize.filter((s) => s !== size)
+                      : [...selectedSize, size];
+                    setSelectedSize(newSizeSelection);
+                  }}
+                />{" "}
+                {size}
+              </label>
               ))}
             </div>
           </AccordionContent>
@@ -127,22 +125,19 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
           <AccordionContent>
             <div className="flex flex-col space-y-2">
               {["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"].map((color) => (
-                <label key={color}>
-                  <input
-                    type="checkbox"
-                    name="color"
-                    value={color}
-                    checked={selectedColor.includes(color)}
-                    onChange={() => {
-                      const newColorSelection = selectedColor.includes(color)
-                        ? selectedColor.filter((c) => c !== color)
-                        : [...selectedColor, color];
-                      setSelectedColor(newColorSelection);
-                    }}
-                  />{" "}
-                  {color}
-                </label>
-              ))}
+              <label key={color}>
+                <Checkbox
+                  checked={selectedColor.includes(color)}
+                  onCheckedChange={() => {
+                    const newColorSelection = selectedColor.includes(color)
+                      ? selectedColor.filter((c) => c !== color)
+                      : [...selectedColor, color];
+                    setSelectedColor(newColorSelection);
+                  }}
+                />{" "}
+                {color}
+              </label>
+            ))}
             </div>
           </AccordionContent>
         </AccordionItem>

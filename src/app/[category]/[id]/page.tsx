@@ -126,12 +126,23 @@ const ProductPage = ({ params }: ProductPageProps) => {
           {/* Product Info */}
           <div className="w-full lg:w-2/5 lg:pl-10">
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-            <p className="text-lg mb-4 font-semibold text-gray-700">
-              ${product.price.toFixed(2)}
-            </p>
+            <div className="mb-4 font-semibold">
+              <p
+                className={`${
+                  product.disc === "0%" ? "text-mainBlack" : "text-primaryRed-600"
+                } font-semibold text-md`}
+              >
+                ${product.price.toFixed(2)}
+              </p>
+              {product.disc === "0%" ? null : (
+                <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
+                  -{product.disc}
+                </div>
+              )}
+            </div>
 
             {/* add to cart button */}
-            <Button className="h-[26px] flex rounded-full" variant="outline">
+            <Button className="h-[35px] flex rounded-full" variant="outline">
               <svg
                 width="16"
                 height="16"
@@ -162,7 +173,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             </Button>
 
             {/* Product Description */}
-            <div className="mt-6">
+            <div className="mt-4">
               <h2 className="text-xl font-bold mb-2">Product Description</h2>
               <p className="text-gray-600">
                 {/* Add dynamic description or other info based on the product */}
@@ -203,6 +214,38 @@ const ProductPage = ({ params }: ProductPageProps) => {
                 }`}
                 onClick={() => setLoveIconClicked(!isLoveIconClicked)}
               ></Heart>
+            </div>
+
+            {/* size chart */}
+            <div className="mt-10">
+              {/* <img 
+                src="/images/sizechart.png"
+                alt={`Size Chart`}
+                className="h-full w-full"
+              /> */}
+              <h2>Size Chart</h2>
+              <table>
+                <tr>
+                    <th>Size</th>
+                    <th>Chest</th>
+                    <th>Body Length</th>
+                </tr>
+                <tr>
+                    <td>XS</td>
+                    <td>19</td>
+                    <td>Male</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>19</td>
+                    <td>Female</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>25</td>
+                    <td>Male</td>
+                </tr>
+            </table>
             </div>
           </div>
         </div>
