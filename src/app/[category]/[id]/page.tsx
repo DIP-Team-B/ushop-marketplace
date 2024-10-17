@@ -13,6 +13,7 @@ import {
   CarouselItem
 } from "@/components/ui/carousel";
 import ProductCards from "@/components/ProductCards";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 type ProductPageProps = {
   params: { category: string; id: string };
@@ -217,35 +218,61 @@ const ProductPage = ({ params }: ProductPageProps) => {
             </div>
 
             {/* size chart */}
-            <div className="mt-10">
-              {/* <img 
-                src="/images/sizechart.png"
-                alt={`Size Chart`}
-                className="h-full w-full"
-              /> */}
-              <h2>Size Chart</h2>
-              <table>
-                <tr>
-                    <th>Size</th>
-                    <th>Chest</th>
-                    <th>Body Length</th>
-                </tr>
-                <tr>
-                    <td>XS</td>
-                    <td>19</td>
-                    <td>Male</td>
-                </tr>
-                <tr>
-                    <td>S</td>
-                    <td>19</td>
-                    <td>Female</td>
-                </tr>
-                <tr>
-                    <td>M</td>
-                    <td>25</td>
-                    <td>Male</td>
-                </tr>
-            </table>
+            <div className="mt-4">
+              <Accordion type="single" className="space-y-4">
+                <AccordionItem value="sizechart">
+                  <AccordionTrigger><span className="font-bold text-base">Size Chart</span></AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col space-y-2">
+                      <table className="border-solid border-1 border-black p-1 text-center">
+                        <tr className="border-solid border-b-2 border-black">
+                          <th>Size</th>
+                          <th>Chest <span className="text-xs italic text-darkRed">(INCH)</span></th>
+                          <th>Body Length <span className="text-xs italic text-darkRed">(INCH)</span></th>
+                          <th>Shoulder to Shoulder <span className="text-xs italic text-darkRed">(INCH)</span></th>
+                          <th>Sleeves Length <span className="text-xs italic text-darkRed">(INCH)</span></th>
+                        </tr>
+                        <tr className="border-b-2">
+                          <td>XS</td>
+                          <td>17"</td>
+                          <td>24"</td>
+                          <td>15"</td>
+                          <td>6.5"</td>
+                        </tr>
+                        <tr className="border-b-2">
+                          <td>S</td>
+                          <td>18"</td>
+                          <td>25"</td>
+                          <td>16"</td>
+                          <td>7"</td>
+                        </tr>
+                        <tr className="border-b-2">
+                          <td>M</td>
+                          <td>20"</td>
+                          <td>27"</td>
+                          <td>18"</td>
+                          <td>8"</td>
+                        </tr>
+                        <tr className="border-b-2">
+                          <td>L</td>
+                          <td>21"</td>
+                          <td>28"</td>
+                          <td>19"</td>
+                          <td>8.5"</td>
+                        </tr>
+                        <tr>
+                          <td>XL</td>
+                          <td>23"</td>
+                          <td>30"</td>
+                          <td>21"</td>
+                          <td>9.5"</td>
+                        </tr>
+                    </table>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              
             </div>
           </div>
         </div>
