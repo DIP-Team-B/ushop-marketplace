@@ -206,14 +206,12 @@ const Page = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-
-    // Create new product object
+  
     const newProduct = {
-      id: newProducts.length + 1, // Increment the id
       name: productName,
-      price: parseFloat(price), // Convert price to a number
+      price: parseFloat(price),
       category: category,
       stock: counter,
       sizes: sizes,
@@ -221,34 +219,38 @@ const Page = () => {
       description: description,
       promo: isPromo,
       disc: isPromo ? disc : "0%",
-      images: [
-        image1
-          ? URL.createObjectURL(image1)
-          : "/placeholder.svg?height=200&width=300",
-        image2
-          ? URL.createObjectURL(image2)
-          : "/placeholder.svg?height=200&width=300",
-        image3
-          ? URL.createObjectURL(image3)
-          : "/placeholder.svg?height=200&width=300",
-      ], // Use URL.createObjectURL to generate a preview
     };
-
-    // Append new product to the products array
-    setNewProducts([...newProducts, newProduct]);
-
-    // Optionally clear form fields after submission
-    setProductName("");
-    setPrice("");
-    setCategory("");
-    setCounter(10);
-    setDescription("");
-    setSizes([]);
-    setPromo(false);
-    setDisc("");
-    setImage1(null);
-    setImage2(null);
-    setImage3(null);
+  
+    try {
+      const response = await fetch('/api/add_item', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProduct),
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        alert("Product added successfully!");
+        // Optionally clear form fields after successful submission
+        setProductName("");
+        setPrice("");
+        setCategory("");
+        setCounter(10);
+        setDescription("");
+        setSizes([]);
+        setPromo(false);
+        setDisc("");
+        setImage1(null);
+        setImage2(null);
+        setImage3(null);
+      } else {
+        alert("Failed to add product: " + result.error);
+      }
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    }
   };
 
   return (
