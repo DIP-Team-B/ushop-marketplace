@@ -105,7 +105,7 @@ export default async function Page({ searchParams }) {
   const wishlistItems = await fetchWishlistItems(id);
   return (
     <div className='justify-center'>
-      <Navbar/>
+      <Navbar id={id}/>
       <div className="container mx-auto p-6">
         <Wishlist title="Your Wishlist" products={wishlistItems} />
         <hr />
