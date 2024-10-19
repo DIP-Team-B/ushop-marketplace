@@ -1,5 +1,4 @@
 "use client";
-
 // Ghost
 import { SearchIcon, Trash, XIcon } from "lucide-react";
 import { Button, buttonVariants } from "./ui/button";
@@ -13,6 +12,7 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { useRouter } from 'next/navigation';
 
 export var globalIsBannerClosed: boolean;
 
@@ -85,6 +85,26 @@ const Navbar = ({ id }: { id: string }) => {
       disc: "5%",
     },
   ];
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'GET',
+      });
+
+      if (response.ok) {
+        console.log("Logged out successfully");
+        router.push('/log-in');  // Redirect to login page after logout
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
 
   return (
     <div className="flex flex-col gap-0 fixed z-50 w-[100%] top-0">
