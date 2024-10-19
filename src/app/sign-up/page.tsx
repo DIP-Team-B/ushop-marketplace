@@ -17,9 +17,12 @@ import {
 import { createConnection } from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
 import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
+import { useState } from "react";
 
 const Page = () => {
 
+  const [errorMessage, setErrorMessage] = useState(''); 
   const router = useRouter();
   const {
     register,
@@ -69,11 +72,12 @@ const Page = () => {
       if(data.success == true)
         {
           console.log("Registration successful", data);
-          router.push("/"); 
+          router.push("/log-in"); 
+          setErrorMessage(''); 
         }
         else{
           console.log("Registration unsuccessful", data);
-          alert("Email has been taken.");
+          setErrorMessage("NOTE: Email has been taken.");
         }
     } else {
       console.error("Error registering user", data);
@@ -90,36 +94,39 @@ const Page = () => {
   return (
     <div>
       <div className="w-full h-screen">
-        <Navbar></Navbar>
+        <Header></Header>
         <div className="flex flex-col items-center w-full py-40">
           <div className="flex flex-col items-center gap-8 w-[500px]">
-            <h1 className="font-bold text-3xl">Sign Up</h1>
+            <h1 className="font-bold text-3xl text-black">Sign Up</h1>
             <form
               className="grid gap-6 w-full"
               onSubmit={handleSubmit(onSubmit)}
             >
               <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-black font-bold">Email</Label>
                 <Input
                   {...register("email")}
                   placeholder="you@example.com"
                   className={cn(
                     { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
+                    "w-full h-10 text-black"
                   )}
                 ></Input>
                 {errors.email && (
                   <p className="text-red-500 text-sm">{errors.email.message}</p>
                 )}
+                 {errorMessage && (
+                  <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+                )}
               </div>
               <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-black font-bold">Password</Label>
                 <Input
                   {...register("password")}
                   placeholder="Password"
                   className={cn(
                     { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
+                    "w-full h-10 text-black"
                   )}
                 ></Input>
                 {errors.password && (
@@ -127,13 +134,13 @@ const Page = () => {
                 )}
               </div>
               <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="password2">Confirm Password</Label>
+                <Label htmlFor="password2" className="text-black font-bold">Confirm Password</Label>
                 <Input
                   {...register("password2")}
                   placeholder="Password"
                   className={cn(
                     { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
+                    "w-full h-10 text-black"
                   )}
                 ></Input>
                 {errors.password2 && (

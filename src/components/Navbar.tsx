@@ -1,13 +1,35 @@
+"use client";
 // Ghost
 import { SearchIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
   const cartCount = 0;
   const wishlistCount = 0;
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'GET',
+      });
+
+      if (response.ok) {
+        console.log("Logged out successfully");
+        router.push('/log-in');  // Redirect to login page after logout
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
 
   return (
     <div className="flex flex-col gap-0">
@@ -54,6 +76,17 @@ const Navbar = () => {
               />
             </svg>
           </Button>
+
+          <nav>
+      <ul>
+        <li>
+          <button onClick={handleLogout} className="text-black font-bold">
+            Logout
+          </button>
+        </li>
+      </ul>
+    </nav>
+
           <Button
             variant="special"
             className="flex gap-2 items-center px-[10px] rounded-full"

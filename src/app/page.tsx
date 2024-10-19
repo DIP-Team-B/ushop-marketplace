@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import jwtDecode from "jwt-decode";  // Use default import for jwt-decode
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import HomepageCategoryCards from "@/components/HomepageCategoryCard";
@@ -7,6 +10,32 @@ import PromoBanner from "@/components/PromoBanner";
 import PromoCardCarousel from "@/components/PromoCardCarousel";
 
 export default function Home() {
+  const [email, setUserEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [role, setUserRole] = useState("");
+  const [id, setUserId] = useState("");
+  
+
+
+  // Function to retrieve the username from the JWT token stored in the cookie
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await fetch('/api/session');  // Call the API route to get user data
+      const data = await response.json();
+
+      if (data.success) {
+        setUserEmail(data.user.email)
+        setUsername(data.user.username);  // Set the username from the response
+        setUserRole(data.user.role);
+        setUserId(data.user.id);
+       ;
+
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   const categoryItems = [
     { title: "Tops", id: "tops" },
     { title: "Bottoms", id: "bottoms" },
@@ -14,24 +43,35 @@ export default function Home() {
     { title: "Others", id: "others" },
   ];
 
+  console.log("welcome, s" + username );
   return (
     <div className="justify-center">
-      <Navbar />
+      <Navbar/> {/* Pass the username to the Navbar */}
+
+        {/* Welcome message */}
+        <div className="welcome-message py-6 text-center">
+        {username ? (
+          <h1 className="text-2xl font-bold text-black">
+            Welcome back, {username}!
+          </h1>
+        ) : (
+          <h1 className="text-2xl font-bold text-black">
+            Welcome to Our Shop!
+          </h1>
+        )}
+      </div>
+
       {/* screen size */}
       <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center">
         {/* promotion */}
-        <PromoBanner></PromoBanner>
+        <PromoBanner />
 
         {/* category cards */}
         <div className="flex flex-col gap-2 w-full items-center pt-6">
           <p className="font-semibold text-xl text-mainBlack">#ShopByMood</p>
           <div className="flex flex-col lg:flex-row p-4 gap-4 bg-secondBG w-full rounded-md items-center">
             {categoryItems.map((item) => (
-              <HomepageCategoryCards
-                key={item.id}
-                title={item.title}
-                id={item.id}
-              />
+              <HomepageCategoryCards key={item.id} title={item.title} id={item.id} />
             ))}
           </div>
         </div>
@@ -42,10 +82,10 @@ export default function Home() {
             <p className="animate-bounce mr-1 font-semibold text-xl text-mainBlack">
               🔥
             </p>
-            <p className="font-semibold text-xl text-mainBlack ">SuperDealz</p>
+            <p className="font-semibold text-xl text-mainBlack">SuperDealz</p>
           </div>
 
-          <PromoCardCarousel></PromoCardCarousel>
+          <PromoCardCarousel />
         </div>
       </div>
       <Footer />

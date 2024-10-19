@@ -1,7 +1,7 @@
 "use client";
 
 import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Header from "@/components/Header";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ const Page = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); 
   const router = useRouter();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,11 +41,12 @@ const Page = () => {
           if(data.success == true)
           {
             console.log("Login successful", data);
+            setErrorMessage(''); 
             router.push("/"); 
           }
           else{
             console.log("Login unsuccessful", data);
-            alert("Invalid email or password.");
+            setErrorMessage("NOTE: Invalid email or password.");
           }
         } else {
           console.error("Login failed", data.message);
@@ -61,44 +63,48 @@ const Page = () => {
   return (
     <div>
       <div className="w-full h-screen">
-        <Navbar></Navbar>
+        <Header></Header>
         <div className="flex flex-col items-center w-full py-40">
           <div className="flex flex-col items-center gap-8 w-[500px]">
-            <h1 className="font-bold text-3xl">Log In as Guest</h1>
+            <h1 className="font-bold text-3xl text-black">Log In</h1>
             <form className="grid gap-6 w-full" onSubmit={onSubmit}>
               <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-black font-bold">Email</Label>
                 <Input
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className={cn(
                     { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
+                    "w-full h-10 text-black"
                   )}
                 ></Input>
+
               </div>
               <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-black font-bold">Password</Label>
                 <Input
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Your password"
                   className={cn(
                     { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
+                    "w-full h-10 text-black"
                   )}
                 ></Input>
               </div>
+              {errorMessage && (
+                  <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+                )}
               <Button type="submit" className="w-full h-10" >Log In</Button>
             </form>
             
             <div className="flex gap-3 w-full items-center">
               <div className="bg-mainBlack h-[1px] w-full"></div>
-              <p className="font-bold text-md">or</p>
+              <p className="font-bold text-md text-black">or</p>
               <div className="bg-mainBlack h-[1px] w-full"></div>
             </div>
-            <Link href="/log-in-member" className="w-full h-10">
-              <Button className="w-full h-10" variant="outline">
-                Continue as Student/Staff
+            <Link href="/" className="w-full h-10">
+              <Button className="w-full h-10 text-black" variant="outline">
+                Continue as Guest
               </Button>
             </Link>
             <Link
