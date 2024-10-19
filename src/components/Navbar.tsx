@@ -42,7 +42,7 @@ const Navbar = () => {
                 strokeOpacity="0.87"
                 strokeWidth="2"
                 strokeLinecap="round"
-                stroke-linejoin="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M8.99988 9C6.78988 9 4.99988 7.21 4.99988 5C4.99988 2.79 6.78988 1 8.99988 1C11.2099 1 12.9999 2.79 12.9999 5C12.9999 7.21 11.2099 9 8.99988 9Z"
@@ -50,7 +50,7 @@ const Navbar = () => {
                 strokeOpacity="0.87"
                 strokeWidth="2"
                 strokeLinecap="round"
-                stroke-linejoin="round"
+                strokeLinejoin="round"
               />
             </svg>
           </Button>
@@ -71,7 +71,7 @@ const Navbar = () => {
                 stroke="black"
                 strokeOpacity="0.87"
                 strokeWidth="2"
-                stroke-linejoin="round"
+                strokeLinejoin="round"
               />
               <path
                 d="M4 5L3.19 1.757C3.13583 1.54075 3.01095 1.34881 2.83521 1.21166C2.65946 1.0745 2.44293 1.00001 2.22 1H1M7 19H9M15 19H17"
@@ -79,7 +79,7 @@ const Navbar = () => {
                 strokeOpacity="0.87"
                 strokeWidth="2"
                 strokeLinecap="round"
-                stroke-linejoin="round"
+                strokeLinejoin="round"
               />
             </svg>
             <div className="text-sm font-medium">{cartCount}</div>

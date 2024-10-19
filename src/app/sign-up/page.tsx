@@ -14,8 +14,13 @@ import {
   AuthCredentialsValidator,
   TAuthCredentialsValidator,
 } from "@/lib/validators/account-credentials-validator";
+import { createConnection } from '@/lib/db';
+import { RowDataPacket } from 'mysql2';
+import { useRouter } from "next/navigation";
 
 const Page = () => {
+
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -24,12 +29,62 @@ const Page = () => {
     resolver: zodResolver(AuthCredentialsValidator),
   });
 
-  const onSubmit = ({
+  const onSubmit = async({
     email,
     password,
     password2,
   }: TAuthCredentialsValidator) => {
+    alert("Form submitted!");
+    console.log(email+" "+password+" "+email.split('@')[1]);
     console.log("submitted");
+    const username = email.split('@')[0];
+    const formattedUsername = username.charAt(0).toUpperCase() + username.slice(1).toLowerCase();
+    let role;
+
+    if(email.split('@')[1] == 'e.ntu.edu.sg'){
+      role = 'Student'}
+     else if(email.split('@')[1] == 'ntu.edu.sg'){
+      role = 'Staff'}
+      else{
+      role = 'Normal'}
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          formattedUsername,
+          password,
+          role,
+        }),
+      });
+
+      const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    const data = await response.json();
+    if (response.ok) {
+      if(data.success == true)
+        {
+          console.log("Registration successful", data);
+          router.push("/"); 
+        }
+        else{
+          console.log("Registration unsuccessful", data);
+          alert("Email has been taken.");
+        }
+    } else {
+      console.error("Error registering user", data);
+    }
+  } else {
+    const text = await response.text();
+    console.error("Unexpected response format", text);
+  }
+} catch (error) {
+  console.error("Error submitting form", error);
+}
   };
 
   return (
