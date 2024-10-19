@@ -1,7 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button";
+"use client";
+
+import ProductCards from "@/components/ProductCards";
 import Link from "next/link";
-import { Heart } from "lucide-react"
+import React, { useState } from "react";
+import Filter from "@/components/Filter";
 
 type Product = {
   id: number;
@@ -23,60 +25,70 @@ type ProductsProps = {
 
 const Products: React.FC<ProductsProps> = ({ title, products }) => {
 
-  return (
-    <div className="justify-center">
-      <div className="text-left py-9 pl-16 text-sm text-mainGrey">
-        <Link href="./" className="underline hover:color-darkRed">Home</Link> 
-        &nbsp;&nbsp;
-        &gt; 
-        &nbsp;&nbsp;
-        <Link href="" className="underline hover:color-darkRed">{title}</Link> 
-      </div>
-      <div className="text-left pb-9 pl-16 text-5xl font-bold text-darkRed">{title}</div>
-      <hr />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 m-10">
-        {products.map((product) => (
-          <Card key={product.id} className="overflow-hidden w-80">
-            <Link href={`/${product.category?.toLowerCase()}/${product.id}`}>
-            
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-80 object-cover cursor-pointer"
-              />
-              
-              <CardContent className="p-4">
-                {/* row 1 */}
-                <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
+  const [filters, setFilters] = useState({
+    price: [0, 100],
+    size: ["XS", "S", "M", "L", "XL"],
+    color: ["Black", "Red", "Blue", "Green", "Yellow"],
+  });
 
-                {/* row 2 */}
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                  <Button variant="destructive" size="sm">
-                    Add to Cart
-                  </Button>
-                </div>
-                
-                {/* row 3 */}
-                <div className="flex justify-between items-center mt-2">
-                  <p className="text-sm text-darkRed">
-                    Stock left: {product.stock}
-                  </p>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="bg-white bg-opacity-50 hover:bg-opacity-75 transition-colors"
-                    aria-label={product.liked ? "Unlike" : "Like"}
-                  >
-                    <Heart className={`w-5 h-5 ${product.liked ? "text-red-500 fill-current" : "text-gray-600"}`} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Link>
-          </Card>
-        ))}
+  const handleFilterChange = (newFilters: { price: [number, number]; size: string[]; color: string[] }) => {
+    setFilters(newFilters);
+  };
+
+  const filteredProducts = products.filter((product) => {
+    // Apply Price Filter
+    const matchesPrice = product.price >= filters.price[0] && product.price <= filters.price[1];
+
+    // Apply Size Filter
+    const matchesSize = filters.size.length ? filters.size.some((size) => product.sizes.includes(size)) : true;
+
+    // Apply Color Filter
+    const matchesColor = filters.color.length ? filters.color.some((color) => product.colours.includes(color)) : true;
+
+    return matchesPrice && matchesSize && matchesColor && product.category;
+  });
+
+  return (
+    <>
+      <div className="w-[1350px] px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
+        {/* Breadcrumb */}
+        <div className="text-left text-sm text-mainGrey">
+          <Link href="./" className="underline hover:color-darkRed">
+            Home
+          </Link>
+          &nbsp;&nbsp; &gt; &nbsp;&nbsp;
+          <Link href="" className="underline hover:color-darkRed">
+            {title}
+          </Link>
+        </div>
+        <div className="text-left text-5xl font-bold text-darkRed">{title}</div>
       </div>
-    </div>
+  
+      <hr />
+  
+      <div className="w-80% px-40 py-36 flex">
+        {/* Filter */}
+        <div className="w-1/4 pr-8 ">
+          <Filter onFilterChange={handleFilterChange} />
+        </div>
+  
+        {/* Product Listings */}
+        <div className="w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:space-x-5">
+            {filteredProducts.map((product) => (
+              <ProductCards
+                key={product.id}
+                name={product.name}
+                id={product.id}
+                images={product.images}
+                price={product.price}
+                disc={product.disc}
+                category={product.category}
+              />
+            ))}
+        </div>
+      </div>
+    </>
+
   );
 }
 

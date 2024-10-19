@@ -28,6 +28,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
 
   return (
     <div className="relative ">
+      {/* heart */}
       <div className="w-7 h-7 rounded-full flex items-center justify-center bg-mainWhite bg-opacity-65 absolute top-4 right-4 z-20">
         <Heart
           className={`w-5 h-5 ${
@@ -36,6 +37,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
           onClick={() => setLoveIconClicked(!isLoveIconClicked)}
         ></Heart>
       </div>
+      
       <Link
         className="w-full  overflow-hidden block p-2 pb-4 rounded-sm hover:shadow-md z-10"
         href={`/${category?.toLowerCase()}/${id}`}
@@ -93,6 +95,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
                 </div>
               )}
             </div>
+
             {/* add to cart button */}
             <Button className="h-[26px] flex rounded-full" variant="outline">
               <svg

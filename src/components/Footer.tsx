@@ -43,8 +43,8 @@ const Footer = () => (
 
         {/* Below footer */}
         <div className='md:container-xl md:mx-auto bg-darkRed absolute text-mainWhite inset-x-0 bottom-0 w-full text-center pb-1'>
-            <span className='font-semibold text-[8px] md:text-xs tracking-wide'>©UShop 2024 </span>
-            <span className='font-semibold text-[8px] md:text-xs tracking-wide'>Company Registration No.: afkafj</span>
+            <span className='font-semibold text-[8px] md:text-xs tracking-wide'>©UShop 2024, </span>
+            <span className='font-semibold text-[8px] md:text-xs tracking-wide'>All rights reserved.</span>
         </div>
     </div>
 )

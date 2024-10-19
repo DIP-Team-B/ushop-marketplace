@@ -1,7 +1,5 @@
 "use client";
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ArrowLeft, Container, Lock, Trash, Truck, XIcon } from "lucide-react";
@@ -64,9 +62,8 @@ function totalPrice(items: any) {
 const Page = () => {
   return (
     <div className="justify-center">
-      <div className="flex flex-col h-screen ">
-        <Navbar></Navbar>
-        <div className="flex w-full h-full items-center justify-center my-16 ">
+      <div className="flex flex-col h-screen z-10 pb-28"> // or min-h-screen
+        <div className="flex w-full h-full items-center justify-center my-16 relative z-10 top-[100px]">
           <div className="flex h-full bg-mainWhite rounded-2xl overflow-hidden border-[1px] border-gray-200 shadow-sm mx-36">
             {/* left side */}
             <div className=" justify-between min-w-[500px] h-full flex flex-col gap-4 overflow-hidden p-8 max-w-xl">
@@ -174,7 +171,6 @@ const Page = () => {
           </div>
         </div>
       </div>
-      <Footer></Footer>
     </div>
   );
 };
