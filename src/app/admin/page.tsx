@@ -112,34 +112,33 @@ const Page = () => {
   const [isPromo, setPromo] = useState(false);
 
   // Fetch orders from the API
-// Fetch orders from the API
-useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch('/api/check_order');
-      const result = await response.json();
-      if (result.success) {
-        console.log("Fetched invoices:", result.data); // Log the fetched data
-        // Map the fetched data to the Invoice interface
-        const formattedInvoices = result.data.map((invoice: any) => ({
-          images: [`/${invoice.Images}`], // Prepend leading slash to image paths
-          name: invoice.Name,
-          invoice: invoice.Invoice,
-          category: invoice.Category,
-          id: invoice.ID.toString(),
-          date: new Date(invoice.Order_date).toISOString().split('T')[0],
-          status: invoice.Status,
-          quantity: invoice.Quantity,
-          price: invoice.Price,
-        }));
-        setInvoices(formattedInvoices);
-      } else {
-        alert("Failed to fetch orders: " + result.error);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('/api/check_order');
+        const result = await response.json();
+        if (result.success) {
+          console.log("Fetched invoices:", result.data); // Log the fetched data
+          // Map the fetched data to the Invoice interface
+          const formattedInvoices = result.data.map((invoice: any) => ({
+            images: [`/images/${invoice.Images}`], // Prepend leading slash to image paths
+            name: invoice.Name,
+            invoice: invoice.Invoice,
+            category: invoice.Category,
+            id: invoice.ID.toString(),
+            date: new Date(invoice.Order_date).toISOString().split('T')[0],
+            status: invoice.Status,
+            quantity: invoice.Quantity,
+            price: invoice.Price,
+          }));
+          setInvoices(formattedInvoices);
+        } else {
+          alert("Failed to fetch orders: " + result.error);
+        }
+      } catch (error: any) {
+        alert("Error: " + error.message);
       }
-    } catch (error: any) {
-      alert("Error: " + error.message);
-    }
-  };
+    };
 
   fetchOrders();
 }, []);
