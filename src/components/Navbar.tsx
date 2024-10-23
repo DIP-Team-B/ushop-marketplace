@@ -62,13 +62,8 @@ const Navbar = () => {
     <div className="flex flex-col gap-0">
       {/* top navbar */}
       <div className="flex px-16 py-3 justify-between items-center bg-beige z-10">
-        <Link href="./">
-          <Image
-            src={"/images/logo.png"}
-            alt="Logo"
-            height={48}
-            width={100}
-          ></Image>
+        <Link href="/">
+        <Image src={'/images/logo.png'} alt="Logo" height={48} width={100}></Image>
         </Link>
         <div className="flex gap-0 rounded-sm overflow-hidden border-mainBlack border-[1px]">
           <Input
@@ -83,218 +78,62 @@ const Navbar = () => {
 
         <div className="flex items-center gap-6">
           {/* icon account */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="special"
-                className="flex gap-2 items-center px-[10px] rounded-full"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="20"
-                  viewBox="0 0 18 20"
-                  fill="none"
-                >
-                  <path
-                    d="M1 19V18C1 14.69 3.69 12 7 12H11C14.31 12 17 14.69 17 18V19"
-                    stroke="black"
-                    strokeOpacity="0.87"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8.99988 9C6.78988 9 4.99988 7.21 4.99988 5C4.99988 2.79 6.78988 1 8.99988 1C11.2099 1 12.9999 2.79 12.9999 5C12.9999 7.21 11.2099 9 8.99988 9Z"
-                    stroke="black"
-                    strokeOpacity="0.87"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-36 bg-mainWhite mt-2 flex flex-col p-2 rounded-lg shadow-md">
-              {isLoggedIn ? (
-                <>
-                  <Link
-                    href="/log-in"
-                    className={`${buttonVariants({
-                      variant: "ghost",
-                    })} w-full `}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      Log out
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/log-in"
-                    className={`${buttonVariants({
-                      variant: "ghost",
-                    })} w-full `}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      Change account
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/history"
-                    className={`${buttonVariants({
-                      variant: "ghost",
-                    })} w-full `}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      My purchase
-                    </DropdownMenuItem>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/log-in"
-                    className={`${buttonVariants({
-                      variant: "ghost",
-                    })} w-full `}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      Sign in
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className={`${buttonVariants({ variant: "ghost" })} w-full`}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      Sign up
-                    </DropdownMenuItem>
-                  </Link>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          {/* icon cart */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="special"
-                className="flex gap-2 items-center px-[10px] rounded-full"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="21"
-                  height="20"
-                  viewBox="0 0 21 20"
-                  fill="none"
-                >
-                  <path
-                    d="M4 5H17.79C18.0694 5.00001 18.3457 5.05857 18.6011 5.17191C18.8565 5.28524 19.0854 5.45083 19.2729 5.65801C19.4603 5.86519 19.6023 6.10936 19.6897 6.37478C19.777 6.64019 19.8078 6.92097 19.78 7.199L19.18 13.199C19.1307 13.6925 18.8997 14.1501 18.532 14.4829C18.1642 14.8157 17.686 15 17.19 15H7.64C7.17747 15.0002 6.72918 14.84 6.37144 14.5469C6.01371 14.2537 5.76866 13.8456 5.678 13.392L4 5Z"
-                    stroke="black"
-                    strokeOpacity="0.87"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M4 5L3.19 1.757C3.13583 1.54075 3.01095 1.34881 2.83521 1.21166C2.65946 1.0745 2.44293 1.00001 2.22 1H1M7 19H9M15 19H17"
-                    stroke="black"
-                    strokeOpacity="0.87"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <div className="text-sm font-medium text-mainBlack">
-                  {cartItems.length}
-                </div>
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="bg-mainWhite text-mainBlack rounded-tl-xl rounded-bl-xl">
-              <SheetTitle className="text-xl">My Cart</SheetTitle>
-              {cartItems.length > 0 ? (
-                <div className="pt-4 flex flex-col gap-4 items-center">
-                  <div className="flex flex-col w-full gap-2">
-                    {cartItems.map((product) => (
-                      <div className="relative">
-                        <Link
-                          href={`/${product.category?.toLowerCase()}/${
-                            product.id
-                          }`}
-                          className="flex gap-3 w-full p-3 bg-mainWhite rounded-lg border-[1px] border-gray-100 hover:border-gray-200 hover:bg-gray-100"
-                        >
-                          <Image
-                            src={product.images[0]}
-                            alt="product image"
-                            width={80}
-                            height={80}
-                            className="aspect-square object-cover rounded-sm"
-                          ></Image>
-                          <div className="flex items-center justify-between w-full gap-4">
-                            <div className="flex flex-col justify-between h-full w-[170px] ">
-                              <div className="flex flex-col gap-1 overflow-hidden">
-                                <p className="font-medium text-sm">
-                                  {product.name}
-                                </p>
-                                <p className="font-light text-xs text-muted-foreground truncate overflow-hidden ">
-                                  {product.description}
-                                </p>
-                              </div>
-
-                              <div className="flex gap-2 items-center">
-                                <p
-                                  className={`${
-                                    product.disc === "0%"
-                                      ? "text-mainBlack"
-                                      : "text-primaryRed-600"
-                                  } font-semibold text-lg`}
-                                >
-                                  ${product.price.toFixed(2)}
-                                </p>
-                                {product.disc === "0%" ? null : (
-                                  <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
-                                    -{product.disc}
-                                  </div>
-                                )}
-                                <p className="text-xs text-muted-foreground">
-                                  x 1
-                                </p>
-                              </div>
-                            </div>
-                            <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
-                          </div>
-                        </Link>
-                        <Trash className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
-                      </div>
-                    ))}
-                  </div>
-                  <Link
-                    href="/checkout"
-                    className={`${buttonVariants({
-                      variant: "default",
-                    })} w-full h-12`}
-                  >
-                    Checkout
-                  </Link>
-                </div>
-              ) : (
-                <div className="h-full flex flex-col gap-5 items-center justify-center">
-                  <Image
-                    width="240"
-                    height="300"
-                    src="/images/empty-cart.svg"
-                    alt="empty-cart"
-                  ></Image>
-                  <div className="flex flex-col gap-1 items-center mb-20">
-                    <h3 className="font-semibold text-lg">
-                      Your cart is empty
-                    </h3>
-                    <p className="text-muted-foreground text-center text-sm">
-                      Whoops! Nothing to show here yet.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </SheetContent>
-          </Sheet>
+          <Button variant="special" className="px-[10px] rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="20"
+              viewBox="0 0 18 20"
+              fill="none"
+            >
+              <path
+                d="M1 19V18C1 14.69 3.69 12 7 12H11C14.31 12 17 14.69 17 18V19"
+                stroke="black"
+                strokeOpacity="0.87"
+                strokeWidth="2"
+                strokeLinecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M8.99988 9C6.78988 9 4.99988 7.21 4.99988 5C4.99988 2.79 6.78988 1 8.99988 1C11.2099 1 12.9999 2.79 12.9999 5C12.9999 7.21 11.2099 9 8.99988 9Z"
+                stroke="black"
+                strokeOpacity="0.87"
+                strokeWidth="2"
+                strokeLinecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </Button>
+          <Button
+            variant="special"
+            className="flex gap-2 items-center px-[10px] rounded-full"
+          >
+            {/* icon cart */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="21"
+              height="20"
+              viewBox="0 0 21 20"
+              fill="none"
+            >
+              <path
+                d="M4 5H17.79C18.0694 5.00001 18.3457 5.05857 18.6011 5.17191C18.8565 5.28524 19.0854 5.45083 19.2729 5.65801C19.4603 5.86519 19.6023 6.10936 19.6897 6.37478C19.777 6.64019 19.8078 6.92097 19.78 7.199L19.18 13.199C19.1307 13.6925 18.8997 14.1501 18.532 14.4829C18.1642 14.8157 17.686 15 17.19 15H7.64C7.17747 15.0002 6.72918 14.84 6.37144 14.5469C6.01371 14.2537 5.76866 13.8456 5.678 13.392L4 5Z"
+                stroke="black"
+                strokeOpacity="0.87"
+                strokeWidth="2"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M4 5L3.19 1.757C3.13583 1.54075 3.01095 1.34881 2.83521 1.21166C2.65946 1.0745 2.44293 1.00001 2.22 1H1M7 19H9M15 19H17"
+                stroke="black"
+                strokeOpacity="0.87"
+                strokeWidth="2"
+                strokeLinecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <div className="text-sm font-medium">{cartCount}</div>
+          </Button>
           <Link href="/wishlist">
             <Button
               variant="special"
@@ -311,7 +150,7 @@ const Navbar = () => {
                 <path
                   d="M16.5 3C14.76 3 13.09 3.81 12 5.09C10.91 3.81 9.24 3 7.5 3C4.42 3 2 5.42 2 8.5C2 12.28 5.4 15.36 10.55 20.04L12 21.35L13.45 20.03C18.6 15.36 22 12.28 22 8.5C22 5.42 19.58 3 16.5 3ZM12.1 18.55L12 18.65L11.9 18.55C7.14 14.24 4 11.39 4 8.5C4 6.5 5.5 5 7.5 5C9.04 5 10.54 5.99 11.07 7.36H12.94C13.46 5.99 14.96 5 16.5 5C18.5 5 20 6.5 20 8.5C20 11.39 16.86 14.24 12.1 18.55Z"
                   fill="black"
-                  fill-opacity="0.87"
+                  fillOpacity="0.87"
                 />
               </svg>
               <div className="text-sm font-medium text-mainBlack">
