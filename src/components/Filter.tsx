@@ -21,7 +21,7 @@ type FilterAccordionProps = {
 const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
   const [selectedPrice, setSelectedPrice] = useState<[number, number]>([0, 100]); 
   const [selectedSize, setSelectedSize] = useState<string[]>(["XS", "S", "M", "L", "XL", "One Size"]);
-  const [selectedColor, setSelectedColor] = useState<string[]>(["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
+  const [selectedColor, setSelectedColor] = useState<string[]>(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
   const [maxPrice, setMaxPrice] = useState(100)
 
   const handleSliderChange = (newValues: number[]) => {
@@ -125,7 +125,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
           <AccordionTrigger>Color</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col space-y-2">
-              {["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"].map((color) => (
+              {["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"].map((color) => (
               <label key={color}>
                 <Checkbox
                   checked={selectedColor.includes(color)}
@@ -150,7 +150,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
           onClick={() => {
             setSelectedPrice([0, 100]);
             setSelectedSize(["XS", "S", "M", "L", "XL", "One Size"]);
-            setSelectedColor(["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
+            setSelectedColor(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
           }}
         >
           Clear Filter
