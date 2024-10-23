@@ -20,7 +20,7 @@ type FilterAccordionProps = {
 
 const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
   const [selectedPrice, setSelectedPrice] = useState<[number, number]>([0, 100]); 
-  const [selectedSize, setSelectedSize] = useState<string[]>(["XS", "S", "M", "L", "XL"]);
+  const [selectedSize, setSelectedSize] = useState<string[]>(["XS", "S", "M", "L", "XL", "One Size"]);
   const [selectedColor, setSelectedColor] = useState<string[]>(["Black", "Red", "Navy", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
   const [maxPrice, setMaxPrice] = useState(100)
 
