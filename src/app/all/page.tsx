@@ -22,7 +22,8 @@ export default function Page() {
       </div>
 
       <hr />
-      <div className="screen-size-wrapper w-full px-40 py-36 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:space-x-5">        {products.map((product) => (
+      <div className="w-full px-40 py-36 gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+        {products.map((product) => (
           <ProductCards
             key={product.id}
             name={product.name}
