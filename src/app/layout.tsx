@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const manrope = localFont({
   src: "./fonts/Manrope.ttf",
@@ -23,7 +25,12 @@ export default function RootLayout({
       <body
         className={`${manrope.variable} antialiased`}
       >
-        {children}
+        <div className="justify-center z-10">
+          <Navbar />
+          {/* screen size */}
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );

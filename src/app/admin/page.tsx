@@ -199,8 +199,8 @@ const Page = () => {
   return (
     <div className="flex justify-center flex-col text-mainBlack">
       {!isAdmin ? (
-        <div className="w-[1350px]">
-          <div className="flex flex-col items-center w-full py-40">
+        <div className="w-full">
+          <div className="flex flex-col items-center w-full py-56">
             <div className="flex flex-col items-center gap-8 w-[500px]">
               <h1 className="font-bold text-3xl">Admin Log In</h1>
               <form className="grid gap-6 w-full" onSubmit={handleLogin}>
@@ -241,7 +241,7 @@ const Page = () => {
         </div>
       ) : (
         <div>
-          <div className="flex flex-col gap-4 p-8 w-full items-center">
+          <div className="flex flex-col gap-4 p-8 w-full items-center py-48">
             <div className="flex justify-between items-center w-full">
               <Button variant="link" className="opacity-0">
                 Log out
