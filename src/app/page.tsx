@@ -10,7 +10,6 @@ import PromoBanner from "@/components/PromoBanner";
 import PromoCardCarousel from "@/components/PromoCardCarousel";
 import { products } from "./productsData";
 import ProductCards from "@/components/ProductCards";
-import { useState } from "react";
 import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 
@@ -48,10 +47,18 @@ export default function Home() {
     { title: "Others", id: "others" },
   ];
 
+  const [visibleRows, setVisibleRows] = useState(3);
+  const productsPerRow = 4;
+  const visibleProducts = visibleRows * productsPerRow;
+
+  const handleShowMore = () => {
+    setVisibleRows((prevRows) => prevRows + 3);
+  };
+
   console.log("welcome, s" + username );
   return (
     <div className="justify-center">
-      <Navbar/> {/* Pass the username to the Navbar */}
+      <Navbar id={id}/>{/* Pass the username to the Navbar */}
 
         {/* Welcome message */}
         <div className="welcome-message py-6 text-center">
@@ -131,6 +138,6 @@ export default function Home() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

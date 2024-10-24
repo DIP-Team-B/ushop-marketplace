@@ -26,7 +26,6 @@ export default function RootLayout({
         className={`${manrope.variable} antialiased`}
       >
         <div className="justify-center z-10">
-          <Navbar />
           {/* screen size */}
           {children}
           <Footer />

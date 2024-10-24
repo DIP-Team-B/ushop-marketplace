@@ -1,6 +1,7 @@
 import Wishlist from "@/components/Wishlist";
 import { createConnection } from '@/lib/db';
 import { RowDataPacket } from 'mysql2';
+import Navbar from "@/components/Navbar";
 
 // Fetch wishlist items directly in the component
 const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
@@ -44,51 +45,56 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
 
     await connection.end();
 
-    let num: number = 0;
-    if (Array.isArray(rows) && rows.length > 0) {
-      while (num < rows.length) {
-        const row = rows[num] as RowDataPacket; // Type assertion to RowDataPacket
-        //Top List
-        if (num < (rows_length[0].TopList.length-1)/2) {
-          row.Image_URL = 'tops/' + row.Image_URL ;
-          row.category = 'tops';
+    if (rows_length[0] === null)  {
+      return Response.json({  });
+    }
+    else {
+      let num: number = 0;
+      if (Array.isArray(rows) && rows.length > 0) {
+        while (num < rows.length) {
+          const row = rows[num] as RowDataPacket; // Type assertion to RowDataPacket
+          //Top List
+          if (num < (rows_length[0].TopList.length-1)/2) {
+            row.Image_URL = 'tops/' + row.Image_URL ;
+            row.category = 'tops';
+          }
+          //Bottom List
+          else if (num >= (rows_length[0].TopList.length-1)/2 && 
+          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2) {
+            row.Image_URL = 'bottoms/' + row.Image_URL ;
+            row.category = 'bottoms';
+          }
+          //Accessories List
+          else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 && 
+          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2) {
+            row.Image_URL = 'accessories/' + row.Image_URL ;
+            row.category = 'accessories';
+          }
+          //Others List
+          else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 && 
+          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 +(rows_length[0].OthersList.length-1)/2) {
+            row.Image_URL = 'others/' + row.Image_URL ;
+            row.category = 'others';
+          }
+          num++;
         }
-        //Bottom List
-        else if (num >= (rows_length[0].TopList.length-1)/2 && 
-        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2) {
-          row.Image_URL = 'bottoms/' + row.Image_URL ;
-          row.category = 'bottoms';
-        }
-        //Accessories List
-        else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 && 
-        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2) {
-          row.Image_URL = 'accessories/' + row.Image_URL ;
-          row.category = 'accessories';
-        }
-        //Others List
-        else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 && 
-        num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 +(rows_length[0].OthersList.length-1)/2) {
-          row.Image_URL = 'others/' + row.Image_URL ;
-          row.category = 'others';
-        }
-        num++;
       }
-    }
-    //console.log("Updated Rows data:", rows);
+      //console.log("Updated Rows data:", rows);
 
-    if (Array.isArray(rows) && rows.length > 0) {
-      wishlistItems = rows.map((row) => ({
-        user: id,
-        id: row.ID,
-        name: row.Name,
-        price: row.Price,
-        images: '/images/products/'+[row.Image_URL],
-        category: row.category,
-        stock: row.Quantity,
-        liked: true,
-      }));
+      if (Array.isArray(rows) && rows.length > 0) {
+        wishlistItems = rows.map((row) => ({
+          user: id,
+          id: row.ID,
+          name: row.Name,
+          price: row.Price,
+          images: '/images/products/'+[row.Image_URL],
+          category: row.category,
+          stock: row.Quantity,
+          liked: true,
+        }));
+      }
+      //console.log("WishList data:", wishlistItems);
     }
-    //console.log("WishList data:", wishlistItems);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -103,8 +109,9 @@ export default async function Page({ searchParams }) {
   const wishlistItems = await fetchWishlistItems(id);
   return (
     <>
+    <Navbar id={id}/>
       <div className="container mx-auto p-6 pb-36 relative z-10 top-[100px]">
-        <Wishlist title="Your Wishlist" products={wishlistItems} />
+        <Wishlist title="Your Wishlist" products={wishlistItems} id={id} />
         <hr />
         
       </div>

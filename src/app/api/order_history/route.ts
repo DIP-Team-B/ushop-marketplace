@@ -35,7 +35,7 @@ export async function POST(request: Request) {
             top_table
           ON jt.TopID = top_table.ID
           WHERE 
-            order_table.Account_ID = 1
+            order_table.Account_ID = ?
 
           UNION
 
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
             bottom_table
           ON jt.BottomID = bottom_table.ID
           WHERE 
-            order_table.Account_ID = 1
+            order_table.Account_ID = ?
 
           UNION
 
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
             accessories_table
           ON jt.AccessoriesID = accessories_table.ID
           WHERE 
-            order_table.Account_ID = 1
+            order_table.Account_ID = ?
 
           UNION
 
@@ -110,33 +110,38 @@ export async function POST(request: Request) {
             others_table
           ON jt.OthersID = others_table.ID
           WHERE 
-            order_table.Account_ID = 1
+            order_table.Account_ID = ?
 
           ORDER BY 
             Invoice ASC;
         `;
         const [rows_length] = await connection.execute(length_sql, [id]);
         //console.log(rows_length);
-        const [rows] = await connection.execute(sql, []);
+        const [rows] = await connection.execute(sql, [id,id,id,id]);
         //console.log(rows);
 
         await connection.end();
-      
-        if (Array.isArray(rows) && rows.length > 0) {
-          InvoiceItems = rows.map((row) => ({
-            images: '/images/products/'+[row.ImageURL],
-            name: row.Name,
-            invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
-            category: row.Category,
-            id: 'NTU000'+row.Invoice+row.Name,
-            date: row.Date,
-            status: row.Status,
-            quantity: row.OrderedQuantity,
-            price: row.Price.toFixed(2),
-          }));
+
+        if (rows_length[0] === null)  {
+          return NextResponse.json({  });
         }
-        console.log("InvoiceItems data:", InvoiceItems);
-        return NextResponse.json(InvoiceItems);
+        else {
+          if (Array.isArray(rows) && rows.length > 0) {
+            InvoiceItems = rows.map((row) => ({
+              images: '/images/products/'+[row.ImageURL],
+              name: row.Name,
+              invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
+              category: row.Category,
+              id: 'NTU000'+row.Invoice+row.Name,
+              date: row.Date,
+              status: row.Status,
+              quantity: row.OrderedQuantity,
+              price: row.Price.toFixed(2),
+            }));
+          }
+          console.log("InvoiceItems data:", InvoiceItems);
+          return NextResponse.json(InvoiceItems);
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
         return NextResponse.json({ success: false, error: error.message });

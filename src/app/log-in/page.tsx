@@ -42,7 +42,7 @@ const Page = () => {
           {
             console.log("Login successful", data);
             setErrorMessage(''); 
-            router.push("/"); 
+            router.push(`/?id=${data.id}`); 
           }
           else{
             console.log("Login unsuccessful", data);
@@ -116,7 +116,7 @@ const Page = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -16,11 +16,19 @@ import { useRouter } from 'next/navigation';
 
 export var globalIsBannerClosed: boolean;
 
+let isStudentStaff = true;
+let isLoggedIn = true;
+
 const Navbar = ({ id }: { id: string }) => {
-  const [wishlistCount, setwishlistCount] = useState([]);
+  // State for wishlist count
+  const [wishlistCount, setwishlistCount] = useState(0);
+  
+  // State for user role
+  const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
+
   useEffect(() => {
     // Fetching data from API endpoint
-    const fetchData = async () => {
+    const fetchWishlistCount = async () => {
       try {
         const response = await fetch(`/api/wishlist_length`, {
           method: "POST",
@@ -43,11 +51,39 @@ const Navbar = ({ id }: { id: string }) => {
       }
     };
 
-    fetchData();
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch(`/api/UserData`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+          }),
+        });
+        const data = await response.json();
+        console.log(data);
+        // Assuming data is in the format { success: true, count: 5 }
+        if (data.success) {
+          if (data.rows[0].Role === "Student" || data.rows[0].Role === "Staff") {
+            setIsStudentStaff(true); // Update the state properly
+            //console.log("True");
+          } else {
+            setIsStudentStaff(false);
+            //console.log("False");
+          }
+        } else {
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchWishlistCount();
+    fetchUserRole();
   }, [id]);
-  console.log(wishlistCount);
-  const isStudentStaff = true;
-  const isLoggedIn = true;
 
   const [isBannerClosed, setBannerClosed] = useState(false);
 
@@ -110,7 +146,7 @@ const Navbar = ({ id }: { id: string }) => {
     <div className="flex flex-col gap-0 fixed z-50 w-[100%] top-0">
       {/* top navbar */}
       <div className="flex px-16 py-3 justify-between items-center bg-beige z-50">
-        <Link href="./">
+        <Link href={`/?id=${id}`}>
           <Image
             src={"/images/logo.png"}
             alt="Logo"
@@ -398,7 +434,7 @@ const Navbar = ({ id }: { id: string }) => {
           </Button>
         </Link>
       </div>
-
+      
       {/* Announcment that the price shown is promo for student/staff */}
       {isStudentStaff && !isBannerClosed && (
         <div className="flex justify-between items-center bg-emerald-400 text-mainBlack py-2 px-6 z-40">
