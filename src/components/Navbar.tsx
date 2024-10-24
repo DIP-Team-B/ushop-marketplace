@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { useRouter } from "next/navigation";
 
 export var globalIsBannerClosed: boolean;
 
@@ -46,7 +47,7 @@ const Navbar = ({ id }: { id: string }) => {
   }, [id]);
   console.log(wishlistCount);
   const isStudentStaff = true;
-  const isLoggedIn = true;
+ // const isLoggedIn = true;
 
   const [isBannerClosed, setBannerClosed] = useState(false);
 
@@ -86,6 +87,35 @@ const Navbar = ({ id }: { id: string }) => {
   ];
 
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    // Function to check if the user is logged in
+    useEffect(() => {
+      const checkUserStatus = async () => {
+        try {
+          const response = await fetch('/api/session'); 
+          const data = await response.json();
+          if (response.ok && data.user.username) {
+            setIsLoggedIn(true); // User is logged in
+          } else {
+            setIsLoggedIn(false); // User is not logged in
+          }
+        } catch (error) {
+          console.error("Error checking user session:", error);
+          setIsLoggedIn(false); // Handle error by considering user as logged out
+        }
+      };
+  
+      checkUserStatus();
+    }, []);
+
+    const handleIsLoggedIn = () => {
+      if (isLoggedIn) {
+        router.push('/wishlist?id=${id}'); // Redirect to checkout page if logged in
+      } else {
+        router.push("/log-in"); // Redirect to login page if not logged in
+      }
+    };
 
   const handleLogout = async () => {
     try {
@@ -171,7 +201,7 @@ const Navbar = ({ id }: { id: string }) => {
                       variant: "ghost",
                     })} w-full `}
                   >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
+                    <DropdownMenuItem className="text-mainBlack text-sm" onClick={handleLogout}>
                       Log out
                     </DropdownMenuItem>
                   </Link>
@@ -342,10 +372,10 @@ const Navbar = ({ id }: { id: string }) => {
               )}
             </SheetContent>
           </Sheet>
-          <Link href={`/wishlist?id=${id}`}>
             <Button
               variant="special"
               className="flex gap-2 items-center px-[10px] rounded-full"
+              onClick={handleIsLoggedIn}
             >
               {/* icon wishlist */}
               <svg
@@ -365,7 +395,6 @@ const Navbar = ({ id }: { id: string }) => {
                 {wishlistCount ?? 0}
               </div>
             </Button>
-          </Link>
         </div>
       </div>
 
