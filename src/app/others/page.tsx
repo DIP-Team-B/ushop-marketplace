@@ -1,16 +1,14 @@
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+"use client"
+
 import Products from "@/components/Products";
 import { products } from "../productsData";
 
 export default function Page() {
-  const others = products.filter(product => product.category === "Others");
+  const filteredProducts = products.filter(
+    (product) => product.category === "Others"
+  );
 
   return (
-    <div className='justify-center'>
-        <Navbar/>
-        <Products title="Others" products={others} />
-        <Footer />
-    </div>
+    <Products title="Others" products={filteredProducts} />
   );
 }

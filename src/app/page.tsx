@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
-import jwtDecode from "jwt-decode";  // Use default import for jwt-decode
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import HomepageCategoryCards from "@/components/HomepageCategoryCard";
 import PromoBanner from "@/components/PromoBanner";
 import PromoCardCarousel from "@/components/PromoCardCarousel";
+import { products } from "./productsData";
+import ProductCards from "@/components/ProductCards";
+import { useState } from "react";
+import { ArrowDown } from "lucide-react";
+import Image from "next/image";
 
 export default function Home() {
   const [email, setUserEmail] = useState("");
@@ -43,26 +43,18 @@ export default function Home() {
     { title: "Others", id: "others" },
   ];
 
-  console.log("welcome, s" + username );
+  const [visibleRows, setVisibleRows] = useState(3);
+  const productsPerRow = 4;
+  const visibleProducts = visibleRows * productsPerRow;
+
+  const handleShowMore = () => {
+    setVisibleRows((prevRows) => prevRows + 3);
+  };
+
   return (
-    <div className="justify-center">
-      <Navbar/> {/* Pass the username to the Navbar */}
-
-        {/* Welcome message */}
-        <div className="welcome-message py-6 text-center">
-        {username ? (
-          <h1 className="text-2xl font-bold text-black">
-            Welcome back, {username}!
-          </h1>
-        ) : (
-          <h1 className="text-2xl font-bold text-black">
-            Welcome to Our Shop!
-          </h1>
-        )}
-      </div>
-
+    <>
       {/* screen size */}
-      <div className="screen-size-wrapper w-screen px-40 py-6 gap-4 flex flex-col items-center">
+      <div className="w-full px-40 py-6 gap-4 flex flex-col items-center relative z-10 top-[148px]">
         {/* promotion */}
         <PromoBanner />
 
@@ -77,7 +69,7 @@ export default function Home() {
         </div>
 
         {/* promo */}
-        <div className="flex flex-col gap-2 w-full items-center pt-6">
+        <div className="flex flex-col gap-2 w-[1350px] px-40 items-center pt-6">
           <div className="flex items-center gap-1">
             <p className="animate-bounce mr-1 font-semibold text-xl text-mainBlack">
               🔥
@@ -87,8 +79,45 @@ export default function Home() {
 
           <PromoCardCarousel />
         </div>
+
+        {/* show all items */}
+        <div className="flex flex-col gap-2 w-full items-center pt-6 mb-[150px]">
+          <p className="font-semibold text-xl text-mainBlack ">
+            Find Your Style!
+          </p>
+
+          <div className="screen-size-wrapper w-[1350px] px-40 py-6 gap-2 grid grid-cols-4">
+            {products.slice(0, visibleProducts).map((product) => (
+              <ProductCards
+                key={product.id}
+                name={product.name}
+                id={product.id}
+                images={product.images}
+                price={product.price}
+                disc={product.disc}
+                category={product.category}
+              />
+            ))}
+          </div>
+          {visibleProducts < products.length && (
+            <div
+              className="flex items-center justify-center"
+              onClick={handleShowMore}
+            >
+              <div className="flex w-16 h-16 items-center justify-center cursor-pointer m-8">
+                <ArrowDown className="text-mainBlack animate-bounce-slow"></ArrowDown>
+                <Image
+                  src="/icons/circular-show-more.svg"
+                  width={64}
+                  height={64}
+                  alt="show more"
+                  className="absolute animate-spin-slow"
+                ></Image>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <Footer />
-    </div>
+    </>
   );
 }
