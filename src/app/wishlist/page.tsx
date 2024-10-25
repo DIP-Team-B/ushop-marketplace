@@ -18,25 +18,29 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
       SELECT top_table.*
       FROM top_table
       JOIN favourite_table
-      ON JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$')
+      ON favourite_table.TopList != '' 
+      AND JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
       SELECT bottom_table.*
       FROM bottom_table
       JOIN favourite_table
-      ON JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$')
+      ON favourite_table.BottomList != '' 
+      AND JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
       SELECT accessories_table.*
       FROM accessories_table
       JOIN favourite_table
-      ON JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$')
+      ON favourite_table.AccessoriesList != '' 
+      AND JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
       SELECT others_table.*
       FROM others_table
       JOIN favourite_table
-      ON JSON_CONTAINS(favourite_table.OthersList, CAST(others_table.ID AS JSON), '$')
+      ON favourite_table.OthersList != '' 
+      AND JSON_CONTAINS(favourite_table.OthersList, CAST(others_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?;
     `;
     const [rows_length] = await connection.execute(length_sql, [id]);

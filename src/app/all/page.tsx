@@ -1,11 +1,14 @@
 import { products } from "../productsData";
 import ProductCards from "@/components/ProductCards";
+import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
-export default function Page() {
+export default async function Page({ searchParams }) {
+  const { id } = searchParams;  // Fetch the ID from the search params
 
   return (
     <>
+    <Navbar id={id}/>
       <div className="px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
         <div className="text-left text-sm text-mainGrey">
           <Link href="./" className="underline hover:color-darkRed">

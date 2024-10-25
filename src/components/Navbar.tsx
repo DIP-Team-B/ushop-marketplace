@@ -22,6 +22,8 @@ let isLoggedIn = true;
 const Navbar = ({ id }: { id: string }) => {
   // State for wishlist count
   const [wishlistCount, setwishlistCount] = useState(0);
+  // State for shoppingcart count
+  const [shoppingcartCount, setshoppingcartCount] = useState(0);
   
   // State for user role
   const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
@@ -43,6 +45,29 @@ const Navbar = ({ id }: { id: string }) => {
         // Assuming data is in the format { success: true, count: 5 }
         if (data.success) {
           setwishlistCount(data.count); // Extracting the count from the response
+        } else {
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchShoppingCartCount = async () => {
+      try {
+        const response = await fetch(`/api/shoppingcart_length`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+          }),
+        });
+        const data = await response.json();
+        // Assuming data is in the format { success: true, count: 5 }
+        if (data.success) {
+          setshoppingcartCount(data.count); // Extracting the count from the response
         } else {
           console.error(data.error); // Handle error in the response
         }
@@ -82,6 +107,7 @@ const Navbar = ({ id }: { id: string }) => {
     };
 
     fetchWishlistCount();
+    fetchShoppingCartCount();
     fetchUserRole();
   }, [id]);
 
@@ -147,7 +173,7 @@ const Navbar = ({ id }: { id: string }) => {
 
     const handleIsLoggedIn = () => {
       if (isLoggedIn) {
-        router.push('/wishlist?id=${id}'); // Redirect to checkout page if logged in
+        router.push(`/wishlist?id=${id}`); // Redirect to checkout page if logged in
       } else {
         router.push("/log-in"); // Redirect to login page if not logged in
       }
@@ -317,7 +343,7 @@ const Navbar = ({ id }: { id: string }) => {
                   />
                 </svg>
                 <div className="text-sm font-medium text-mainBlack">
-                  {cartItems.length}
+                  {shoppingcartCount ?? 0}
                 </div>
               </Button>
             </SheetTrigger>
@@ -437,27 +463,27 @@ const Navbar = ({ id }: { id: string }) => {
 
       {/* category navbar */}
       <div className="flex py-2 justify-center items-center gap-3 shadow-md z-40 bg-white">
-        <Link title="view all page" href="/all">
+        <Link title="view all page" href={`/all?id=${id}`}>
           <Button className="text-mainBlack" variant="ghost">
             View All
           </Button>
         </Link>
-        <Link title="tops page" href="/tops">
+        <Link title="tops page" href={`/tops?id=${id}`}>
           <Button className="text-mainBlack" variant="ghost">
             Tops
           </Button>
         </Link>
-        <Link title="bottoms page" href="/bottoms">
+        <Link title="bottoms page" href={`/bottoms?id=${id}`}>
           <Button className="text-mainBlack" variant="ghost">
             Bottoms
           </Button>
         </Link>
-        <Link title="accessories page" href="/accessories">
+        <Link title="accessories page" href={`/accessories?id=${id}`}>
           <Button className="text-mainBlack" variant="ghost">
             Accessories
           </Button>
         </Link>
-        <Link title="others page" href="/others">
+        <Link title="others page" href={`/others?id=${id}`}>
           <Button className="text-mainBlack" variant="ghost">
             Others
           </Button>

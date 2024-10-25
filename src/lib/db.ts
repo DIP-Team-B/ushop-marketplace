@@ -6,7 +6,7 @@ export const createConnection = async () => {
     const connection = await mysql.createConnection({
       host: 'localhost',
       user: 'root',
-      password: '',
+      password: 'Suigaise99',
       database: 'ntushop'
     });
     console.log("Database connection successful");
