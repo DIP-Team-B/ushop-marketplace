@@ -129,7 +129,7 @@ const Page = () => {
             invoice: invoice.Invoice,
             category: invoice.Category,
             id: invoice.ID.toString(),
-            date: new Date(invoice.Order_date).toISOString().split('T')[0],
+            date: invoice.Order_date, 
             status: invoice.Status,
             quantity: invoice.Quantity,
             price: invoice.Price,
@@ -363,13 +363,23 @@ return (
               </div>
               <div
                 className={`py-2 px-4 rounded-full cursor-pointer ${
-                  dataShown !== "check"
+                  dataShown === "upload"
                     ? "bg-mainBlack text-mainWhite"
                     : "bg-gray-100 text-mainBlack"
                 }`}
                 onClick={() => setDataShown("upload")}
               >
                 Upload product
+              </div>
+              <div
+                className={`py-2 px-4 rounded-full cursor-pointer ${
+                  dataShown === "inventory" && "bg-mainBlack text-mainWhite"
+                } ${
+                  dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
+                }`}
+                onClick={() => setDataShown("inventory")}
+              >
+                Inventory
               </div>
             </div>
             <Button variant="link" onClick={() => setAdmin(false)}>
@@ -630,7 +640,7 @@ return (
                 </Pagination>
               )}
             </div>
-          ) : (
+          ) : dataShown === "upload" ? (
             <div className="w-[1350px] flex flex-col gap-4 py-8 px-32">
               <h1 className="text-2xl font-bold">Upload Product</h1>
               <form className="flex flex-col gap-4"
@@ -820,6 +830,8 @@ return (
                 </Button>
               </form>
             </div>
+          ) : (
+            <AdminInventory />
           )}
         </div>
       </div>
