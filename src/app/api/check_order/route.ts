@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from "c:/ushop-marketplace/src/lib/db";
+import { createConnection } from '@/lib/db';
 
 export async function GET(request: Request) {
   let connection;
