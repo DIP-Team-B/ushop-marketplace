@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Filter from "@/components/Filter";
 
-type Product = {
+export type Product = {
   id: number;
   name: string;
   price: number;
