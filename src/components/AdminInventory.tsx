@@ -101,7 +101,7 @@ const AdminInventory = () => {
         });
         const result = await response.json();
         if (result.success) {
-            setProducts(products.filter((product) => product.id !== id));
+            setProducts(products.filter((product) => product.ID !== id));
         } else {
             console.error('Error removing product:', result.error);
         }
@@ -112,12 +112,13 @@ const AdminInventory = () => {
 
   const handleEditPrice = (id: number) => {
       setEditingPrice({ ...editingPrice, [id]: true });
-      const productToEdit = products.find((p) => p.id === id);
+      const productToEdit = products.find((p) => p.ID === id);
+      console.log(productToEdit);
       if (productToEdit) {
+        console.log("Setting price");
           setNewPrice({ ...newPrice, [id]: productToEdit.Price.toString() });
       }
-  };
-
+  }
   const handleSavePrice = async (id: number, table: string) => {
     try {
         const newPriceValue = parseFloat(newPrice[id]);
@@ -126,7 +127,7 @@ const AdminInventory = () => {
             return;
         }
 
-        const productToUpdate = products.find((p) => p.id === id);
+        const productToUpdate = products.find((p) => p.ID === id);
         if (!productToUpdate) {
             setErrorMessage('Product not found');
             return;
@@ -157,7 +158,7 @@ const AdminInventory = () => {
         if (result.success) {
             setProducts((prevProducts) =>
                 prevProducts.map((product) =>
-                    product.id === id ? { ...product, Price: newPriceValue } : product
+                    product.ID === id ? { ...product, Price: newPriceValue } : product
                 )
             );
         } else {
@@ -177,7 +178,7 @@ const AdminInventory = () => {
 
   const handleEditQuantity = (id: number) => {
       setEditingQuantity({ ...editingQuantity, [id]: true });
-      const productToEdit = products.find((p) => p.id === id);
+      const productToEdit = products.find((p) => p.ID === id);
       if (productToEdit) {
           setNewQuantity({ ...newQuantity, [id]: productToEdit.Quantity.toString() });
       }
@@ -191,7 +192,7 @@ const AdminInventory = () => {
             return;
         }
 
-        const productToUpdate = products.find((p) => p.id === id);
+        const productToUpdate = products.find((p) => p.ID === id);
         if (!productToUpdate) {
             setErrorMessage('Product not found');
             return;
@@ -222,7 +223,7 @@ const AdminInventory = () => {
         if (result.success) {
             setProducts((prevProducts) =>
                 prevProducts.map((product) =>
-                    product.id === id ? { ...product, Quantity: newQuantityValue } : product
+                    product.ID === id ? { ...product, Quantity: newQuantityValue } : product
                 )
             );
         } else {
@@ -243,7 +244,7 @@ const AdminInventory = () => {
   const handleQuantityChange = (id: number, change: number) => {
     setProducts((prevProducts) =>
         prevProducts.map((product) =>
-            product.id === id ? { ...product, Quantity: product.Quantity + change } : product
+            product.ID === id ? { ...product, Quantity: product.Quantity + change } : product
         )
     );
 };
@@ -282,7 +283,7 @@ const AdminInventory = () => {
         </TableHeader>
         <TableBody>
           {paginatedProducts.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow key={product.ID}>
               <TableCell>
                 <div className="flex gap-2 items-center">
                   <Image
@@ -296,16 +297,16 @@ const AdminInventory = () => {
                 </div>
               </TableCell>
               <TableCell className="font-light">
-                {editingPrice[product.id] ? (
+                {editingPrice[product.ID] ? (
                   <div className="flex items-center">
                     <input
                       type="number"
-                      value={newPrice[product.id] || ""}
-                      onChange={(e) => setNewPrice({ ...newPrice, [product.id]: e.target.value })}
+                      value={newPrice[product.ID] || ""}
+                      onChange={(e) => setNewPrice({ ...newPrice, [product.ID]: e.target.value })}
                       className="border border-gray-300 rounded p-1 w-20"
                     />
                     <Button
-                      onClick={() => handleSavePrice(product.id, product.table)}
+                      onClick={() => handleSavePrice(product.ID, product.category)}
                       className="h-8 ml-2"
                     >
                       Save
@@ -315,23 +316,23 @@ const AdminInventory = () => {
                   <div className="flex items-center">
                     <span>${typeof product.Price === 'number' ? product.Price.toFixed(2) : 'N/A'}</span>
                     <Edit
-                      onClick={() => handleEditPrice(product.id)}
+                      onClick={() => handleEditPrice(product.ID)}
                       className="ml-2 w-5 h-5 text-mainBlack cursor-pointer hover:text-muted-foreground"
                     />
                   </div>
                 )}
               </TableCell>
               <TableCell className="font-light">
-                {editingQuantity[product.id] ? (
+                {editingQuantity[product.ID] ? (
                   <div className="flex items-center">
                     <input
                       type="number"
-                      value={newQuantity[product.id] || ""}
-                      onChange={(e) => setNewQuantity({ ...newQuantity, [product.id]: e.target.value })}
+                      value={newQuantity[product.ID] || ""}
+                      onChange={(e) => setNewQuantity({ ...newQuantity, [product.ID]: e.target.value })}
                       className="border border-gray-300 rounded p-1 w-20"
                     />
                     <Button
-                      onClick={() => handleSaveQuantity(product.id, product.table)}
+                      onClick={() => handleSaveQuantity(product.ID, product.category)}
                       className="h-8 ml-2"
                     >
                       Save
@@ -341,14 +342,14 @@ const AdminInventory = () => {
                   <div className="flex items-center pl-2">
                     <span>{product.Quantity}</span>
                     <Edit
-                      onClick={() => handleEditQuantity(product.id)}
+                      onClick={() => handleEditQuantity(product.ID)}
                       className="ml-2 w-5 h-5 text-mainBlack cursor-pointer hover:text-muted-foreground"
                     />
                   </div>
                 )}
               </TableCell>
               <TableCell className="text-right font-light text-mainBlack ">
-                <Trash2 onClick={() => handleRemoveProduct(product.id, product.table)} className="w-6 h-6 text-mainBlack cursor-pointer hover:text-muted-foreground"/>
+                <Trash2 onClick={() => handleRemoveProduct(product.ID, product.category)} className="w-6 h-6 text-mainBlack cursor-pointer hover:text-muted-foreground"/>
               </TableCell>
             </TableRow>
           ))}
