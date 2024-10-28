@@ -1,19 +1,48 @@
 "use client"
 
-import { products } from "../productsData";
+import { useEffect, useState } from "react";
 import Products from "@/components/Products";
 import Navbar from "@/components/Navbar";
 
 export default async function Page({ searchParams }) {
-  const filteredProducts = products.filter(
-      (product) => product.category === "Tops"
-    );
-  const { id } = searchParams;  // Fetch the ID from the search params
+    const [topItems, setTopItems] = useState([]);
+    const { id } = searchParams;  // Fetch the ID from the search params
+
+    useEffect(() => {
+      // Fetching data from API endpoint
+      const getTops = async () => {
+        try {
+          const response = await fetch(`/api/get_products`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              category: 'tops'
+            }),
+          });
+          const data = await response.json();
+          // Assuming data is in the format { success: true, count: 5 }
+          if (data.success) {
+            setTopItems(data.result); // Extracting the count from the response
+          } else {
+            console.error(data.error); // Handle error in the response
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      getTops();
+    }, []);
 
   return (
     <>
     <Navbar id={id}/>
-    <Products title="Tops" products={filteredProducts}/>
+    <Products title="Tops" products={topItems} />
     </>
   );
+
+
+  
 }

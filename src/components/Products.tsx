@@ -5,17 +5,17 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Filter from "@/components/Filter";
 
-type Product = {
+export type Product = {
   id: number;
   name: string;
   price: number;
-  images: string;
+  images?: string;
   category: string;
-  stock: number;
-  sizes: string[];
-  colours: string[];
-  description: string[],
-  liked: boolean,
+  stock?: number;
+  sizes?: string[];
+  colours?: string[];
+  description?: string[],
+  liked?: boolean,
 }
 
 type ProductsProps = {
