@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { products } from "../../productsData"; 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -28,11 +28,36 @@ const ProductPage = ({ params }: ProductPageProps) => {
   const [selectedSize, setSelectedSize] = useState(""); 
   const [selectedColour, setSelectedColour] = useState("");
 
-  // Find the product by ID
-  const product = products.find(
-    (p) =>
-      p.id.toString() === productId && p.category?.toLowerCase() === productCat
-  );
+  const [product, setProduct] = useState([]);
+  useEffect(() => {
+    // Fetching data from API endpoint
+    const getTops = async () => {
+      try {
+        const response = await fetch(`/api/get_products_details`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            category: productCat,
+            id: productId
+          }),
+        });
+        const data = await response.json();
+        // Assuming data is in the format { success: true, count: 5 }
+        if (data.success) {
+          setProduct(data.result); // Extracting the count from the response
+        } else {
+          // Find the product by ID;
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    getTops();
+  }, []);
 
   if (!product) {
     return (
@@ -88,7 +113,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
               <div className="flex space-x-4">
                 {/* Carousel Thumbnails */}
                 <div className="w-1/4 space-y-4">
-                  {product.images.map((image, index) => (
+                  {/* {product.images.map((image, index) => (
                     <div
                       key={index}
                       className={`cursor-pointer transition-all ${
@@ -98,13 +123,13 @@ const ProductPage = ({ params }: ProductPageProps) => {
                     >
                       <img src={image} alt={`Thumbnail ${index}`} className="w-full aspect-square object-cover" />
                     </div>
-                  ))}
+                  ))} */}
                 </div>
 
                 {/* Main Image */}
                 <div className="w-3/4 h-full">
                   <CarouselContent>
-                    {product.images.map((image, index) => (
+                    {/* {product.images.map((image, index) => (
                       <CarouselItem key={index} className={index === currentIndex ? "" : "hidden"}>
                         <div className="p-1 w-full h-full">
                           <img
@@ -114,7 +139,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                           />
                         </div>
                       </CarouselItem>
-                    ))}
+                    ))} */}
                   </CarouselContent>
                 </div>
               </div>
@@ -130,7 +155,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                   product.disc === "0%" ? "text-mainBlack" : "text-primaryRed-600"
                 } font-semibold text-md`}
               >
-                ${product.price.toFixed(2)}
+                {/* ${product.price.toFixed(2)} */}
               </p>
               {product.disc === "0%" ? null : (
                 <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
@@ -183,7 +208,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             <div className="mt-4">
               <strong>Available Sizes:</strong>
               <div className="flex space-x-2 mt-1">
-                {product.sizes.map((size, index) => (
+                {/* {product.sizes.map((size, index) => (
                   <Button
                     variant="selection"
                     key={index}
@@ -194,7 +219,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                   >
                     {size}
                   </Button>
-                ))}
+                ))} */}
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 Selected Size: {selectedSize}
@@ -217,7 +242,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                     {colour}
                   </Button> */}
                   <div className="flex space-x-2 mt-1">
-                    {product.colours.map((colour, index) => (
+                    {/* {product.colours.map((colour, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedColour(colour)}
@@ -227,7 +252,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                         style={{ backgroundColor: colour.toLowerCase() }} 
                         aria-label={colour} 
                       />
-                ))}
+                ))} */}
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 Selected Colour: {selectedColour}

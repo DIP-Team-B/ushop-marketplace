@@ -16,7 +16,7 @@ export default function Page() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              category: 'tops',
+              category: 'tops'
             }),
           });
           const data = await response.json();
@@ -37,4 +37,7 @@ export default function Page() {
   return (
     <Products title="Tops" products={topItems} />
   );
+
+
+  
 }
