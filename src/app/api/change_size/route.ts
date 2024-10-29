@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
 
   try {
-    const { category, id } = await request.json();
+    const { category, name, size } = await request.json();
     let productItem: Product = {
         id: 0,
         name: '',
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     switch (category) {
       case "tops":
         selectQuery = `
-          SELECT * FROM top_table WHERE ID = ?;
+          SELECT * FROM top_table WHERE Name = ? AND Size = ?;
         `;
         sizeQuery = `
           SELECT Size From top_table WHERE Name = ?;
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         break;
       case "bottoms":
         selectQuery = `
-          SELECT * FROM bottom_table WHERE ID = ?;
+          SELECT * FROM bottom_table WHERE Name = ? AND Size = ?;
         `;
         sizeQuery = `
           SELECT Size From bottom_table WHERE Name = ?;
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         break;
       case "accessories":
         selectQuery = `
-          SELECT * FROM accessories_table WHERE ID = ?;
+          SELECT * FROM accessories_table WHERE Name = ? AND Size = ?;
         `;
         sizeQuery = `
           SELECT Size From accessories_table WHERE Name = ?;
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         break;
       case "others":
         selectQuery = `
-          SELECT * FROM others_table WHERE ID = ?;
+          SELECT * FROM others_table WHERE Name = ? AND Size = ?;
         `;
         sizeQuery = `
           SELECT Size From others_table WHERE Name = ?;
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         throw new Error("Invalid category");
     }
 
-    const [result] = await connection.execute(selectQuery, [id]);
+    const [result] = await connection.execute(selectQuery, [name, size]);
     const [size_result] = await connection.execute(sizeQuery, [result[0].Name]);
     console.log("Query executed successfully", result);
     console.log(size_result);

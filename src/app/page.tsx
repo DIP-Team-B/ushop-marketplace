@@ -19,8 +19,6 @@ export default function Home() {
   const [role, setUserRole] = useState("");
   const [id, setUserId] = useState("");
   
-
-
   // Function to retrieve the username from the JWT token stored in the cookie
   useEffect(() => {
     const fetchUser = async () => {
@@ -55,7 +53,7 @@ export default function Home() {
     setVisibleRows((prevRows) => prevRows + 3);
   };
 
-  console.log("welcome, s" + username );
+  console.log("welcome, " + username );
   return (
     <div className="justify-center">
       <Navbar id={id}/>{/* Pass the username to the Navbar */}
@@ -83,7 +81,7 @@ export default function Home() {
           <p className="font-semibold text-xl text-mainBlack">#ShopByMood</p>
           <div className="flex flex-col lg:flex-row p-4 gap-4 bg-secondBG w-full rounded-md items-center">
             {categoryItems.map((item) => (
-              <HomepageCategoryCards key={item.id} title={item.title} id={item.id} />
+              <HomepageCategoryCards key={item.id} title={item.title} id={item.id} userid={id} />
             ))}
           </div>
         </div>

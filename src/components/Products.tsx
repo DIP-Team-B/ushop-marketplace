@@ -5,31 +5,34 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Filter from "@/components/Filter";
 
-export type Product = {
+type Product = {
   id: number;
   name: string;
   price: number;
-  images?: string;
+  images: string;
   category: string;
-  stock?: number;
-  sizes?: string[];
-  colours?: string[];
-  description?: string[],
-  liked?: boolean,
+  stock: number;
+  sizes: string[];
+  colours: string[];
+  description: string[],
+  liked: boolean,
 }
 
 type ProductsProps = {
   title: string;
   products: Product[];
+  userid: string;
 };
 
-const Products: React.FC<ProductsProps> = ({ title, products }) => {
 
+const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
   const [filters, setFilters] = useState({
     price: [0, 100],
     size: ["XS", "S", "M", "L", "XL"],
     color: ["Black", "Red", "Blue", "Green", "Yellow"],
   });
+
+  
 
   const handleFilterChange = (newFilters: { price: [number, number]; size: string[]; color: string[] }) => {
     setFilters(newFilters);
@@ -48,12 +51,15 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
     return matchesPrice && matchesSize && matchesColor && product.category;
   });
 
+  console.log(products);
+  console.log(userid);
+
   return (
     <>
       <div className="w-[1350px] px-40 gap-4 flex flex-col py-6 relative z-10 top-[148px]">
         {/* Breadcrumb */}
         <div className="text-left text-sm text-mainGrey">
-          <Link href="./" className="underline hover:color-darkRed">
+          <Link href={`./?id=${userid}`} className="underline hover:color-darkRed">
             Home
           </Link>
           &nbsp;&nbsp; &gt; &nbsp;&nbsp;
@@ -73,7 +79,7 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
         </div>
   
         {/* Product Listings */}
-        <div className="w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:space-x-5">
             {filteredProducts.map((product) => (
               <ProductCards
                 key={product.id}
@@ -83,6 +89,7 @@ const Products: React.FC<ProductsProps> = ({ title, products }) => {
                 price={product.price}
                 disc={product.disc}
                 category={product.category}
+                userid={userid}
               />
             ))}
         </div>

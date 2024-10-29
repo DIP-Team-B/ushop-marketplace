@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
 import { products } from "../../productsData"; 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import Image from "next/image";
+import Navbar from "@/components/Navbar";
 import React from "react"
 import {
   Carousel,
@@ -22,13 +24,16 @@ type ProductPageProps = {
 const ProductPage = ({ params }: ProductPageProps) => {
   const productId = params.id;
   const productCat = params.category;
+  const searchParams = useSearchParams(); // Use to get query params
+  const userid = searchParams.get("id"); // Extract `id` from query parameters
+  const router = useRouter();  // Initialize the router
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoveIconClicked, setLoveIconClicked] = useState(false);
   const [selectedSize, setSelectedSize] = useState(""); 
-  const [selectedColour, setSelectedColour] = useState("");
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [product, setProduct] = useState([]);
   useEffect(() => {
     // Fetching data from API endpoint
     const getTops = async () => {
@@ -44,20 +49,55 @@ const ProductPage = ({ params }: ProductPageProps) => {
           }),
         });
         const data = await response.json();
+        console.log(data);
         // Assuming data is in the format { success: true, count: 5 }
         if (data.success) {
           setProduct(data.result); // Extracting the count from the response
+          setSelectedSize(data.result.size)
         } else {
           // Find the product by ID;
           console.error(data.error); // Handle error in the response
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getTops();
-  }, []);
+  }, [productCat, productId]);
+  // Function to change the selected size
+  const changeSize = async (size) => {
+    try {
+      const response = await fetch(`/api/change_size`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          category: productCat,
+          name: product.name, // Assuming product has a 'name' field
+          size: size
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data.success) {
+        setProduct(data.result);
+        setSelectedSize(data.result.size);
+        router.push(`/${data.result.category?.toLowerCase()}/${data.result.id}?id=${userid}`);
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   if (!product) {
     return (
@@ -85,24 +125,25 @@ const ProductPage = ({ params }: ProductPageProps) => {
       </>
     );
   }
-  
+  console.log(product);
   return (
     <>
+    <Navbar id={userid}/>
       <div className="container mx-auto p-6 mb-20 py-32">
         {/* Header Section */}
         <div className="text-left py-9 pl-16 text-sm text-mainGrey">
-          <Link href="./" className="underline hover:color-darkRed">
+          <Link href={`./?id=${userid}`} className="underline hover:color-darkRed">
             Home
           </Link>
           &nbsp;&nbsp; &gt; &nbsp;&nbsp;
           <Link
-            href={`/${product.category?.toLowerCase()}`}
+            href={`/${product.category?.toLowerCase()}?id=${userid}`}
             className="underline hover:color-darkRed"
           >
             {product.category}
           </Link>
           &nbsp;&nbsp; &gt; &nbsp;&nbsp;
-          <Link href="#" className="underline hover:color-darkRed">
+          <Link href="" className="underline hover:color-darkRed">
             {product.name}
           </Link>
         </div>
@@ -113,7 +154,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
               <div className="flex space-x-4">
                 {/* Carousel Thumbnails */}
                 <div className="w-1/4 space-y-4">
-                  {/* {product.images.map((image, index) => (
+                  {product.images?.map((image, index) => (
                     <div
                       key={index}
                       className={`cursor-pointer transition-all ${
@@ -123,13 +164,13 @@ const ProductPage = ({ params }: ProductPageProps) => {
                     >
                       <img src={image} alt={`Thumbnail ${index}`} className="w-full aspect-square object-cover" />
                     </div>
-                  ))} */}
+                  ))}
                 </div>
 
                 {/* Main Image */}
                 <div className="w-3/4 h-full">
                   <CarouselContent>
-                    {/* {product.images.map((image, index) => (
+                    {product.images?.map((image, index) => (
                       <CarouselItem key={index} className={index === currentIndex ? "" : "hidden"}>
                         <div className="p-1 w-full h-full">
                           <img
@@ -139,7 +180,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                           />
                         </div>
                       </CarouselItem>
-                    ))} */}
+                    ))}
                   </CarouselContent>
                 </div>
               </div>
@@ -204,29 +245,29 @@ const ProductPage = ({ params }: ProductPageProps) => {
               </p>
             </div>
             
-            {/* Stock left, Size, Colours, Like Button */}
+            {/* Stock left, Size, Like Button */}
             <div className="mt-4">
               <strong>Available Sizes:</strong>
               <div className="flex space-x-2 mt-1">
-                {/* {product.sizes.map((size, index) => (
+                {product.sizes.map((size, index) => (
                   <Button
                     variant="selection"
                     key={index}
                     className={`text-black ${
                       selectedSize === size ? "bg-darkGrey text-black" : "bg-gray-200"
                     }`}
-                    onClick={() => setSelectedSize(size)} // Handles size selection
+                    onClick={() => changeSize(size)} // Handles size selection
                   >
                     {size}
                   </Button>
-                ))} */}
+                ))}
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 Selected Size: {selectedSize}
               </p>
             </div>
 
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <strong>Available Colours:</strong>
               {/* <div className="flex space-x-2 mt-1">
                 {product.colours.map((colour, index) => (
@@ -240,7 +281,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                     value={selectedColour}
                   >
                     {colour}
-                  </Button> */}
+                  </Button> 
                   <div className="flex space-x-2 mt-1">
                     {/* {product.colours.map((colour, index) => (
                       <button
@@ -252,12 +293,12 @@ const ProductPage = ({ params }: ProductPageProps) => {
                         style={{ backgroundColor: colour.toLowerCase() }} 
                         aria-label={colour} 
                       />
-                ))} */}
+                ))} 
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
                 Selected Colour: {selectedColour}
               </p>
-            </div>
+            </div> */}
 
             <div className="mt-4">
               <p className="text-md font-bold mb-2 text-darkRed">

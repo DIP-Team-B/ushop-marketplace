@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import Products from "@/components/Products";
 import Navbar from "@/components/Navbar";
 
-export default async function Page({ searchParams }) {
+export default function Page({ searchParams }) {
     const [topItems, setTopItems] = useState([]);
     const { id } = searchParams;  // Fetch the ID from the search params
 
@@ -22,6 +22,7 @@ export default async function Page({ searchParams }) {
             }),
           });
           const data = await response.json();
+          console.log(data);
           // Assuming data is in the format { success: true, count: 5 }
           if (data.success) {
             setTopItems(data.result); // Extracting the count from the response
@@ -39,7 +40,7 @@ export default async function Page({ searchParams }) {
   return (
     <>
     <Navbar id={id}/>
-    <Products title="Tops" products={topItems} />
+    <Products title="Tops" products={topItems} userid={id} />
     </>
   );
 

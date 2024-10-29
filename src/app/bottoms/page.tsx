@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import Products from "@/components/Products";
 import Navbar from "@/components/Navbar";
 
-export default async function Page({ searchParams }) {
+export default function Page({ searchParams }) {
     const [bottomItems, setBottomItems] = useState([]);
     const { id } = searchParams;  // Fetch the ID from the search params
 
@@ -39,7 +39,7 @@ export default async function Page({ searchParams }) {
   return (
     <>
     <Navbar id={id}/>
-    <Products title="Bottoms" products={bottomItems} />
+    <Products title="Bottoms" products={bottomItems} userid={id} />
     </>
   );
 }

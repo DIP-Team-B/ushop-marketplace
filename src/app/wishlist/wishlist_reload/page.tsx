@@ -21,8 +21,9 @@ export default function Page({ searchParams }) {
             },
             body: JSON.stringify({
               id,
-              removeItemId: Number(removeItemId),
+              ItemId: Number(removeItemId),
               category: String(category),
+              mode: "delete",
             }),
           });
   

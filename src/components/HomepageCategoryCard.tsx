@@ -7,15 +7,17 @@ import React, { useState } from "react";
 interface HomepageCategoryCardsProps {
   title: string;
   id: string;
+  userid: string;
 }
 
 const HomepageCategoryCards: React.FC<HomepageCategoryCardsProps> = ({
   title,
   id,
+  userid,
 }) => {
   const [isHovered, setHovered] = useState(false);
   return (
-    <Link className="w-full overflow-hidden" href={`/${id}`}>
+    <Link className="w-full overflow-hidden" href={`/${id}?id=${userid}`}>
       <div
         className={`h-[420px] relative transition-shadow duration-200 ease-in ${
           isHovered ? "shadow-sm" : ""

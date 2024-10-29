@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
@@ -13,6 +14,8 @@ interface ProductCardsProps {
   price: number;
   disc: string;
   category: string;
+  userid: string;
+  liked: boolean;
 }
 
 const ProductCards: React.FC<ProductCardsProps> = ({
@@ -22,9 +25,71 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   price,
   disc,
   category,
+  userid,
+  liked,
 }) => {
+  const router = useRouter();  // Initialize the router
   const [isHovered, setHovered] = useState(false);
-  const [isLoveIconClicked, setLoveIconClicked] = useState(false);
+  const [isLoveIconClicked, setLoveIconClicked] = useState(liked);
+
+  const UpdateWishlistList = async (liked: boolean) => {
+    if(liked) {
+      try {
+        const response = await fetch('/api/update-wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userid,
+            ItemId: Number(id),
+            category: String(category),
+            mode: "delete",
+          }),
+        });
+        const data = await response.json();
+        console.log('Reload');
+        if (data.success) {
+          console.log('Reload');
+          // Redirect to the updated wishlist page after successful removal
+          router.push(`/all?id=${id}`);
+          router.refresh();
+        } else {
+          console.error('Failed to update wishlist:', data.error);
+        }
+      } catch (error) {
+        console.error("Error removing from wishlist:", error);
+      }
+    }
+    if(!liked) {
+      try {
+        const response = await fetch('/api/update-wishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userid,
+            ItemId: Number(id),
+            category: String(category),
+            mode: "add",
+          }),
+        });
+        const data = await response.json();
+        console.log('Reload');
+        if (data.success) {
+          console.log('Reload');
+          // Redirect to the updated wishlist page after successful removal
+          router.push(`/all?id=${id}`);
+          router.refresh();
+        } else {
+          console.error('Failed to update wishlist:', data.error);
+        }
+      } catch (error) {
+        console.error("Error adding from wishlist:", error);
+      }
+    }
+  };
 
   return (
     <div className="relative ">
@@ -34,13 +99,13 @@ const ProductCards: React.FC<ProductCardsProps> = ({
           className={`w-5 h-5 ${
             isLoveIconClicked && `stroke-none fill-primaryRed-600`
           }`}
-          onClick={() => setLoveIconClicked(!isLoveIconClicked)}
+          onClick={() => UpdateWishlistList(liked)}
         ></Heart>
       </div>
       
       <Link
         className="w-full  overflow-hidden block p-2 pb-4 rounded-sm hover:shadow-md z-10"
-        href={`/${category?.toLowerCase()}/${id}`}
+        href={`/${category?.toLowerCase()}/${id}?id=${userid}`}
       >
         <div className="flex flex-col gap-1">
           <div
