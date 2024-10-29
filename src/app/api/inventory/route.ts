@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
     const actualTableName = tableMap[table];
     const connection = await createConnection();
     try {
-        const [results] = await connection.execute(`SELECT * FROM ${actualTableName}`);
+        const [results] = await connection.execute(
+          `SELECT *, '${table}' AS category
+          FROM ${actualTableName};`);
+        console.log(results);
         return NextResponse.json({ success: true, data: results });
     } catch (error) {
         console.error('Error fetching products:', error);

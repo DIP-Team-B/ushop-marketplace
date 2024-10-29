@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     connection = await createConnection();
     console.log("Database connection established");
 
-    const [rows] = await connection.execute("SELECT * FROM order_table");
+    const [rows] = await connection.execute("SELECT ID, Images, Name, Invoice, Category, DATE_FORMAT(Order_date, '%Y-%m-%d') as Order_date, Status, Quantity, Price FROM order_table");
     console.log("Orders fetched successfully", rows);
 
     return NextResponse.json({ success: true, data: rows });
