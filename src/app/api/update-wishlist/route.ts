@@ -25,11 +25,11 @@ export async function POST(request: Request) {
         let TopList = JSON.parse(rows[0].TopList || '[]');
         TopList = TopList.filter((item: number) => item !== ItemId);
 
-        if (TopList.length === 0) {
-          TopList = "";  // Set to empty string when the array is empty
-        }
+        //if (TopList.length === 0) {
+        //  TopList = "";  // Set to empty string when the array is empty
+        //}
 
-        await connection.execute(update_top_sql, [TopList === "" ? TopList : JSON.stringify(TopList), id]);
+        await connection.execute(update_top_sql, [TopList.length === 0 ? null : JSON.stringify(TopList), id]);
       }
     
       //Update Bottom_list
@@ -41,11 +41,11 @@ export async function POST(request: Request) {
           `;
           let BottomList = JSON.parse(rows[0].BottomList || '[]');
           BottomList = BottomList.filter((item: number) => item !== ItemId);
-          if (BottomList.length === 0) {
-            BottomList = "";  // Set to empty string when the array is empty
-          }
+          //if (BottomList.length === 0) {
+          //  BottomList = "";  // Set to empty string when the array is empty
+          //}
         
-          await connection.execute(update_bottom_sql, [BottomList === "" ? BottomList : JSON.stringify(BottomList), id]);
+          await connection.execute(update_bottom_sql, [BottomList.length === 0 ? null : JSON.stringify(BottomList), id]);
       }
     
       //Update Accessories_list
@@ -57,11 +57,11 @@ export async function POST(request: Request) {
         `;
         let AccessoriesList = JSON.parse(rows[0].AccessoriesList || '[]');
         AccessoriesList = AccessoriesList.filter((item: number) => item !== ItemId);
-        if (AccessoriesList.length === 0) {
-          AccessoriesList = "";  // Set to empty string when the array is empty
-        }
+        //if (AccessoriesList.length === 0) {
+        //  AccessoriesList = "";  // Set to empty string when the array is empty
+        //}
       
-        await connection.execute(update_accessories_sql, [AccessoriesList === "" ? AccessoriesList : JSON.stringify(AccessoriesList), id]);
+        await connection.execute(update_accessories_sql, [AccessoriesList.length === 0 ? null : JSON.stringify(AccessoriesList), id]);
       }
     
       //Update Others_list
@@ -73,11 +73,11 @@ export async function POST(request: Request) {
         `;
         let OthersList = JSON.parse(rows[0].OthersList || '[]');
         OthersList = OthersList.filter((item: number) => item !== ItemId);
-        if (OthersList.length === 0) {
-          OthersList = "";  // Set to empty string when the array is empty
-        }
+        //if (OthersList.length === 0) {
+        //  OthersList = "";  // Set to empty string when the array is empty
+        //}
       
-        await connection.execute(update_others_sql, [OthersList === "" ? OthersList : JSON.stringify(OthersList), id]);
+        await connection.execute(update_others_sql, [OthersList.length === 0 ? null : JSON.stringify(OthersList), id]);
       }
 
       console.log('remove Done');
@@ -96,6 +96,7 @@ export async function POST(request: Request) {
         // Add the item if it's not already in the TopList to avoid duplicates
         if (!TopList.includes(ItemId)) {
           TopList.push(ItemId);
+          TopList.sort((a: number, b: number) => a - b);
         }
 
         await connection.execute(update_top_sql, [JSON.stringify(TopList), id]);
@@ -111,6 +112,7 @@ export async function POST(request: Request) {
         let BottomList = JSON.parse(rows[0].BottomList || '[]');
         if (!BottomList.includes(ItemId)) {
           BottomList.push(ItemId);
+          BottomList.sort((a: number, b: number) => a - b);
         }
       
         await connection.execute(update_bottom_sql, [JSON.stringify(BottomList), id]);
@@ -126,6 +128,7 @@ export async function POST(request: Request) {
         let AccessoriesList = JSON.parse(rows[0].AccessoriesList || '[]');
         if (!AccessoriesList.includes(ItemId)) {
           AccessoriesList.push(ItemId);
+          AccessoriesList.sort((a: number, b: number) => a - b); 
         }
       
         await connection.execute(update_accessories_sql, [JSON.stringify(AccessoriesList), id]);
@@ -141,6 +144,7 @@ export async function POST(request: Request) {
         let OthersList = JSON.parse(rows[0].OthersList || '[]');
         if (!OthersList.includes(ItemId)) {
           OthersList.push(ItemId);
+          OthersList.sort((a: number, b: number) => a - b);
         }
       
         await connection.execute(update_others_sql, [JSON.stringify(OthersList), id]);

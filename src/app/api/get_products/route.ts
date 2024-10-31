@@ -6,28 +6,78 @@ export async function POST(request: Request) {
 
 
   try {
-    const { category } = await request.json();
+    const { id, category, role } = await request.json();
     let productList: Product[] = [];
 
     const connection = await createConnection();
     console.log("Database connection established");
+
+    let disc = "";
+    if(role) {
+      disc = "10%";
+    }
+    else {
+      disc = "0%";
+    }
 
     let selectQuery = "";
 
     switch (category) {
       case "tops":
         selectQuery = `
-          SELECT * FROM top_table;
+          SELECT 
+            top_table.ID AS ProductID,
+            top_table.*,
+            'tops' AS Category,
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked
+          FROM 
+            top_table
+          LEFT JOIN 
+		      	favourite_table 
+		      ON 
+			      favourite_table.ID = ?;
         `;
         break;
       case "bottoms":
         selectQuery = `
-          SELECT * FROM bottom_table 
+          SELECT 
+            bottom_table.ID AS ProductID,
+            bottom_table.*,
+            'bottoms' AS Category,
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked 
+          FROM 
+            bottom_table
+          LEFT JOIN 
+		      	favourite_table 
+		      ON 
+		      	favourite_table.ID = ?; 
         `;
         break;
       case "accessories":
         selectQuery = `
-          SELECT * FROM accessories_table 
+          SELECT 
+            accessories_table.ID AS ProductID,
+            accessories_table.*, 
+            'accessories' AS Category,
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked  
+          FROM 
+            accessories_table
+          LEFT JOIN 
+			      favourite_table 
+		      ON 
+			      favourite_table.ID = ?
         `;
         break;
       case "others":
@@ -39,7 +89,7 @@ export async function POST(request: Request) {
         throw new Error("Invalid category");
     }
 
-    const [result] = await connection.execute(selectQuery);
+    const [result] = await connection.execute(selectQuery,[id]);
     console.log("Query executed successfully", result);
 
     if (Array.isArray(result) && result.length > 0) {
@@ -55,10 +105,10 @@ export async function POST(request: Request) {
         sizes: ["XS", "S", "M", "L"],
         colours: ["Black", "Red", "Navy", "Green"],
         description: "Comfortable",
-        disc: "0%",
+        disc: disc,
         promo: false,
         category: category,
-        liked: false
+        liked: product.liked
       }));
     }
 

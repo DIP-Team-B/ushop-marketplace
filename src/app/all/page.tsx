@@ -9,7 +9,43 @@ import Link from "next/link";
 export default function Page({ searchParams }) {
   const [allItems, setAllItems] = useState([]);
   const { id } = searchParams;  // Fetch the ID from the search params
+  // State for user role
+  const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
   useEffect(() => {
+    // Fetch user role first
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch(`/api/UserData`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+          }),
+        });
+        const data = await response.json();
+        console.log("role: ", data);
+        if (data.success) {
+          if (data.rows[0].Role === "Student" || data.rows[0].Role === "Staff") {
+            setIsStudentStaff(true);
+          } else {
+            setIsStudentStaff(false);
+          }
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchUserRole();
+  }, [id]); // Only fetch the user role when 'id' changes
+
+  useEffect(() => {
+    if (isStudentStaff === null) return; // Wait until role is determined
+    
     // Fetching data from API endpoint
     const getAll = async () => {
       try {
@@ -20,6 +56,7 @@ export default function Page({ searchParams }) {
           },
           body: JSON.stringify({
             id,
+            role: isStudentStaff,
           }),
         });
         const data = await response.json();
@@ -36,8 +73,9 @@ export default function Page({ searchParams }) {
         setAllItems([]);
       }
     }
+
     getAll();
-  }, [id]);
+  }, [id,isStudentStaff]);
 
   console.log(allItems);
 
@@ -63,7 +101,7 @@ export default function Page({ searchParams }) {
       <div className="w-full px-40 py-36 gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
         {allItems.map((product) => (
           <ProductCards
-            key={product.id}
+            key={product.id+product.name+product.category}
             name={product.name}
             id={product.id}
             images={product.images}

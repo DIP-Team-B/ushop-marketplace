@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
 
   try {
-    const { category, id } = await request.json();
+    const { category, id, userid, role } = await request.json();
     let productItem: Product = {
         id: 0,
         name: '',
@@ -21,11 +21,35 @@ export async function POST(request: Request) {
 
     let selectQuery = "";
     let sizeQuery = "";
+    let disc = "";
+
+    if (role) {
+      disc = "10%";
+    }
+    else {
+      disc = "0%";
+    }
+
+    console.log(disc);
 
     switch (category) {
       case "tops":
         selectQuery = `
-          SELECT * FROM top_table WHERE ID = ?;
+          SELECT 
+              top_table.*,
+              favourite_table.ID AS userID,
+          CASE 
+              WHEN JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$') THEN true
+              ELSE false 
+          END AS liked
+          FROM 
+              top_table
+          LEFT JOIN 
+		      	favourite_table 
+		      ON 
+		      	favourite_table.ID = ?
+		      WHERE
+		      	top_table.ID = ?;
         `;
         sizeQuery = `
           SELECT Size From top_table WHERE Name = ?;
@@ -33,7 +57,21 @@ export async function POST(request: Request) {
         break;
       case "bottoms":
         selectQuery = `
-          SELECT * FROM bottom_table WHERE ID = ?;
+          SELECT 
+            bottom_table.*,
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked 
+          FROM 
+            bottom_table
+          LEFT JOIN 
+		      	favourite_table 
+		      ON 
+		      	favourite_table.ID = ?
+          WHERE
+		      	bottom_table.ID = ?;
         `;
         sizeQuery = `
           SELECT Size From bottom_table WHERE Name = ?;
@@ -41,7 +79,21 @@ export async function POST(request: Request) {
         break;
       case "accessories":
         selectQuery = `
-          SELECT * FROM accessories_table WHERE ID = ?;
+          SELECT 
+            accessories_table.*, 
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked  
+          FROM 
+            accessories_table
+          LEFT JOIN 
+		      	favourite_table 
+		      ON 
+		      	favourite_table.ID = ?
+          WHERE
+		        accessories_table.ID = ?;
         `;
         sizeQuery = `
           SELECT Size From accessories_table WHERE Name = ?;
@@ -49,7 +101,21 @@ export async function POST(request: Request) {
         break;
       case "others":
         selectQuery = `
-          SELECT * FROM others_table WHERE ID = ?;
+          SELECT 
+            others_table.*, 
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.OthersList, CAST(others_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked
+          FROM 
+            others_table
+          LEFT JOIN 
+			      favourite_table 
+		      ON 
+			      favourite_table.ID = ?
+          WHERE
+		        others_table.ID = ?;
         `;
         sizeQuery = `
           SELECT Size From others_table WHERE Name = ?;
@@ -59,7 +125,7 @@ export async function POST(request: Request) {
         throw new Error("Invalid category");
     }
 
-    const [result] = await connection.execute(selectQuery, [id]);
+    const [result] = await connection.execute(selectQuery, [userid, id]);
     const [size_result] = await connection.execute(sizeQuery, [result[0].Name]);
     console.log("Query executed successfully", result);
     console.log(size_result);
@@ -74,10 +140,10 @@ export async function POST(request: Request) {
         description: result[0].Description,
         stock: result[0].Quantity,
         sizes: size_result.map(item => item.Size),
-        disc: "0%",
+        disc: disc,
         promo: false,
         category: category,
-        liked: false
+        liked: result[0].liked
       };
     }
 

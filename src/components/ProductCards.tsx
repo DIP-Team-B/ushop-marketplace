@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
 
@@ -20,8 +20,8 @@ interface ProductCardsProps {
 
 const ProductCards: React.FC<ProductCardsProps> = ({
   name,
-  id,
   images,
+  id,
   price,
   disc,
   category,
@@ -31,63 +31,55 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   const router = useRouter();  // Initialize the router
   const [isHovered, setHovered] = useState(false);
   const [isLoveIconClicked, setLoveIconClicked] = useState(liked);
+  const [loading, setLoading] = useState(false);
+
+  const [currentURL, setCurrentURL] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentURL(window.location.href);
+    }
+  }, []);
+
+  //console.log("Current URL:", currentURL);
 
   const UpdateWishlistList = async (liked: boolean) => {
-    if(liked) {
-      try {
-        const response = await fetch('/api/update-wishlist', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userid,
-            ItemId: Number(id),
-            category: String(category),
-            mode: "delete",
-          }),
-        });
-        const data = await response.json();
-        console.log('Reload');
-        if (data.success) {
-          console.log('Reload');
-          // Redirect to the updated wishlist page after successful removal
-          router.push(`/all?id=${id}`);
-          router.refresh();
-        } else {
-          console.error('Failed to update wishlist:', data.error);
-        }
-      } catch (error) {
-        console.error("Error removing from wishlist:", error);
-      }
+    // Check if any parameter is undefined
+    if (userid === undefined || id === undefined || category === undefined) {
+      console.error("Parameters cannot be undefined:", { userid, id, category });
+      return; // Exit the function early if any required parameter is missing
     }
-    if(!liked) {
-      try {
-        const response = await fetch('/api/update-wishlist', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userid,
-            ItemId: Number(id),
-            category: String(category),
-            mode: "add",
-          }),
-        });
-        const data = await response.json();
+
+    const mode = liked ? "add" : "delete";
+    setLoading(true);
+    
+    try {
+      const response = await fetch('/api/update-wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userid,
+          ItemId: Number(id),
+          category: String(category),
+          mode: mode,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        console.log(data);
+        setLoveIconClicked(!isLoveIconClicked);
         console.log('Reload');
-        if (data.success) {
-          console.log('Reload');
-          // Redirect to the updated wishlist page after successful removal
-          router.push(`/all?id=${id}`);
-          router.refresh();
-        } else {
-          console.error('Failed to update wishlist:', data.error);
-        }
-      } catch (error) {
-        console.error("Error adding from wishlist:", error);
+        // Redirect to the updated wishlist page after successful removal
+        //window.location.reload();
+      } else {
+        console.error('Failed to update wishlist:', data.error);
       }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,7 +91,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
           className={`w-5 h-5 ${
             isLoveIconClicked && `stroke-none fill-primaryRed-600`
           }`}
-          onClick={() => UpdateWishlistList(liked)}
+          onClick={() => UpdateWishlistList(!isLoveIconClicked)}
         ></Heart>
       </div>
       
@@ -152,7 +144,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
                   disc === "0%" ? "text-mainBlack" : "text-primaryRed-600"
                 } font-semibold text-md`}
               >
-                ${price.toFixed(2)}
+                ${((price * (1 - parseFloat(disc) / 100)).toFixed(2))}
               </p>
               {disc === "0%" ? null : (
                 <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">

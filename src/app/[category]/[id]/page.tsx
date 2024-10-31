@@ -33,11 +33,56 @@ const ProductPage = ({ params }: ProductPageProps) => {
   const [selectedSize, setSelectedSize] = useState(""); 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentURL, setCurrentURL] = useState("");
+  // State for user role
+  const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
+  useEffect(() => {
+    // Fetch user role first
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch(`/api/UserData`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: userid,
+          }),
+        });
+        const data = await response.json();
+        console.log("role: ", data);
+        if (data.success) {
+          if (data.rows[0].Role === "Student" || data.rows[0].Role === "Staff") {
+            setIsStudentStaff(true);
+          } else {
+            setIsStudentStaff(false);
+          }
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchUserRole();
+  }, [userid]); // Only fetch the user role when 'id' changes
 
   useEffect(() => {
+
+    if (typeof window !== "undefined") {
+      setCurrentURL(window.location.href);
+    }
+
+    if (isStudentStaff === null) return; // Wait until role is determined
+
     // Fetching data from API endpoint
     const getTops = async () => {
       try {
+        console.log(productCat);
+        console.log(productId);
+        console.log(userid);
+
         const response = await fetch(`/api/get_products_details`, {
           method: "POST",
           headers: {
@@ -45,7 +90,9 @@ const ProductPage = ({ params }: ProductPageProps) => {
           },
           body: JSON.stringify({
             category: productCat,
-            id: productId
+            id: productId,
+            userid: userid,
+            role: isStudentStaff,
           }),
         });
         const data = await response.json();
@@ -53,7 +100,8 @@ const ProductPage = ({ params }: ProductPageProps) => {
         // Assuming data is in the format { success: true, count: 5 }
         if (data.success) {
           setProduct(data.result); // Extracting the count from the response
-          setSelectedSize(data.result.size)
+          setSelectedSize(data.result.size);
+          setLoveIconClicked(data.result.liked);
         } else {
           // Find the product by ID;
           console.error(data.error); // Handle error in the response
@@ -66,7 +114,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
     }
 
     getTops();
-  }, [productCat, productId]);
+  }, [productCat, productId, userid, isStudentStaff]);
   // Function to change the selected size
   const changeSize = async (size) => {
     try {
@@ -92,6 +140,40 @@ const ProductPage = ({ params }: ProductPageProps) => {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+    }
+  };
+
+  //UPDATE WISHLIST
+  const UpdateWishlistList = async (liked: boolean) => {
+
+    const mode = liked ? "add" : "delete";
+    
+    try {
+      const response = await fetch('/api/update-wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userid,
+          ItemId: Number(product.id),
+          category: String(product.category),
+          mode: mode,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (data.success) {
+        setLoveIconClicked(!isLoveIconClicked);
+        // Redirect to the updated wishlist page after successful removal
+        //router.replace(currentURL);
+        //router.refresh();
+        window.location.reload();
+      } else {
+        console.error('Failed to update wishlist:', data.error);
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
     }
   };
 
@@ -196,7 +278,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                   product.disc === "0%" ? "text-mainBlack" : "text-primaryRed-600"
                 } font-semibold text-md`}
               >
-                {/* ${product.price.toFixed(2)} */}
+                ${((product.price * (1 - parseFloat(product.disc) / 100)).toFixed(2))}
               </p>
               {product.disc === "0%" ? null : (
                 <div className="text-xs text-primaryRed-600 border-primaryRed-600 border-[1px] rounded-[2px] flex items-center justify-center h-4 w-9">
@@ -312,7 +394,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                 className={`w-5 h-5 ${
                   isLoveIconClicked && `stroke-none fill-primaryRed-600`
                 }`}
-                onClick={() => setLoveIconClicked(!isLoveIconClicked)}
+                onClick={() => UpdateWishlistList(!product.liked)}
               ></Heart>
             </div>
 

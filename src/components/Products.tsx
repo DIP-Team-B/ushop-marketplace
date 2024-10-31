@@ -32,6 +32,7 @@ const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
     color: ["Black", "Red", "Blue", "Green", "Yellow"],
   });
 
+  console.log(products);
   
 
   const handleFilterChange = (newFilters: { price: [number, number]; size: string[]; color: string[] }) => {
@@ -89,6 +90,7 @@ const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
                 price={product.price}
                 disc={product.disc}
                 category={product.category}
+                liked={product.liked}
                 userid={userid}
               />
             ))}
