@@ -55,6 +55,7 @@ import { products } from "../productsData";
 import AdminCheck from "@/components/AdminCheck";
 import AdminUpload from "@/components/AdminUpload";
 import AdminInventory from "@/components/AdminInventory";
+import Navbar from "@/components/Navbar";
 
 interface Invoice {
   images: string[];
@@ -300,57 +301,39 @@ const handleSubmit = async (
   }
 };
 
+const [isLoggedInAdminAccount, setIsLoginInAdminAccount] = useState(false);
+// Function to check if the user is logged in and an admin
+useEffect(() => {
+  const checkUserStatus = async () => {
+    try {
+      const response = await fetch('/api/session'); 
+      const data = await response.json();
+      if (response.ok && data.user.username && data.user.role == 'Admin') {
+        setIsLoginInAdminAccount(true); // User is logged in and admin
+      } else {
+        setIsLoginInAdminAccount(false); // User is not logged in or admin
+      }
+    } catch (error) {
+      console.error("Error checking user session:", error);
+      setIsLoginInAdminAccount(false); // Handle error 
+    }
+  };
+
+  checkUserStatus();
+}, []);
+
+
 return (
-  <div className="flex justify-center flex-col text-mainBlack">
-    {!isAdmin ? (
-      <div className="w-[1350px]">
-        <div className="flex flex-col items-center w-full py-40">
-          <div className="flex flex-col items-center gap-8 w-[500px]">
-            <h1 className="font-bold text-3xl">Admin Log In</h1>
-            <form className="grid gap-6 w-full" onSubmit={handleLogin}>
-              <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={cn(
-                    { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
-                  )}
-                />
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={cn(
-                    { "focus-visible:ring-mainBlack": true },
-                    "w-full h-10"
-                  )}
-                />
-              </div>
-              <Button type="submit" className="w-full h-10 mt-2">
-                Log In
-              </Button>
-            </form>
-          </div>
-        </div>
-      </div>
-    ) : (
+  isLoggedInAdminAccount? (
+    <div className="flex justify-center flex-col text-mainBlack relative">   
       <div>
-        <div className="flex flex-col gap-4 p-8 w-full items-center">
+      <Navbar className="fixed top-0 left-0 w-full z-50"></Navbar>
+        <div className="flex flex-col gap-4 p-8 w-full items-center mt-32 z-20">
           <div className="flex justify-between items-center w-full">
             <Button variant="link" className="opacity-0">
               Log out
             </Button>
-            <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
+            <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200 z-20">
               <div
                 className={`py-2 px-4 rounded-full cursor-pointer ${
                   dataShown === "check"
@@ -372,8 +355,8 @@ return (
                 Upload product
               </div>
             </div>
-            <Button variant="link" onClick={() => setAdmin(false)}>
-              Log out
+            <Button variant="link">
+           
             </Button>
           </div>
           {dataShown === "check" ? (
@@ -823,8 +806,14 @@ return (
           )}
         </div>
       </div>
-    )}
+    
   </div>
+  ): (
+    <div className="flex justify-center items-center h-screen">
+    <p className="text-center text-black font-bold">Access denied.</p>
+  </div>
+  )
+  
 );
 };
 
