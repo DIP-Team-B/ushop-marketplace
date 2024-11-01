@@ -52,9 +52,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { products } from "../productsData";
-import AdminCheck from "@/components/AdminCheck";
-import AdminUpload from "@/components/AdminUpload";
 import AdminInventory from "@/components/AdminInventory";
+import { useRouter } from 'next/navigation';
 
 interface Invoice {
   images: string[];
@@ -91,6 +90,7 @@ const statusOptions = ["All", "Pending", "Confirmed", "Cancelled"];
 const ITEMS_PER_PAGE = 8;
 
 const Page = () => {
+  const router = useRouter();
   const [isAdmin, setAdmin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,6 +99,7 @@ const Page = () => {
     e.preventDefault();
     if (email === adminEmail && password === adminPassword) {
       setAdmin(true);
+      router.push("/admin_CheckOrder");
     } else {
       alert("Invalid email or password");
     }
@@ -120,20 +121,10 @@ const Page = () => {
       try {
         const response = await fetch('/api/check_order');
         const result = await response.json();
+        console.log(result);
         if (result.success) {
-          // Map the fetched data to the Invoice interface
-          const formattedInvoices = result.data.map((invoice: any) => ({
-            images: [`/images/${invoice.Images}`], // Prepend leading slash to image paths
-            name: invoice.Name,
-            invoice: invoice.Invoice,
-            category: invoice.Category,
-            id: invoice.ID.toString(),
-            date: invoice.Order_date, 
-            status: invoice.Status,
-            quantity: invoice.Quantity,
-            price: invoice.Price,
-          }));
-          setInvoices(formattedInvoices);
+          console.log(result.data);
+          setInvoices(result.data);
         } else {
           alert("Failed to fetch orders: " + result.error);
         }
@@ -165,6 +156,7 @@ const Page = () => {
               : invoice
           )
         );
+        window.location.reload(); // Refresh the page
       } else {
         alert("Failed to update order status: " + result.error);
       }
@@ -295,7 +287,6 @@ const Page = () => {
 
   return (
     <div className="flex justify-center flex-col text-mainBlack">
-      {!isAdmin ? (
         <div className="w-[1350px]">
           <div className="flex flex-col items-center w-full py-40">
             <div className="flex flex-col items-center gap-8 w-[500px]">
@@ -336,500 +327,6 @@ const Page = () => {
             </div>
           </div>
         </div>
-      ) : (
-        <div>
-          <div className="flex flex-col gap-4 p-8 w-full items-center">
-            <div className="flex justify-between items-center w-full">
-              <Button variant="link" className="opacity-0">
-                Log out
-              </Button>
-              <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "check"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => setDataShown("check")}
-                >
-                  Check orders
-                </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "upload"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => setDataShown("upload")}
-                >
-                  Upload product
-                </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "inventory" && "bg-mainBlack text-mainWhite"
-                  } ${
-                    dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => setDataShown("inventory")}
-                >
-                  Inventory
-                </div>
-              </div>
-              <Button variant="link" onClick={() => setAdmin(false)}>
-                Log out
-              </Button>
-            </div>
-            {dataShown === "check" ? (
-              <div className="w-[1350px] flex flex-col gap-2 p-8">
-                <div className="flex items-center justify-between">
-                  {/* Month and Year Filters */}
-                  <div className="flex gap-2 items-center">
-                    {/* Month Filter */}
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="text-xs flex items-center justify-between w-40"
-                          >
-                            {Month}
-                            <ChevronDown className="w-3 h-3"></ChevronDown>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40 bg-mainWhite flex flex-col p-2 rounded-lg shadow-md">
-                          {months.map((month, index) => (
-                            <DropdownMenuItem
-                              key={index}
-                              onClick={() => setMonth(month)}
-                            >
-                              <Button
-                                variant="ghost"
-                                className="text-xs h-5 p-0"
-                              >
-                                {month}
-                              </Button>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      {Month !== "Month" && (
-                        <RotateCcw
-                          className="w-4 h-4 cursor-pointer mr-3"
-                          onClick={() => setMonth("Month")}
-                        />
-                      )}
-                    </div>
-                    {/* Year Filter */}
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="text-xs flex items-center justify-between w-40"
-                          >
-                            {Year}{" "}
-                            <ChevronDown className="w-3 h-3"></ChevronDown>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40 bg-mainWhite flex flex-col p-2 rounded-lg shadow-md">
-                          {Array.from({ length: 5 }).map((_, index) => (
-                            <DropdownMenuItem
-                              key={index}
-                              onClick={() => setYear(String(2024 - index))}
-                            >
-                              <Button
-                                variant="ghost"
-                                className="text-xs h-5 p-0"
-                              >
-                                {String(2024 - index)}
-                              </Button>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      {Year !== "Year" && (
-                        <RotateCcw
-                          className="w-4 h-4 cursor-pointer mr-3"
-                          onClick={() => setYear("Year")}
-                        />
-                      )}
-                    </div>
-                    {/* Status Filter */}
-                    <div className="flex items-center gap-2">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="text-xs flex items-center justify-between w-40"
-                          >
-                            {statusFilter}{" "}
-                            <ChevronDown className="w-3 h-3"></ChevronDown>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-40 bg-mainWhite flex flex-col p-2 rounded-lg shadow-md">
-                          {statusOptions.map((status) => (
-                            <DropdownMenuItem
-                              key={status}
-                              onClick={() => setStatusFilter(status)}
-                            >
-                              <Button
-                                variant="ghost"
-                                className="text-xs h-5 p-0"
-                              >
-                                {status}
-                              </Button>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                      {statusFilter !== "All" && (
-                        <RotateCcw
-                          className="w-4 h-4 cursor-pointer mr-3"
-                          onClick={() => setStatusFilter("All")}
-                        />
-                      )}
-                    </div>
-                  </div>
-                  {/* Sorting Button */}
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={() => setFilterUp(!filterUp)}
-                  >
-                    {filterUp ? (
-                      <>
-                        <ArrowDownNarrowWide className="w-4 h-4" />
-                        <span className="text-xs text-mainBlack">Recent</span>
-                      </>
-                    ) : (
-                      <>
-                        <ArrowUpNarrowWide className="w-4 h-4" />
-                        <span className="text-xs text-mainBlack">Oldest</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                {/* Invoices Table */}
-                <div className="p-5 rounded-2xl overflow-hidden border-[1px] border-gray-200 shadow-sm">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableCell className="w-[300px]">Item</TableCell>
-                        <TableCell>Invoice</TableCell>
-                        <TableCell>
-                          Date{" "}
-                          <p className="text-[10px] text-muted-foreground mt-[-2px]">
-                            (YYYY-MM-DD)
-                          </p>
-                        </TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell className="text-right">Amount</TableCell>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedInvoices.map((invoice) => (
-                        <TableRow key={invoice.invoice}>
-                          <TableCell>
-                            <div className="w-[200px] flex gap-2 items-center">
-                              <Image
-                                width={48}
-                                height={48}
-                                alt="image"
-                                src={invoice.images[0]}
-                                className="object-cover aspect-square rounded-md"
-                              />
-                              <div className="flex flex-col gap-0">
-                                <p className="text-xs font-medium">
-                                  {invoice.name}
-                                </p>
-                                <p className="text-xs font-light text-muted-foreground">
-                                  {invoice.category}
-                                </p>
-                                <p className="text-[10px] font-light text-muted-foreground">
-                                  x {invoice.quantity}
-                                </p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="font-light">
-                            {invoice.invoice}
-                          </TableCell>
-                          <TableCell className="font-light">
-                            {invoice.date}
-                          </TableCell>
-                          <TableCell className="font-light">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="text-xs">
-                                  {invoice.status}
-                                  <ChevronDown className="w-3 h-3 ml-2" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent className="w-40">
-                                {statusOptions.slice(1).map((status) => (
-                                  <DropdownMenuItem
-                                    key={status}
-                                    onClick={() =>
-                                      handleStatusChange(
-                                        invoice.invoice,
-                                        status
-                                      )
-                                    }
-                                  >
-                                    {status}
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                          <TableCell className="text-right font-light">
-                            ${invoice.quantity * invoice.price}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        {currentPage === 1 ? null : (
-                          <PaginationPrevious
-                            href="#"
-                            onClick={() =>
-                              handlePageChange(Math.max(1, currentPage - 1))
-                            }
-                            aria-disabled={currentPage === 1}
-                          />
-                        )}
-                      </PaginationItem>
-                      {Array.from({ length: totalPages }).map((_, index) => (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => handlePageChange(index + 1)}
-                            isActive={currentPage === index + 1}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      {totalPages > 3 && <PaginationEllipsis />}
-                      <PaginationItem>
-                        {currentPage === totalPages ? null : (
-                          <PaginationNext
-                            href="#"
-                            onClick={() =>
-                              handlePageChange(
-                                Math.min(totalPages, currentPage + 1)
-                              )
-                            }
-                          />
-                        )}
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                )}
-              </div>
-            ) : dataShown === "upload" ? (
-              <div className="w-[1350px] flex flex-col gap-4 py-8 px-32">
-                <h1 className="text-2xl font-bold">Upload Product</h1>
-                <form className="flex flex-col gap-4"
-                onSubmit={async (e) => {
-                  e.preventDefault(); // Prevent default form submission behavior
-                  await handleSubmit(productName, price, category, counter, sizes, imageURL, description, isPromo, disc);
-                }}>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="name">
-                      Product name
-                    </Label>
-                    <Input
-                      type="productName"
-                      id="productName"
-                      placeholder="Product Name"
-                      value={productName}
-                      onChange={(e) => setProductName(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="price">
-                      Price (SGD)
-                    </Label>
-                    <Input
-                      type="price"
-                      id="price"
-                      placeholder="Product price (in SGD)"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="category">
-                      Product category
-                    </Label>
-                    <Select
-                      value={category}
-                      onValueChange={(value) => setCategory(value)}
-                    >
-                      <SelectTrigger className="w-[300px] text-s text-muted-foreground">
-                        <SelectValue placeholder="Select product category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel className="text-xs">
-                            Category
-                          </SelectLabel>
-                          <SelectItem value="tops">Tops</SelectItem>
-                          <SelectItem value="bottom">Bottoms</SelectItem>
-                          <SelectItem value="accessories">
-                            Accessories
-                          </SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="picture">
-                      Product image 1
-                    </Label>
-                    <Input
-                      type="file"
-                      id="picture1"
-                      className="text-xs text-muted-foreground"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        if (file) {
-                          const imageUrl = file.name; // Use the file name instead of the blob URL
-                          setImageURL(imageUrl);  // Update the image URL state
-                          setImage1(file);        // Update the image file state
-                        } else {
-                          setImageURL(null); // Ensure imageURL is null if no file is selected
-                        }
-                      }}
-                    />
-                    {imageURL && (
-                      <p className="text-xs mt-2">
-                        Image URL: {imageURL}  {/* Display the image URL */}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="stock">
-                      Stock
-                    </Label>
-                    <div className="flex p-2 gap-2 rounded-sm border-[1px] border-gray-200 items-center">
-                      <MinusCircle
-                        className={`w-4 h-4 ${counter === 0 && `hidden`}`}
-                        onClick={() => setCounter(counter - 1)}
-                      ></MinusCircle>
-                      <p className="text-xs">{counter}</p>
-                      <PlusCircle
-                        className={"w-4 h-4"}
-                        onClick={() => setCounter(counter + 1)}
-                      ></PlusCircle>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="description">
-                      Product description
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Type your product description here."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="description">
-                      Sizes
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-s"
-                        onCheckedChange={() => handleSizeChange("S")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        S
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-m"
-                        onCheckedChange={() => handleSizeChange("M")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        M
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-l"
-                        onCheckedChange={() => handleSizeChange("L")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        L
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-xl"
-                        onCheckedChange={() => handleSizeChange("XL")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        XL
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-xxl"
-                        onCheckedChange={() => handleSizeChange("XXL")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        XXL
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Label className="text-xs" htmlFor="promo">
-                      Promotion
-                    </Label>
-                    <Switch
-                      id="promo"
-                      checked={isPromo}
-                      onClick={() => setPromo(!isPromo)}
-                    />
-                  </div>
-
-                  {isPromo && (
-                    <div className="flex flex-col items-start gap-1.5">
-                      <Label className="text-xs" htmlFor="disc">
-                        Discount
-                      </Label>
-                      <Input
-                        type="disc"
-                        id="disc"
-                        placeholder="5%"
-                        value={disc}
-                        onChange={(e) => setDisc(e.target.value)}
-                      />
-                    </div>
-                  )}
-                  <Button type="submit" className="h-12">
-                    Submit
-                  </Button>
-                </form>
-              </div>
-            ) : (
-              <AdminInventory />
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

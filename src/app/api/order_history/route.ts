@@ -36,6 +36,7 @@ export async function POST(request: Request) {
           ON jt.TopID = top_table.ID
           WHERE 
             order_table.Account_ID = ?
+            AND JSON_LENGTH(order_table.TopList) > 0
 
           UNION
 
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
           ON jt.BottomID = bottom_table.ID
           WHERE 
             order_table.Account_ID = ?
+            AND JSON_LENGTH(order_table.BottomList) > 0
 
           UNION
 
@@ -86,6 +88,7 @@ export async function POST(request: Request) {
           ON jt.AccessoriesID = accessories_table.ID
           WHERE 
             order_table.Account_ID = ?
+            AND JSON_LENGTH(order_table.AccessoriesList) > 0
 
           UNION
 
@@ -111,6 +114,7 @@ export async function POST(request: Request) {
           ON jt.OthersID = others_table.ID
           WHERE 
             order_table.Account_ID = ?
+            AND JSON_LENGTH(order_table.OthersList) > 0
 
           ORDER BY 
             Invoice ASC;

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db';
 
+let InvoiceItems = [];
+
 export async function GET(request: Request) {
   let connection;
 
@@ -8,10 +10,127 @@ export async function GET(request: Request) {
     connection = await createConnection();
     console.log("Database connection established");
 
-    const [rows] = await connection.execute("SELECT ID, Images, Name, Invoice, Category, DATE_FORMAT(Order_date, '%Y-%m-%d') as Order_date, Status, Quantity, Price FROM order_table");
-    console.log("Orders fetched successfully", rows);
+    const sql = `
+          SELECT 
+            order_table.ID AS Invoice,
+            top_table.*, 
+            SUBSTRING(order_table.Date, 1, 10) AS Date, 
+            order_table.Status,
+            jt.OrderedQuantity,
+            'tops' AS Category,
+            CONCAT('tops/', top_table.Image_URL) AS ImageURL
+          FROM 
+            order_table
+          JOIN
+            JSON_TABLE(order_table.TopList, '$[*]' 
+              COLUMNS (
+                TopID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+          JOIN 
+            top_table
+          ON jt.TopID = top_table.ID
+          WHERE 
+            JSON_LENGTH(order_table.TopList) > 0
 
-    return NextResponse.json({ success: true, data: rows });
+          UNION
+
+          SELECT 
+            order_table.ID AS Invoice,
+            bottom_table.*, 
+            SUBSTRING(order_table.Date, 1, 10) AS Date, 
+            order_table.Status,
+            jt.OrderedQuantity,
+            'bottoms' AS Category,
+            CONCAT('bottoms/', bottom_table.Image_URL) AS ImageURL
+          FROM 
+            order_table
+          JOIN
+            JSON_TABLE(order_table.BottomList, '$[*]' 
+              COLUMNS (
+                BottomID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+          JOIN 
+            bottom_table
+          ON jt.BottomID = bottom_table.ID
+          WHERE 
+            JSON_LENGTH(order_table.BottomList) > 0
+
+          UNION
+
+          SELECT 
+            order_table.ID AS Invoice,
+            accessories_table.*, 
+            SUBSTRING(order_table.Date, 1, 10) AS Date, 
+            order_table.Status,
+            jt.OrderedQuantity,
+            'accessories' AS Category,
+            CONCAT('accessories/', accessories_table.Image_URL) AS ImageURL
+          FROM 
+            order_table
+          JOIN
+            JSON_TABLE(order_table.AccessoriesList, '$[*]' 
+              COLUMNS (
+                AccessoriesID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+          JOIN 
+            accessories_table
+          ON jt.AccessoriesID = accessories_table.ID
+          WHERE 
+            JSON_LENGTH(order_table.AccessoriesList) > 0
+
+          UNION
+
+          SELECT 
+            order_table.ID AS Invoice,
+            others_table.*, 
+            SUBSTRING(order_table.Date, 1, 10) AS Date, 
+            order_table.Status,
+            jt.OrderedQuantity,
+            'others' AS Category,
+            CONCAT('others/', others_table.Image_URL) AS ImageURL
+          FROM 
+            order_table
+          JOIN
+            JSON_TABLE(order_table.OthersList, '$[*]' 
+              COLUMNS (
+                OthersID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+          JOIN 
+            others_table
+          ON jt.OthersID = others_table.ID
+          WHERE 
+            JSON_LENGTH(order_table.OthersList) > 0
+
+          ORDER BY 
+            Invoice ASC;
+        `;
+
+    const [rows] = await connection.execute(sql,[]);
+    console.log("Orders fetched successfully", rows);
+    if (Array.isArray(rows) && rows.length > 0) {
+      InvoiceItems = rows.map((row) => ({
+        images: '/images/products/'+[row.ImageURL],
+        name: row.Name,
+        invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
+        category: row.Category,
+        id: 'NTU000'+row.Invoice+row.Name,
+        date: row.Date,
+        status: row.Status,
+        quantity: row.OrderedQuantity,
+        price: row.Price.toFixed(2),
+      }));
+    }
+    console.log("InvoiceItems data:", InvoiceItems);
+
+    return NextResponse.json({ success: true, data: InvoiceItems });
   } catch (error: any) {
     console.error("Error in GET function", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -36,7 +155,7 @@ export async function PUT(request: Request) {
     console.log("Database connection established");
 
     const [result] = await connection.execute(
-      "UPDATE order_table SET Status = ? WHERE Invoice = ?",
+      "UPDATE order_table SET Status = ? WHERE ID = ?",
       [status, invoice]
     );
     console.log("Order status updated successfully", result);
