@@ -1,0 +1,546 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import {
+  ChevronDown,
+  Minus,
+  MinusCircle,
+  Plus,
+  PlusCircle,
+  RotateCcw,
+} from "lucide-react";
+import { SetStateAction, useState, useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from "@/components/ui/table";
+import Image from "next/image";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { products } from "../productsData";
+import AdminInventory from "@/components/AdminInventory";
+import { useRouter } from 'next/navigation';
+
+interface Invoice {
+  images: string[];
+  name: string;
+  invoice: string;
+  category: string;
+  id: string;
+  date: string;
+  status: string;
+  quantity: number;
+  price: number;
+}
+
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const adminEmail = "admin@gmail.com";
+const adminPassword = "admin12345678";
+
+const statusOptions = ["All", "Pending", "Confirmed", "Cancelled"];
+
+const ITEMS_PER_PAGE = 8;
+
+const Page = () => {
+  const router = useRouter();
+  const [isAdmin, setAdmin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (email === adminEmail && password === adminPassword) {
+      setAdmin(true);
+    } else {
+      alert("Invalid email or password");
+    }
+  };
+
+  const [dataShown, setDataShown] = useState("upload");
+
+  const [Month, setMonth] = useState("Month");
+  const [Year, setYear] = useState("Year");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filterUp, setFilterUp] = useState(false);
+  const [invoices, setInvoices] = useState<Invoice[]>([]); // Initialize with an empty array
+  const [isPromo, setPromo] = useState(false);
+
+  // Fetch orders from the API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('/api/check_order');
+        const result = await response.json();
+        console.log(result);
+        if (result.success) {
+          console.log(result.data);
+          setInvoices(result.data);
+        } else {
+          alert("Failed to fetch orders: " + result.error);
+        }
+      } catch (error: any) {
+        alert("Error: " + error.message);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Handle status update
+  const handleStatusChange = async (invoiceNum: string, newStatus: string) => {
+    try {
+      const response = await fetch('/api/check_order', {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ invoice: invoiceNum, status: newStatus }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setInvoices((prevInvoices) =>
+          prevInvoices.map((invoice) =>
+            invoice.invoice === invoiceNum
+              ? { ...invoice, status: newStatus }
+              : invoice
+          )
+        );
+        window.location.reload(); // Refresh the page
+      } else {
+        alert("Failed to update order status: " + result.error);
+      }
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  // Filter and sort the invoices based on the selected month, year, status, and sorting order.
+  const filteredInvoices = invoices
+    .filter((invoice) => {
+      const invoiceDate = new Date(invoice.date);
+      const selectedMonthIndex = months.indexOf(Month);
+      const selectedYear = parseInt(Year, 10);
+
+      const matchesMonth =
+        Month === "Month" || invoiceDate.getMonth() === selectedMonthIndex;
+      const matchesYear =
+        Year === "Year" || invoiceDate.getFullYear() === selectedYear;
+      const matchesStatus =
+        statusFilter === "All" || invoice.status === statusFilter;
+
+      return matchesMonth && matchesYear && matchesStatus;
+    })
+    .filter((invoice) => invoice.date) // Ensure date property exists
+    .sort((a, b) => {
+      return filterUp
+        ? a.date.localeCompare(b.date)
+        : b.date.localeCompare(a.date);
+    });
+
+  const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedInvoices = filteredInvoices.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
+  const handlePageChange = (pageNumber: SetStateAction<number>) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const routerPush = (link: string) => {
+    if (link === "check") {
+        router.push("/admin_CheckOrder");
+    }
+    else if (link === "upload") {
+        router.push("/admin_InventoryUpload");
+    }
+    else if (link === "inventory") {
+        router.push("/admin_Inventory");
+    }
+    else {
+        router.push("/admin");
+    }
+  }
+
+  const [counter, setCounter] = useState(10);
+
+  const [productName, setProductName] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [sizes, setSizes] = useState<string[]>([]);
+  const [disc, setDisc] = useState("");
+
+  // State for image files
+  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [image1, setImage1] = useState<File | null>(null);
+
+  // Handle size checkbox changes
+  const handleSizeChange = (size: string) => {
+    if (sizes.includes(size)) {
+      setSizes(sizes.filter((s) => s !== size));
+    } else {
+      setSizes([...sizes, size]);
+    }
+  };
+
+  const handleSubmit = async (
+    productName: string, 
+    price: string, 
+    category: string,
+    counter: number,
+    sizes: string[],
+    imageURL: string | null,
+    description: string,
+    isPromo: boolean,
+    disc: string
+  ) => {
+    if (!imageURL) {
+      alert("Image URL is required");
+      return;
+    }
+
+    const newProduct = {
+      name: productName,
+      price: parseFloat(price),
+      category: category,
+      quantity: counter,
+      sizes: sizes,
+      imageurl: imageURL,
+      description: description,
+      promo: isPromo,
+      disc: isPromo ? disc : "0%",
+    };
+
+    try {
+      const response = await fetch('/api/add_item', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newProduct),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Product added successfully!");
+        // Optionally clear form fields after successful submission
+        setProductName("");
+        setPrice("");
+        setCategory("");
+        setCounter(10);
+        setDescription("");
+        setSizes([]);
+        setPromo(false);
+        setDisc("");
+        setImage1(null);
+        setImageURL(null);
+      } else {
+        alert("Failed to add product: " + result.error);
+      }
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    }
+  };
+
+  // Reset the promo switch when the product is added or the page is refreshed
+  useEffect(() => {
+    setPromo(false);
+  }, [invoices]);
+
+  return (
+    <div className="flex justify-center flex-col text-mainBlack">
+        <div>
+          <div className="flex flex-col gap-4 p-8 w-full items-center">
+            <div className="flex justify-between items-center w-full">
+              <Button variant="link" className="opacity-0">
+                Log out
+              </Button>
+              <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
+                <div
+                  className={`py-2 px-4 rounded-full cursor-pointer ${
+                    dataShown === "check"
+                      ? "bg-mainBlack text-mainWhite"
+                      : "bg-gray-100 text-mainBlack"
+                  }`}
+                  onClick={() => routerPush("check")}
+                >
+                  Check orders
+                </div>
+                <div
+                  className={`py-2 px-4 rounded-full cursor-pointer ${
+                    dataShown === "upload"
+                      ? "bg-mainBlack text-mainWhite"
+                      : "bg-gray-100 text-mainBlack"
+                  }`}
+                  onClick={() => routerPush("upload")}
+                >
+                  Upload product
+                </div>
+                <div
+                  className={`py-2 px-4 rounded-full cursor-pointer ${
+                    dataShown === "inventory" && "bg-mainBlack text-mainWhite"
+                  } ${
+                    dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
+                  }`}
+                  onClick={() => routerPush("inventory")}
+                >
+                  Inventory
+                </div>
+              </div>
+              <Button variant="link" onClick={() => setAdmin(false)}>
+                Log out
+              </Button>
+            </div>
+              <div className="w-[1350px] flex flex-col gap-4 py-8 px-32">
+                <h1 className="text-2xl font-bold">Upload Product</h1>
+                <form className="flex flex-col gap-4"
+                onSubmit={async (e) => {
+                  e.preventDefault(); // Prevent default form submission behavior
+                  await handleSubmit(productName, price, category, counter, sizes, imageURL, description, isPromo, disc);
+                }}>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="name">
+                      Product name
+                    </Label>
+                    <Input
+                      type="productName"
+                      id="productName"
+                      placeholder="Product Name"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="price">
+                      Price (SGD)
+                    </Label>
+                    <Input
+                      type="price"
+                      id="price"
+                      placeholder="Product price (in SGD)"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="category">
+                      Product category
+                    </Label>
+                    <Select
+                      value={category}
+                      onValueChange={(value) => setCategory(value)}
+                    >
+                      <SelectTrigger className="w-[300px] text-s text-muted-foreground">
+                        <SelectValue placeholder="Select product category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel className="text-xs">
+                            Category
+                          </SelectLabel>
+                          <SelectItem value="tops">Tops</SelectItem>
+                          <SelectItem value="bottom">Bottoms</SelectItem>
+                          <SelectItem value="accessories">
+                            Accessories
+                          </SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="picture">
+                      Product image 1
+                    </Label>
+                    <Input
+                      type="file"
+                      id="picture1"
+                      className="text-xs text-muted-foreground"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        if (file) {
+                          const imageUrl = file.name; // Use the file name instead of the blob URL
+                          setImageURL(imageUrl);  // Update the image URL state
+                          setImage1(file);        // Update the image file state
+                        } else {
+                          setImageURL(null); // Ensure imageURL is null if no file is selected
+                        }
+                      }}
+                    />
+                    {imageURL && (
+                      <p className="text-xs mt-2">
+                        Image URL: {imageURL}  {/* Display the image URL */}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="stock">
+                      Stock
+                    </Label>
+                    <div className="flex p-2 gap-2 rounded-sm border-[1px] border-gray-200 items-center">
+                      <MinusCircle
+                        className={`w-4 h-4 ${counter === 0 && `hidden`}`}
+                        onClick={() => setCounter(counter - 1)}
+                      ></MinusCircle>
+                      <p className="text-xs">{counter}</p>
+                      <PlusCircle
+                        className={"w-4 h-4"}
+                        onClick={() => setCounter(counter + 1)}
+                      ></PlusCircle>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="description">
+                      Product description
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Type your product description here."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col items-start gap-1.5">
+                    <Label className="text-xs" htmlFor="description">
+                      Sizes
+                    </Label>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="size-s"
+                        onCheckedChange={() => handleSizeChange("S")}
+                      />
+                      <label className="text-xs" htmlFor="size">
+                        S
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="size-m"
+                        onCheckedChange={() => handleSizeChange("M")}
+                      />
+                      <label className="text-xs" htmlFor="size">
+                        M
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="size-l"
+                        onCheckedChange={() => handleSizeChange("L")}
+                      />
+                      <label className="text-xs" htmlFor="size">
+                        L
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="size-xl"
+                        onCheckedChange={() => handleSizeChange("XL")}
+                      />
+                      <label className="text-xs" htmlFor="size">
+                        XL
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="size-xxl"
+                        onCheckedChange={() => handleSizeChange("XXL")}
+                      />
+                      <label className="text-xs" htmlFor="size">
+                        XXL
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs" htmlFor="promo">
+                      Promotion
+                    </Label>
+                    <Switch
+                      id="promo"
+                      checked={isPromo}
+                      onClick={() => setPromo(!isPromo)}
+                    />
+                  </div>
+
+                  {isPromo && (
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="disc">
+                        Discount
+                      </Label>
+                      <Input
+                        type="disc"
+                        id="disc"
+                        placeholder="5%"
+                        value={disc}
+                        onChange={(e) => setDisc(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  <Button type="submit" className="h-12">
+                    Submit
+                  </Button>
+                </form>
+              </div>
+          </div>
+        </div>
+    </div>
+  );
+};
+
+function roundToFixed(num, decimals) {
+  return Number(num.toFixed(decimals));
+}
+
+export default Page;
