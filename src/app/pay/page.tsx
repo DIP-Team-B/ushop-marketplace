@@ -63,6 +63,7 @@ function totalPrice(items: any) {
 
 const Page = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Function to check if the user is logged in
   useEffect(() => {
@@ -78,12 +79,21 @@ const Page = () => {
      } catch (error) {
        console.error("Error checking user session:", error);
        setIsLoggedIn(false); // Handle error by considering user as logged out
-     }
+     } finally {
+      setLoading(false);
+    }
    };
   
    checkUserStatus();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-black font-bold">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     isLoggedIn ? (
