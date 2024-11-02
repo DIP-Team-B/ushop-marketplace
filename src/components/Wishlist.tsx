@@ -62,7 +62,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
         ) : (
           wishlistProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden w-80">
-              <Link href={`/${product.category?.toLowerCase()}/${product.id}`}>
+              <Link href={`/${product.category?.toLowerCase()}/${product.id}?id=${id}`}>
 
                 <img
                   src={product.images}
@@ -72,7 +72,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
               </Link>
               <CardContent className="p-4">
                 {/* row 1 */}
-                <h2 className="font-semibold text-lg mb-2">{product.name}</h2>
+                <h2 className="font-semibold text-lg mb-2">{product.name + " " + product.sizes}</h2>
                 {/* row 2 */}
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg">${product.price.toFixed(2)}</span>

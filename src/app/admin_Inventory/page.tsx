@@ -54,6 +54,7 @@ import { Switch } from "@/components/ui/switch";
 import { products } from "../productsData";
 import AdminInventory from "@/components/AdminInventory";
 import { useRouter } from 'next/navigation';
+import Navbar from "@/components/Navbar";
 
 interface Invoice {
   images: string[];
@@ -89,7 +90,8 @@ const statusOptions = ["All", "Pending", "Confirmed", "Cancelled"];
 
 const ITEMS_PER_PAGE = 8;
 
-const Page = () => {
+export default function Page({ searchParams }) {
+  const { id } = searchParams;  // Fetch the ID from the search params
   const router = useRouter();
   const [isAdmin, setAdmin] = useState(false);
   const [email, setEmail] = useState("");
@@ -200,13 +202,13 @@ const Page = () => {
 
   const routerPush = (link: string) => {
     if (link === "check") {
-        router.push("/admin_CheckOrder");
+        router.push(`/admin_CheckOrder?id=${id}`);
     }
     else if (link === "upload") {
-        router.push("/admin_InventoryUpload");
+        router.push(`/admin_InventoryUpload?id=${id}`);
     }
     else if (link === "inventory") {
-        router.push("/admin_Inventory");
+        router.push(`/admin_Inventory?id=${id}`);
     }
     else {
         router.push("/admin");
@@ -234,6 +236,27 @@ const Page = () => {
       setSizes([...sizes, size]);
     }
   };
+
+  const [isLoggedInAdminAccount, setIsLoginInAdminAccount] = useState(false);
+  // Function to check if the user is logged in and an admin
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username && data.user.role == 'Admin') {
+          setIsLoginInAdminAccount(true); // User is logged in and admin
+        } else {
+          setIsLoginInAdminAccount(false); // User is not logged in or admin
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsLoginInAdminAccount(false); // Handle error 
+      }
+    };
+
+    checkUserStatus();
+  }, []);
 
   const handleSubmit = async (
     productName: string, 
@@ -300,58 +323,62 @@ const Page = () => {
   }, [invoices]);
 
   return (
-    <div className="flex justify-center flex-col text-mainBlack">
-        <div>
-          <div className="flex flex-col gap-4 p-8 w-full items-center">
-            <div className="flex justify-between items-center w-full">
-              <Button variant="link" className="opacity-0">
-                Log out
-              </Button>
-              <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "check"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("check")}
-                >
-                  Check orders
+    <>
+    <Navbar id={id}/>
+    <div className="mt-24" />
+    {isLoggedInAdminAccount? (
+      <div className="flex justify-center flex-col text-mainBlack">
+          <div>
+            <div className="flex flex-col gap-4 p-8 w-full items-center">
+              <div className="flex justify-between items-center w-full">
+              <div></div>
+                <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "check"
+                        ? "bg-mainBlack text-mainWhite"
+                        : "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("check")}
+                  >
+                    Check orders
+                  </div>
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "upload"
+                        ? "bg-mainBlack text-mainWhite"
+                        : "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("upload")}
+                  >
+                    Upload product
+                  </div>
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "inventory" && "bg-mainBlack text-mainWhite"
+                    } ${
+                      dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("inventory")}
+                  >
+                    Inventory
+                  </div>
                 </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "upload"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("upload")}
-                >
-                  Upload product
-                </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "inventory" && "bg-mainBlack text-mainWhite"
-                  } ${
-                    dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("inventory")}
-                >
-                  Inventory
-                </div>
+                <div></div>
               </div>
-              <Button variant="link" onClick={() => setAdmin(false)}>
-                Log out
-              </Button>
+                <AdminInventory />
             </div>
-              <AdminInventory />
           </div>
-        </div>
-    </div>
+      </div>
+    ) : (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-black font-bold">Access denied.</p>
+      </div>
+    )}
+  </>
   );
 };
 
 function roundToFixed(num, decimals) {
   return Number(num.toFixed(decimals));
 }
-
-export default Page;

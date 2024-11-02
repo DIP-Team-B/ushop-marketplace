@@ -90,6 +90,7 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
           user: id,
           id: row.ID,
           name: row.Name,
+          sizes: row.Size,
           price: row.Price,
           images: '/images/products/'+[row.Image_URL],
           category: row.category,

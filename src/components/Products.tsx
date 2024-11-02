@@ -46,10 +46,10 @@ const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
     // Apply Size Filter
     const matchesSize = filters.size.length ? filters.size.some((size) => product.sizes.includes(size)) : true;
 
-    // Apply Color Filter
-    const matchesColor = filters.color.length ? filters.color.some((color) => product.colours.includes(color)) : true;
+    //// Apply Color Filter
+    //const matchesColor = filters.color.length ? filters.color.some((color) => product.colours.includes(color)) : true;
 
-    return matchesPrice && matchesSize && matchesColor && product.category;
+    return matchesPrice && matchesSize && product.category;
   });
 
   console.log(products);

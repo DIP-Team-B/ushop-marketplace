@@ -54,6 +54,7 @@ import { Switch } from "@/components/ui/switch";
 import { products } from "../productsData";
 import AdminInventory from "@/components/AdminInventory";
 import { useRouter } from 'next/navigation';
+import Navbar from "@/components/Navbar";
 
 interface Invoice {
   images: string[];
@@ -89,7 +90,8 @@ const statusOptions = ["All", "Pending", "Confirmed", "Cancelled"];
 
 const ITEMS_PER_PAGE = 8;
 
-const Page = () => {
+export default function Page({ searchParams }) {
+  const { id } = searchParams;  // Fetch the ID from the search params
   const router = useRouter();
   const [isAdmin, setAdmin] = useState(false);
   const [email, setEmail] = useState("");
@@ -200,20 +202,20 @@ const Page = () => {
 
   const routerPush = (link: string) => {
     if (link === "check") {
-        router.push("/admin_CheckOrder");
+        router.push(`/admin_CheckOrder?id=${id}`);
     }
     else if (link === "upload") {
-        router.push("/admin_InventoryUpload");
+        router.push(`/admin_InventoryUpload?id=${id}`);
     }
     else if (link === "inventory") {
-        router.push("/admin_Inventory");
+        router.push(`/admin_Inventory?id=${id}`);
     }
     else {
         router.push("/admin");
     }
   }
 
-  const [counter, setCounter] = useState(10);
+  const [counterStock, setCounterStock] = useState(10);
 
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
@@ -223,8 +225,10 @@ const Page = () => {
   const [disc, setDisc] = useState("");
 
   // State for image files
-  const [imageURL, setImageURL] = useState<string | null>(null);
+  const [imageURL1, setImageURL1] = useState<string | null>(null);
   const [image1, setImage1] = useState<File | null>(null);
+  const [imageURL2, setImageURL2] = useState<string | null>(null);
+  const [image2, setImage2] = useState<File | null>(null);
 
   // Handle size checkbox changes
   const handleSizeChange = (size: string) => {
@@ -235,18 +239,39 @@ const Page = () => {
     }
   };
 
+  const [isLoggedInAdminAccount, setIsLoginInAdminAccount] = useState(false);
+  // Function to check if the user is logged in and an admin
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username && data.user.role == 'Admin') {
+          setIsLoginInAdminAccount(true); // User is logged in and admin
+        } else {
+          setIsLoginInAdminAccount(false); // User is not logged in or admin
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsLoginInAdminAccount(false); // Handle error 
+      }
+    };
+
+    checkUserStatus();
+  }, []);
+
   const handleSubmit = async (
     productName: string, 
     price: string, 
     category: string,
     counter: number,
     sizes: string[],
-    imageURL: string | null,
+    imageURL1: string | null,
+    imageURL2: string | null,
     description: string,
-    isPromo: boolean,
     disc: string
   ) => {
-    if (!imageURL) {
+    if (!imageURL1 || !imageURL2) {
       alert("Image URL is required");
       return;
     }
@@ -257,11 +282,12 @@ const Page = () => {
       category: category,
       quantity: counter,
       sizes: sizes,
-      imageurl: imageURL,
+      imageurl1: imageURL1,
+      imageurl2: imageURL2,
       description: description,
-      promo: isPromo,
-      disc: isPromo ? disc : "0%",
+      disc: disc+'%',
     };
+    console.log(newProduct);
 
     try {
       const response = await fetch('/api/add_item', {
@@ -279,13 +305,14 @@ const Page = () => {
         setProductName("");
         setPrice("");
         setCategory("");
-        setCounter(10);
+        setCounterStock(10);
         setDescription("");
         setSizes([]);
-        setPromo(false);
         setDisc("");
         setImage1(null);
-        setImageURL(null);
+        setImage2(null);
+        setImageURL1(null);
+        setImageURL2(null);
       } else {
         alert("Failed to add product: " + result.error);
       }
@@ -300,247 +327,272 @@ const Page = () => {
   }, [invoices]);
 
   return (
-    <div className="flex justify-center flex-col text-mainBlack">
-        <div>
-          <div className="flex flex-col gap-4 p-8 w-full items-center">
-            <div className="flex justify-between items-center w-full">
-              <Button variant="link" className="opacity-0">
-                Log out
-              </Button>
-              <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "check"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("check")}
-                >
-                  Check orders
+    <>
+    <Navbar id={id}/>
+    <div className="mt-24" />
+    {isLoggedInAdminAccount? (
+      <div className="flex justify-center flex-col text-mainBlack">
+          <div>
+            <div className="flex flex-col gap-4 p-8 w-full items-center">
+              <div className="flex justify-between items-center w-full">
+              <div></div>
+                <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "check"
+                        ? "bg-mainBlack text-mainWhite"
+                        : "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("check")}
+                  >
+                    Check orders
+                  </div>
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "upload"
+                        ? "bg-mainBlack text-mainWhite"
+                        : "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("upload")}
+                  >
+                    Upload product
+                  </div>
+                  <div
+                    className={`py-2 px-4 rounded-full cursor-pointer ${
+                      dataShown === "inventory" && "bg-mainBlack text-mainWhite"
+                    } ${
+                      dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
+                    }`}
+                    onClick={() => routerPush("inventory")}
+                  >
+                    Inventory
+                  </div>
                 </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "upload"
-                      ? "bg-mainBlack text-mainWhite"
-                      : "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("upload")}
-                >
-                  Upload product
-                </div>
-                <div
-                  className={`py-2 px-4 rounded-full cursor-pointer ${
-                    dataShown === "inventory" && "bg-mainBlack text-mainWhite"
-                  } ${
-                    dataShown !== "inventory" && "bg-gray-100 text-mainBlack"
-                  }`}
-                  onClick={() => routerPush("inventory")}
-                >
-                  Inventory
-                </div>
+                <div></div>
               </div>
-              <Button variant="link" onClick={() => setAdmin(false)}>
-                Log out
-              </Button>
-            </div>
-              <div className="w-[1350px] flex flex-col gap-4 py-8 px-32">
-                <h1 className="text-2xl font-bold">Upload Product</h1>
-                <form className="flex flex-col gap-4"
-                onSubmit={async (e) => {
-                  e.preventDefault(); // Prevent default form submission behavior
-                  await handleSubmit(productName, price, category, counter, sizes, imageURL, description, isPromo, disc);
-                }}>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="name">
-                      Product name
-                    </Label>
-                    <Input
-                      type="productName"
-                      id="productName"
-                      placeholder="Product Name"
-                      value={productName}
-                      onChange={(e) => setProductName(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="price">
-                      Price (SGD)
-                    </Label>
-                    <Input
-                      type="price"
-                      id="price"
-                      placeholder="Product price (in SGD)"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="category">
-                      Product category
-                    </Label>
-                    <Select
-                      value={category}
-                      onValueChange={(value) => setCategory(value)}
-                    >
-                      <SelectTrigger className="w-[300px] text-s text-muted-foreground">
-                        <SelectValue placeholder="Select product category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel className="text-xs">
-                            Category
-                          </SelectLabel>
-                          <SelectItem value="tops">Tops</SelectItem>
-                          <SelectItem value="bottom">Bottoms</SelectItem>
-                          <SelectItem value="accessories">
-                            Accessories
-                          </SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="picture">
-                      Product image 1
-                    </Label>
-                    <Input
-                      type="file"
-                      id="picture1"
-                      className="text-xs text-muted-foreground"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        if (file) {
-                          const imageUrl = file.name; // Use the file name instead of the blob URL
-                          setImageURL(imageUrl);  // Update the image URL state
-                          setImage1(file);        // Update the image file state
-                        } else {
-                          setImageURL(null); // Ensure imageURL is null if no file is selected
-                        }
-                      }}
-                    />
-                    {imageURL && (
-                      <p className="text-xs mt-2">
-                        Image URL: {imageURL}  {/* Display the image URL */}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="stock">
-                      Stock
-                    </Label>
-                    <div className="flex p-2 gap-2 rounded-sm border-[1px] border-gray-200 items-center">
-                      <MinusCircle
-                        className={`w-4 h-4 ${counter === 0 && `hidden`}`}
-                        onClick={() => setCounter(counter - 1)}
-                      ></MinusCircle>
-                      <p className="text-xs">{counter}</p>
-                      <PlusCircle
-                        className={"w-4 h-4"}
-                        onClick={() => setCounter(counter + 1)}
-                      ></PlusCircle>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="description">
-                      Product description
-                    </Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Type your product description here."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex flex-col items-start gap-1.5">
-                    <Label className="text-xs" htmlFor="description">
-                      Sizes
-                    </Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-s"
-                        onCheckedChange={() => handleSizeChange("S")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        S
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-m"
-                        onCheckedChange={() => handleSizeChange("M")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        M
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-l"
-                        onCheckedChange={() => handleSizeChange("L")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        L
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-xl"
-                        onCheckedChange={() => handleSizeChange("XL")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        XL
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="size-xxl"
-                        onCheckedChange={() => handleSizeChange("XXL")}
-                      />
-                      <label className="text-xs" htmlFor="size">
-                        XXL
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Label className="text-xs" htmlFor="promo">
-                      Promotion
-                    </Label>
-                    <Switch
-                      id="promo"
-                      checked={isPromo}
-                      onClick={() => setPromo(!isPromo)}
-                    />
-                  </div>
-
-                  {isPromo && (
+                <div className="w-[1350px] flex flex-col gap-4 py-8 px-32">
+                  <h1 className="text-2xl font-bold">Upload Product</h1>
+                  <form className="flex flex-col gap-4"
+                  onSubmit={async (e) => {
+                    e.preventDefault(); // Prevent default form submission behavior
+                    await handleSubmit(productName, price, category, counterStock, sizes, imageURL1, imageURL2, description, disc);
+                  }}>
                     <div className="flex flex-col items-start gap-1.5">
-                      <Label className="text-xs" htmlFor="disc">
-                        Discount
+                      <Label className="text-xs" htmlFor="name">
+                        Product name
+                      </Label>
+                      <Input
+                        type="productName"
+                        id="productName"
+                        placeholder="Product Name"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="price">
+                        Price (SGD)
+                      </Label>
+                      <Input
+                        type="price"
+                        id="price"
+                        placeholder="Product price (in SGD)"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="category">
+                        Product category
+                      </Label>
+                      <Select
+                        value={category}
+                        onValueChange={(value) => setCategory(value)}
+                      >
+                        <SelectTrigger className="w-[300px] text-s text-muted-foreground">
+                          <SelectValue placeholder="Select product category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel className="text-xs">
+                              Category
+                            </SelectLabel>
+                            <SelectItem value="tops">Tops</SelectItem>
+                            <SelectItem value="bottom">Bottoms</SelectItem>
+                            <SelectItem value="accessories">
+                              Accessories
+                            </SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="picture">
+                        Product image 1
+                      </Label>
+                      <Input
+                        type="file"
+                        id="picture1"
+                        className="text-xs text-muted-foreground"
+                        onChange={(e) => {
+                          const file1 = e.target.files?.[0] || null;
+                          if (file1) {
+                            const imageUrl1 = file1.name; // Use the file name instead of the blob URL
+                            setImageURL1(imageUrl1);  // Update the image URL state
+                            setImage1(file1);        // Update the image file state
+                          } else {
+                            setImageURL1(null); // Ensure imageURL is null if no file is selected
+                          }
+                        }}
+                      />
+                      {imageURL1 && (
+                        <p className="text-xs mt-2">
+                          Image URL: {imageURL1}  {/* Display the image URL */}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="picture">
+                        Product image 2
+                      </Label>
+                      <Input
+                        type="file"
+                        id="picture2"
+                        className="text-xs text-muted-foreground"
+                        onChange={(e) => {
+                          const file2 = e.target.files?.[0] || null;
+                          if (file2) {
+                            const imageUrl2 = file2.name; // Use the file name instead of the blob URL
+                            setImageURL2(imageUrl2);  // Update the image URL state
+                            setImage2(file2);        // Update the image file state
+                          } else {
+                            setImageURL2(null); // Ensure imageURL is null if no file is selected
+                          }
+                        }}
+                      />
+                      {imageURL2 && (
+                        <p className="text-xs mt-2">
+                          Image URL: {imageURL2}  {/* Display the image URL */}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="stock">
+                        Stock
+                      </Label>
+                      <div className="flex p-2 gap-2 rounded-sm border-[1px] border-gray-200 items-center">
+                        <MinusCircle
+                          className={`w-4 h-4 ${counterStock === 0 && `hidden`}`}
+                          onClick={() => setCounterStock(counterStock - 1)}
+                        ></MinusCircle>
+                        <p className="text-xs">{counterStock}</p>
+                        <PlusCircle
+                          className={"w-4 h-4"}
+                          onClick={() => setCounterStock(counterStock + 1)}
+                        ></PlusCircle>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="description">
+                        Product description
+                      </Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Type your product description here."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex flex-col items-start gap-1.5">
+                      <Label className="text-xs" htmlFor="description">
+                        Sizes
+                      </Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-xs"
+                          onCheckedChange={() => handleSizeChange("XS")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          XS
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-s"
+                          onCheckedChange={() => handleSizeChange("S")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          S
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-m"
+                          onCheckedChange={() => handleSizeChange("M")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          M
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-l"
+                          onCheckedChange={() => handleSizeChange("L")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          L
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-xl"
+                          onCheckedChange={() => handleSizeChange("XL")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          XL
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="size-xxl"
+                          onCheckedChange={() => handleSizeChange("XXL")}
+                        />
+                        <label className="text-xs" htmlFor="size">
+                          XXL
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs" htmlFor="promo">
+                        Promotion (%)
                       </Label>
                       <Input
                         type="disc"
                         id="disc"
-                        placeholder="5%"
+                        placeholder="Discount Percentage (Without %)"
                         value={disc}
                         onChange={(e) => setDisc(e.target.value)}
                       />
                     </div>
-                  )}
-                  <Button type="submit" className="h-12">
-                    Submit
-                  </Button>
-                </form>
-              </div>
+                    <Button type="submit" className="h-12">
+                      Submit
+                    </Button>
+                  </form>
+                </div>
+            </div>
           </div>
-        </div>
-    </div>
+      </div> 
+    ) : (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-black font-bold">Access denied.</p>
+      </div>
+    )}
+  </>
   );
 };
 
 function roundToFixed(num, decimals) {
   return Number(num.toFixed(decimals));
 }
-
-export default Page;

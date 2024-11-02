@@ -54,6 +54,7 @@ import { Switch } from "@/components/ui/switch";
 import { products } from "../productsData";
 import AdminInventory from "@/components/AdminInventory";
 import { useRouter } from 'next/navigation';
+import Navbar from "@/components/Navbar";
 
 interface Invoice {
   images: string[];
@@ -66,6 +67,9 @@ interface Invoice {
   quantity: number;
   price: number;
 }
+
+//const adminEmail = "admin@gmail.com";
+//const adminPassword = "admin12345678";
 
 const months = [
   "January",
@@ -81,28 +85,26 @@ const months = [
   "November",
   "December",
 ];
-
-const adminEmail = "admin@gmail.com";
-const adminPassword = "admin12345678";
+const ITEMS_PER_PAGE = 8;
 
 const statusOptions = ["All", "Pending", "Confirmed", "Cancelled"];
 
-const ITEMS_PER_PAGE = 8;
-
-const Page = () => {
+export default function Page({ searchParams }) {
+  const { id } = searchParams;  // Fetch the ID from the search params
   const router = useRouter();
   const [isAdmin, setAdmin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    if (email === adminEmail && password === adminPassword) {
-      setAdmin(true);
-    } else {
-      alert("Invalid email or password");
-    }
-  };
+  //const handleLogin = (e: { preventDefault: () => void }) => {
+  //  e.preventDefault();
+  //  if (email === adminEmail && password === adminPassword) {
+  //    setAdmin(true);
+  //    router.push("/admin_CheckOrder");
+  //  } else {
+  //    alert("Invalid email or password");
+  //  }
+  //};
 
   const [dataShown, setDataShown] = useState("check");
 
@@ -164,6 +166,21 @@ const Page = () => {
     }
   };
 
+  const routerPush = (link: string) => {
+    if (link === "check") {
+        router.push(`/admin_CheckOrder?id=${id}`);
+    }
+    else if (link === "upload") {
+        router.push(`/admin_InventoryUpload?id=${id}`);
+    }
+    else if (link === "inventory") {
+        router.push(`/admin_Inventory?id=${id}`);
+    }
+    else {
+        router.push("/admin");
+    }
+  }
+
   // Filter and sort the invoices based on the selected month, year, status, and sorting order.
   const filteredInvoices = invoices
     .filter((invoice) => {
@@ -198,21 +215,6 @@ const Page = () => {
     setCurrentPage(pageNumber);
   };
 
-  const routerPush = (link: string) => {
-    if (link === "check") {
-        router.push("/admin_CheckOrder");
-    }
-    else if (link === "upload") {
-        router.push("/admin_InventoryUpload");
-    }
-    else if (link === "inventory") {
-        router.push("/admin_Inventory");
-    }
-    else {
-        router.push("/admin");
-    }
-  }
-
   const [counter, setCounter] = useState(10);
 
   const [productName, setProductName] = useState("");
@@ -235,6 +237,27 @@ const Page = () => {
     }
   };
 
+  const [isLoggedInAdminAccount, setIsLoginInAdminAccount] = useState(false);
+  // Function to check if the user is logged in and an admin
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username && data.user.role == 'Admin') {
+          setIsLoginInAdminAccount(true); // User is logged in and admin
+        } else {
+          setIsLoginInAdminAccount(false); // User is not logged in or admin
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsLoginInAdminAccount(false); // Handle error 
+      }
+    };
+
+    checkUserStatus();
+  }, []);
+
   const handleSubmit = async (
     productName: string, 
     price: string, 
@@ -251,47 +274,35 @@ const Page = () => {
       return;
     }
 
-    const newProduct = {
-      name: productName,
-      price: parseFloat(price),
-      category: category,
-      quantity: counter,
-      sizes: sizes,
-      imageurl: imageURL,
-      description: description,
-      promo: isPromo,
-      disc: isPromo ? disc : "0%",
-    };
-
-    try {
-      const response = await fetch('/api/add_item', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProduct),
-      });
-
-      const result = await response.json();
-      if (result.success) {
-        alert("Product added successfully!");
-        // Optionally clear form fields after successful submission
-        setProductName("");
-        setPrice("");
-        setCategory("");
-        setCounter(10);
-        setDescription("");
-        setSizes([]);
-        setPromo(false);
-        setDisc("");
-        setImage1(null);
-        setImageURL(null);
-      } else {
-        alert("Failed to add product: " + result.error);
-      }
-    } catch (error: any) {
-      alert("Error: " + error.message);
-    }
+    //try {
+    //  const response = await fetch('/api/add_item', {
+    //    method: "POST",
+    //    headers: {
+    //      "Content-Type": "application/json",
+    //    },
+    //    body: JSON.stringify(newProduct),
+    //  });
+//
+    //  const result = await response.json();
+    //  if (result.success) {
+    //    alert("Product added successfully!");
+    //    // Optionally clear form fields after successful submission
+    //    setProductName("");
+    //    setPrice("");
+    //    setCategory("");
+    //    setCounter(10);
+    //    setDescription("");
+    //    setSizes([]);
+    //    setPromo(false);
+    //    setDisc("");
+    //    setImage1(null);
+    //    setImageURL(null);
+    //  } else {
+    //    alert("Failed to add product: " + result.error);
+    //  }
+    //} catch (error: any) {
+    //  alert("Error: " + error.message);
+    //}
   };
 
   // Reset the promo switch when the product is added or the page is refreshed
@@ -300,13 +311,15 @@ const Page = () => {
   }, [invoices]);
 
   return (
-    <div className="flex justify-center flex-col text-mainBlack">
+    <>
+    <Navbar id={id}/>
+    <div className="mt-24" />
+    {isLoggedInAdminAccount? (
+      <div className="flex justify-center flex-col text-mainBlack">
         <div>
           <div className="flex flex-col gap-4 p-8 w-full items-center">
             <div className="flex justify-between items-center w-full">
-              <Button variant="link" className="opacity-0">
-                Log out
-              </Button>
+              <div></div>
               <div className="flex gap-1 items-center p-2 rounded-full border-[1px] overflow-hidden border-gray-200">
                 <div
                   className={`py-2 px-4 rounded-full cursor-pointer ${
@@ -339,9 +352,7 @@ const Page = () => {
                   Inventory
                 </div>
               </div>
-              <Button variant="link" onClick={() => routerPush("logout")}>
-                Log out
-              </Button>
+              <div></div>
             </div>
               <div className="w-[1350px] flex flex-col gap-2 p-8">
                 <div className="flex items-center justify-between">
@@ -599,11 +610,15 @@ const Page = () => {
           </div>
         </div>
     </div>
+  ): (
+    <div className="flex justify-center items-center h-screen">
+      <p className="text-center text-black font-bold">Access denied.</p>
+    </div>
+    )}
+  </>
   );
 };
 
 function roundToFixed(num, decimals) {
   return Number(num.toFixed(decimals));
 }
-
-export default Page;

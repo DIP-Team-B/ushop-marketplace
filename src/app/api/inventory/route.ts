@@ -73,15 +73,16 @@ export async function PUT(request: NextRequest) {
     const connection = await createConnection();
     try {
       console.log('Updating product:', id, 'in table:', actualTableName);
-      console.log('New price:', product.Price, 'New quantity:', product.Quantity);
+      console.log('New price:', product.Price, 'New quantity:', product.Quantity, 'New Discount:', product.Discount);
   
       await connection.execute(`
         UPDATE ${actualTableName}
-        SET Price = ?, Quantity = ?
+        SET Price = ?, Quantity = ?, Discount = ?
         WHERE ID = ?
       `, [
         product.Price,
         product.Quantity,
+        product.Discount,
         id
       ]);
   

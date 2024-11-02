@@ -12,15 +12,6 @@ export async function POST(request: Request) {
     let productsList = [];
     let disc = "";
 
-    console.log(role);
-
-    if (role) {
-        disc = "10%";
-      }
-    else {
-      disc = "0%";
-    }
-
     console.log(disc);
 
     const connection = await createConnection();
@@ -101,22 +92,41 @@ export async function POST(request: Request) {
     const [result] = await connection.execute(sql, [id,id,id,id]);
     await connection.end();
     console.log("Query executed successfully", result);
-
-    if (Array.isArray(result) && result.length > 0) {
-        productsList = result.map(item => ({
-            id: item.ProductID,
-            name: item.Name, 
-            size: item.Size,
-            price: item.Price, 
-            images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
-            description: item.Description,
-            stock: item.Quantity,
-            disc: disc,
-            promo: false,
-            category: item.Category,
-            liked: item.liked
-        }));
+    if(role) {
+        if (Array.isArray(result) && result.length > 0) {
+            productsList = result.map(item => ({
+                id: item.ProductID,
+                name: item.Name, 
+                size: item.Size,
+                price: item.Price, 
+                images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+                description: item.Description,
+                stock: item.Quantity,
+                disc: item.Discount,
+                promo: false,
+                category: item.Category,
+                liked: item.liked
+            }));
+        }
     }
+    else {
+        if (Array.isArray(result) && result.length > 0) {
+            productsList = result.map(item => ({
+                id: item.ProductID,
+                name: item.Name, 
+                size: item.Size,
+                price: item.Price, 
+                images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+                description: item.Description,
+                stock: item.Quantity,
+                disc: "0%",
+                promo: false,
+                category: item.Category,
+                liked: item.liked
+            }));
+        }
+    }
+    
 
     console.log(productsList);
 

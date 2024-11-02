@@ -130,22 +130,43 @@ export async function POST(request: Request) {
     console.log("Query executed successfully", result);
     console.log(size_result);
 
-    if (Array.isArray(result) && result.length > 0) {
-       productItem = {
-        id: result[0].ID,
-        name: result[0].Name, 
-        size: result[0].Size,
-        price: result[0].Price, 
-        images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
-        description: result[0].Description,
-        stock: result[0].Quantity,
-        sizes: size_result.map(item => item.Size),
-        disc: disc,
-        promo: false,
-        category: category,
-        liked: result[0].liked
-      };
+    if(role) {
+      if (Array.isArray(result) && result.length > 0) {
+        productItem = {
+         id: result[0].ID,
+         name: result[0].Name, 
+         size: result[0].Size,
+         price: result[0].Price, 
+         images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+         description: result[0].Description,
+         stock: result[0].Quantity,
+         sizes: size_result.map(item => item.Size),
+         disc: result[0].Discount,
+         promo: false,
+         category: category,
+         liked: result[0].liked
+       };
+      }
     }
+    else {
+      if (Array.isArray(result) && result.length > 0) {
+        productItem = {
+         id: result[0].ID,
+         name: result[0].Name, 
+         size: result[0].Size,
+         price: result[0].Price, 
+         images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+         description: result[0].Description,
+         stock: result[0].Quantity,
+         sizes: size_result.map(item => item.Size),
+         disc: "0%",
+         promo: false,
+         category: category,
+         liked: result[0].liked
+       };
+     }
+    }
+    
 
     console.log(productItem);
 

@@ -12,14 +12,6 @@ export async function POST(request: Request) {
     const connection = await createConnection();
     console.log("Database connection established");
 
-    let disc = "";
-    if(role) {
-      disc = "10%";
-    }
-    else {
-      disc = "0%";
-    }
-
     let selectQuery = "";
 
     switch (category) {
@@ -92,25 +84,45 @@ export async function POST(request: Request) {
     const [result] = await connection.execute(selectQuery,[id]);
     console.log("Query executed successfully", result);
 
-    if (Array.isArray(result) && result.length > 0) {
-      productList = result.map((product) => ({
-        id: product.ID,
-        name: product.Name, 
-        size: product.Size,
-        price: product.Price, 
-        quantity: product.Quantity, 
-        images: ['/images/'+[product.Image_URL]],
-        desc: product.Description,
-        stock: 9,
-        sizes: ["XS", "S", "M", "L"],
-        colours: ["Black", "Red", "Navy", "Green"],
-        description: "Comfortable",
-        disc: disc,
-        promo: false,
-        category: category,
-        liked: product.liked
-      }));
+    if(role){
+      if (Array.isArray(result) && result.length > 0) {
+        productList = result.map((product) => ({
+          id: product.ID,
+          name: product.Name + " " + product.Size, 
+          size: product.Size,
+          price: product.Price, 
+          quantity: product.Quantity, 
+          images: ['/images/'+[product.Image_URL]],
+          desc: product.Description,
+          sizes: product.Size,
+          description: "Comfortable",
+          disc: product.Discount,
+          promo: false,
+          category: category,
+          liked: product.liked
+        }));
+      }
     }
+    else {
+      if (Array.isArray(result) && result.length > 0) {
+        productList = result.map((product) => ({
+          id: product.ID,
+          name: product.Name, 
+          size: product.Size,
+          price: product.Price, 
+          quantity: product.Quantity, 
+          images: ['/images/'+[product.Image_URL]],
+          desc: product.Description,
+          sizes: ["XS", "S", "M", "L"],
+          description: "Comfortable",
+          disc: '0%',
+          promo: false,
+          category: category,
+          liked: product.liked
+        }));
+      }
+    }
+      
 
     await connection.end();
 

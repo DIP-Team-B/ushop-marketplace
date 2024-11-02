@@ -40,6 +40,7 @@ interface Product {
   Name: string;
   Price: number;
   Quantity: number;
+  Discount: string;
   Image_URL: string;
   table: string;
   category: string;
@@ -53,6 +54,8 @@ const AdminInventory = () => {
   const [newPrice, setNewPrice] = useState<{ [key: number]: string }>({});
   const [editingQuantity, setEditingQuantity] = useState<{ [key: number]: boolean }>({});
   const [newQuantity, setNewQuantity] = useState<{ [key: number]: string }>({});
+  const [editingDiscount, setEditingDiscount] = useState<{ [key: number]: boolean }>({});
+  const [newDiscount, setNewDiscount] = useState<{ [key: number]: string }>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const ITEMS_PER_PAGE = 8;
@@ -180,6 +183,7 @@ const AdminInventory = () => {
       const updatedData = {
         Price: productToUpdate.Price,
         Quantity: newQuantityValue,
+        Discount: productToUpdate.Discount
       };
 
       const response = await fetch('/api/inventory', {
@@ -203,6 +207,60 @@ const AdminInventory = () => {
       setNewQuantity({ ...newQuantity, [id]: "" });
     } catch (error: unknown) {
       setErrorMessage('Error updating quantity: ' + (error instanceof Error ? error.message : 'An unexpected error occurred'));
+    }
+  };
+
+  const handleEditDiscount = (id: number) => {
+    setEditingDiscount({ ...editingDiscount, [id]: true });
+    const productToEdit = products.find((p) => p.ID === id);
+    if (productToEdit) {
+      setNewDiscount({ ...newDiscount, [id]: productToEdit.Discount.toString() });
+    }
+  };
+
+  const handleSaveDiscount = async (id: number, table: string) => {
+    try {
+      const newDiscountValue = parseInt(newDiscount[id], 10);
+      if (isNaN(newDiscountValue)) {
+        setErrorMessage('Invalid Discount value');
+        return;
+      }
+
+      const productToUpdate = products.find((p) => p.ID === id);
+      if (!productToUpdate) {
+        setErrorMessage('Product not found');
+        return;
+      }
+
+      const updatedData = {
+        Price: productToUpdate.Price,
+        Quantity: productToUpdate.Quantity,
+        Discount: newDiscountValue+"%",
+      };
+
+      console.log(updatedData);
+
+      const response = await fetch('/api/inventory', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, table, product: updatedData }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.ID === id ? { ...product, Discount: newDiscountValue +"%" } : product
+          )
+        );
+      } else {
+        setErrorMessage('Error updating product: ' + result.error);
+      }
+
+      setEditingDiscount({ ...editingDiscount, [id]: false });
+      setNewDiscount({ ...newDiscount, [id]: "" });
+    } catch (error: unknown) {
+      setErrorMessage('Error updating Discount: ' + (error instanceof Error ? error.message : 'An unexpected error occurred'));
     }
   };
 
@@ -231,6 +289,7 @@ const AdminInventory = () => {
               <TableCell className="w-[300px]">Item</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Total Quantity</TableCell>
+              <TableCell>Discount</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHeader>
@@ -246,7 +305,7 @@ const AdminInventory = () => {
                       src={`/images/${product.Image_URL}`}
                       className="object-cover aspect-square rounded-md"
                     />
-                    <p className="text-xs font-medium">{product.Name}</p>
+                    <p className="text-xs font-medium">{product.Name + " " + product.Size}</p>
                   </div>
                 </TableCell>
                 <TableCell className="font-light">
@@ -286,6 +345,26 @@ const AdminInventory = () => {
                     <div className="flex items-center pl-2">
                       <span>{product.Quantity}</span>
                       <Edit onClick={() => handleEditQuantity(product.ID)} className="ml-2 w-5 h-5 text-mainBlack cursor-pointer hover:text-muted-foreground" />
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="font-light">
+                  {editingDiscount[product.ID] ? (
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        value={newDiscount[product.ID] || ""}
+                        onChange={(e) => setNewDiscount({ ...newDiscount, [product.ID]: e.target.value })}
+                        className="border border-gray-300 rounded p-1 w-20"
+                      />
+                      <Button onClick={() => handleSaveDiscount(product.ID, product.category)} className="h-8 ml-2">
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center pl-2">
+                      <span>{product.Discount}</span>
+                      <Edit onClick={() => handleEditDiscount(product.ID)} className="ml-2 w-5 h-5 text-mainBlack cursor-pointer hover:text-muted-foreground" />
                     </div>
                   )}
                 </TableCell>

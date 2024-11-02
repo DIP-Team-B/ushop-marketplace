@@ -305,7 +305,7 @@ const Navbar = ({ id }: { id: string }) => {
                   {isAdminAccount ? (
 
                       <Link
-                      href="/admin"
+                      href={`/admin_CheckOrder?id=${id}`}
                       className={`${buttonVariants({
                         variant: "ghost",
                       })} w-full `}

@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from "c:/ushop-marketplace/src/lib/db";
+import { createConnection } from "@/lib/db";
 
 export async function POST(request: Request) {
-  const { name, price, category, quantity, sizes, description, promo, disc, imageurl } = await request.json();
+  const { name, price, category, quantity, sizes, description, disc, imageurl1, imageurl2 } = await request.json();
 
-  // Validate input fields
+  console.log(disc);
+  //Validate input fields
   const missingFields = [];
   if (!name) missingFields.push("name");
   if (!price) missingFields.push("price");
@@ -12,7 +13,8 @@ export async function POST(request: Request) {
   if (!quantity) missingFields.push("quantity");
   if (!sizes) missingFields.push("sizes");
   if (!description) missingFields.push("description");
-  if (!imageurl) missingFields.push("imageurl");
+  if (!imageurl1) missingFields.push("imageurl");
+  if (!imageurl2) missingFields.push("imageurl");
 
   if (missingFields.length > 0) {
     console.error("Missing required fields:", missingFields.join(", "));
@@ -33,44 +35,44 @@ export async function POST(request: Request) {
     console.log("Database connection established");
 
     let insertQuery = "";
-    let queryParams = [];
+    let result;
 
     // Construct SQL query based on category
     switch (category) {
       case "tops":
         insertQuery = `
-          INSERT INTO top_table (Name, Size, Price, Quantity, Image_URL, Description, Promo, Discount) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO top_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        queryParams = [name, sizes.join(","), parseFloat(price), parseInt(quantity), imageurl, description, promo || null, disc || null];
         break;
       case "bottom":
         insertQuery = `
-          INSERT INTO bottom_table (Name, Size, Price, Quantity, Image_URL, Description, Promo, Discount) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO bottom_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        queryParams = [name, sizes.join(","), parseFloat(price), parseInt(quantity), imageurl, description, promo || null, disc || null];
         break;
       case "accessories":
         insertQuery = `
-          INSERT INTO accessories_table (Name, Size, Price, Quantity, Image_URL, Description, Promo, Discount) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO accessories_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        queryParams = [name, sizes.join(","), parseFloat(price), parseInt(quantity), imageurl, description, promo || null, disc || null];
         break;
       case "other":
         insertQuery = `
-          INSERT INTO others_table (Name, Size, Price, Quantity, Image_URL, Description, Promo, Discount) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO others_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        queryParams = [name, sizes.join(","), parseFloat(price), parseInt(quantity), imageurl, description, promo || null, disc || null];
         break;
       default:
         throw new Error(`Invalid category. Must be one of: ${validCategories.join(", ")}`);
     }
 
-    // Execute the query
-    const [result] = await connection.execute(insertQuery, queryParams);
+    // Loop through sizes and insert each size as a new row
+    for (const size of sizes) {
+      const queryParams = [name, size, parseFloat(price), parseInt(quantity), imageurl, description, disc || null];
+      [result] = await connection.execute(insertQuery, queryParams);
+      console.log(`Inserted size ${size} successfully`, result);
+    }
     console.log("Query executed successfully", result);
 
     return NextResponse.json({ success: true, data: result });
