@@ -29,7 +29,6 @@ const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
   const [filters, setFilters] = useState({
     price: [0, 100],
     size: ["XS", "S", "M", "L", "XL"],
-    color: ["Black", "Red", "Blue", "Green", "Yellow"],
   });
 
   console.log(products);

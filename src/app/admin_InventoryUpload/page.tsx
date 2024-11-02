@@ -309,10 +309,11 @@ export default function Page({ searchParams }) {
         setDescription("");
         setSizes([]);
         setDisc("");
-        setImage1(null);
-        setImage2(null);
         setImageURL1(null);
+        setImage1(null);
         setImageURL2(null);
+        setImage2(null);
+        window.location.reload(); // Refresh the page
       } else {
         alert("Failed to add product: " + result.error);
       }

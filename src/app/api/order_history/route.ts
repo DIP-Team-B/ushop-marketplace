@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             order_table.Status,
             jt.OrderedQuantity,
             'tops' AS Category,
-            CONCAT('tops/', top_table.Image_URL) AS ImageURL
+            CONCAT(top_table.Image_URL) AS ImageURL
           FROM 
             order_table
           JOIN
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
             order_table.Status,
             jt.OrderedQuantity,
             'bottoms' AS Category,
-            CONCAT('bottoms/', bottom_table.Image_URL) AS ImageURL
+            CONCAT(bottom_table.Image_URL) AS ImageURL
           FROM 
             order_table
           JOIN
@@ -73,7 +73,7 @@ export async function POST(request: Request) {
             order_table.Status,
             jt.OrderedQuantity,
             'accessories' AS Category,
-            CONCAT('accessories/', accessories_table.Image_URL) AS ImageURL
+            CONCAT(accessories_table.Image_URL) AS ImageURL
           FROM 
             order_table
           JOIN
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
             order_table.Status,
             jt.OrderedQuantity,
             'others' AS Category,
-            CONCAT('others/', others_table.Image_URL) AS ImageURL
+            CONCAT(others_table.Image_URL) AS ImageURL
           FROM 
             order_table
           JOIN
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
         else {
           if (Array.isArray(rows) && rows.length > 0) {
             InvoiceItems = rows.map((row) => ({
-              images: '/images/products/'+[row.ImageURL],
+              images: JSON.parse(row.Image_URL),
               name: row.Name,
               invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
               category: row.Category,
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
               date: row.Date,
               status: row.Status,
               quantity: row.OrderedQuantity,
-              price: row.Price.toFixed(2),
+              price: (row.Price.toFixed(2) * (1 - parseFloat(row.Discount) / 100).toFixed(2)),
             }));
           }
           console.log("InvoiceItems data:", InvoiceItems);

@@ -73,6 +73,7 @@ const AdminInventory = () => {
             ...product,
             Price: parseFloat(product.Price),
           }));
+          
           setProducts(parsedProducts);
         } else {
           console.error('Error fetching products:', data.error);
@@ -302,7 +303,7 @@ const AdminInventory = () => {
                       width={48}
                       height={48}
                       alt="image"
-                      src={`/images/${product.Image_URL}`}
+                      src={product.Image_URL[0]}
                       className="object-cover aspect-square rounded-md"
                     />
                     <p className="text-xs font-medium">{product.Name + " " + product.Size}</p>

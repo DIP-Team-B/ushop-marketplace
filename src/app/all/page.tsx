@@ -102,14 +102,14 @@ export default function Page({ searchParams }) {
         {allItems.map((product) => (
           <ProductCards
             key={product.id+product.name+product.category}
-            name={product.name}
+            name={product.name + " " + product.size}
             id={product.id}
             images={product.images}
             price={product.price}
             disc={product.disc}
             category={product.category}
             liked={product.liked}
-            userid={id}
+            userid={product.userID}
           />
         ))}
       </div>

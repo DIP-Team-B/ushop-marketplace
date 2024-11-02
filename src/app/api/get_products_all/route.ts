@@ -99,13 +99,14 @@ export async function POST(request: Request) {
                 name: item.Name, 
                 size: item.Size,
                 price: item.Price, 
-                images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+                images: JSON.parse(item.Image_URL),
                 description: item.Description,
                 stock: item.Quantity,
                 disc: item.Discount,
                 promo: false,
                 category: item.Category,
-                liked: item.liked
+                liked: item.liked,
+                userID: id,
             }));
         }
     }
@@ -116,13 +117,14 @@ export async function POST(request: Request) {
                 name: item.Name, 
                 size: item.Size,
                 price: item.Price, 
-                images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+                images: JSON.parse(item.Image_URL),
                 description: item.Description,
                 stock: item.Quantity,
                 disc: "0%",
                 promo: false,
                 category: item.Category,
-                liked: item.liked
+                liked: item.liked,
+                userID: id,
             }));
         }
     }

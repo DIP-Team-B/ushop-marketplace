@@ -267,7 +267,7 @@ export default function Page({ searchParams }) {
                                 width={48}
                                 height={48}
                                 alt="image"
-                                src={invoice.images}
+                                src={invoice.images[0]}
                                 className="object-cover aspect-square rounded-md"
                               />
                               <div className="flex flex-col gap-0">

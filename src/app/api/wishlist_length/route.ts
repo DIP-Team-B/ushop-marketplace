@@ -19,11 +19,18 @@ export async function POST(request: Request) {
         await connection.end();
         return NextResponse.json({ success: false, message: 'No records found' });
     }
+    
 
-    const topLength = rows[0].TopList ? (rows[0].TopList.length - 1) / 2 : 0;
-    const bottomLength = rows[0].BottomList ? (rows[0].BottomList.length - 1) / 2 : 0;
-    const accessoriesLength = rows[0].AccessoriesList ? (rows[0].AccessoriesList.length - 1) / 2 : 0;
-    const othersLength = rows[0].OthersList ? (rows[0].OthersList.length - 1) / 2 : 0;
+    const topList = rows[0].TopList ? JSON.parse(rows[0].TopList) : [];
+    const bottomList = rows[0].BottomList ? JSON.parse(rows[0].BottomList) : [];
+    const accessoriesList = rows[0].AccessoriesList ? JSON.parse(rows[0].AccessoriesList) : [];
+    const othersList = rows[0].OthersList ? JSON.parse(rows[0].OthersList) : [];
+
+    // Calculate lengths
+    const topLength = topList.length; // Now correctly gets the count of elements in the array
+    const bottomLength = bottomList.length; // Length of BottomList
+    const accessoriesLength = accessoriesList.length; // Length of AccessoriesList
+    const othersLength = othersList.length; // Length of OthersList
 
     const length = topLength + bottomLength + accessoriesLength + othersLength;
     console.log(length);

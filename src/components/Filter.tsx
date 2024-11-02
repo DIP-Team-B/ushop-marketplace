@@ -11,7 +11,6 @@ import { Button } from "./ui/button";
 type FilterState = {
   price: [number, number];
   size: string[];
-  color: string[];
 };
 
 type FilterAccordionProps = {
@@ -21,7 +20,7 @@ type FilterAccordionProps = {
 const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
   const [selectedPrice, setSelectedPrice] = useState<[number, number]>([0, 100]); 
   const [selectedSize, setSelectedSize] = useState<string[]>(["XS", "S", "M", "L", "XL", "One Size"]);
-  const [selectedColor, setSelectedColor] = useState<string[]>(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
+  //const [selectedColor, setSelectedColor] = useState<string[]>(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
   const [maxPrice, setMaxPrice] = useState(100)
 
   const handleSliderChange = (newValues: number[]) => {
@@ -40,13 +39,12 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
 
   useEffect(() => {
     handleFilterChange();
-  }, [selectedPrice, selectedSize, selectedColor]);
+  }, [selectedPrice, selectedSize]);
 
   const handleFilterChange = () => {
     onFilterChange({
       price: selectedPrice,
       size: selectedSize,
-      color: selectedColor,
     });
   };
 
@@ -121,7 +119,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
         </AccordionItem>
 
         {/* Color Filter */}
-        <AccordionItem value="color">
+        {/*<AccordionItem value="color">
           <AccordionTrigger>Color</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col space-y-2">
@@ -141,7 +139,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
             ))}
             </div>
           </AccordionContent>
-        </AccordionItem>
+        </AccordionItem>*/}
 
         {/* Clear Filter Button */}
         <Button 
@@ -150,7 +148,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
           onClick={() => {
             setSelectedPrice([0, 100]);
             setSelectedSize(["XS", "S", "M", "L", "XL", "One Size"]);
-            setSelectedColor(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
+            //setSelectedColor(["Black", "Red", "Navy", "Grey", "Blue", "Green", "Beige", "White", "Pink", "Purple"]);
           }}
         >
           Clear Filter

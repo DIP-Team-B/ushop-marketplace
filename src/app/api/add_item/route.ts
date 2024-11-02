@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createConnection } from "@/lib/db";
+import * as fs from 'fs'; 
+import * as request from 'request';
 
 export async function POST(request: Request) {
   const { name, price, category, quantity, sizes, description, disc, imageurl1, imageurl2 } = await request.json();
@@ -13,8 +15,8 @@ export async function POST(request: Request) {
   if (!quantity) missingFields.push("quantity");
   if (!sizes) missingFields.push("sizes");
   if (!description) missingFields.push("description");
-  if (!imageurl1) missingFields.push("imageurl");
-  if (!imageurl2) missingFields.push("imageurl");
+  if (!imageurl1) missingFields.push("imageurl1");
+  if (!imageurl2) missingFields.push("imageurl2");
 
   if (missingFields.length > 0) {
     console.error("Missing required fields:", missingFields.join(", "));
@@ -36,6 +38,7 @@ export async function POST(request: Request) {
 
     let insertQuery = "";
     let result;
+    let foldername = "";
 
     // Construct SQL query based on category
     switch (category) {
@@ -44,32 +47,39 @@ export async function POST(request: Request) {
           INSERT INTO top_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
+        foldername = '/images/tops/';
         break;
       case "bottom":
         insertQuery = `
           INSERT INTO bottom_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
+        foldername = '/images/bottoms/';
         break;
       case "accessories":
         insertQuery = `
           INSERT INTO accessories_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
+        foldername = '/images/accessories/';
         break;
       case "other":
         insertQuery = `
           INSERT INTO others_table (Name, Size, Price, Quantity, Image_URL, Description, Discount) 
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
+        foldername = '/images/others/';
         break;
       default:
         throw new Error(`Invalid category. Must be one of: ${validCategories.join(", ")}`);
     }
 
+    let imageurl = [];
+    imageurl.push(foldername+imageurl1,foldername+imageurl2)
+
     // Loop through sizes and insert each size as a new row
     for (const size of sizes) {
-      const queryParams = [name, size, parseFloat(price), parseInt(quantity), imageurl, description, disc || null];
+      const queryParams = [name, size, parseFloat(price), parseInt(quantity), JSON.stringify(imageurl), description, disc || null];
       [result] = await connection.execute(insertQuery, queryParams);
       console.log(`Inserted size ${size} successfully`, result);
     }

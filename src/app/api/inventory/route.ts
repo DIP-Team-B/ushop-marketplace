@@ -31,7 +31,15 @@ export async function GET(request: NextRequest) {
           `SELECT *, '${table}' AS category
           FROM ${actualTableName};`);
         console.log(results);
-        return NextResponse.json({ success: true, data: results });
+        // Parse the Image_URL for each product
+        const modifiedResults = results.map(product => {
+          return {
+              ...product,
+              Image_URL: JSON.parse(product.Image_URL) // Parse Image_URL string to array
+          };
+        });
+
+        return NextResponse.json({ success: true, data: modifiedResults });
     } catch (error) {
         console.error('Error fetching products:', error);
         return NextResponse.json({ success: false, error: 'Error fetching products' }, { status: 500 });

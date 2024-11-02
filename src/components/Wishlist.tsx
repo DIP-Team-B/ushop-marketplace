@@ -65,7 +65,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
               <Link href={`/${product.category?.toLowerCase()}/${product.id}?id=${id}`}>
 
                 <img
-                  src={product.images}
+                  src={product.images[0]}
                   alt={product.name}
                   className="w-full h-80 object-cover cursor-pointer"
                 />

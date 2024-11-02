@@ -15,28 +15,32 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
     `;
 
     const sql = `
-      SELECT top_table.*
+      SELECT top_table.*,
+      'tops' AS Category
       FROM top_table
       JOIN favourite_table
       ON favourite_table.TopList != '' 
       AND JSON_CONTAINS(favourite_table.TopList, CAST(top_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
-      SELECT bottom_table.*
+      SELECT bottom_table.*,
+      'bottoms' AS Category
       FROM bottom_table
       JOIN favourite_table
       ON favourite_table.BottomList != '' 
       AND JSON_CONTAINS(favourite_table.BottomList, CAST(bottom_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
-      SELECT accessories_table.*
+      SELECT accessories_table.*,
+      'accessories' AS Category
       FROM accessories_table
       JOIN favourite_table
       ON favourite_table.AccessoriesList != '' 
       AND JSON_CONTAINS(favourite_table.AccessoriesList, CAST(accessories_table.ID AS JSON), '$')
       WHERE favourite_table.ID = ?
       UNION
-      SELECT others_table.*
+      SELECT others_table.*,
+      'others' AS Category
       FROM others_table
       JOIN favourite_table
       ON favourite_table.OthersList != '' 
@@ -53,36 +57,6 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
       return Response.json({  });
     }
     else {
-      let num: number = 0;
-      if (Array.isArray(rows) && rows.length > 0) {
-        while (num < rows.length) {
-          const row = rows[num] as RowDataPacket; // Type assertion to RowDataPacket
-          //Top List
-          if (num < (rows_length[0].TopList.length-1)/2) {
-            row.Image_URL = 'tops/' + row.Image_URL ;
-            row.category = 'tops';
-          }
-          //Bottom List
-          else if (num >= (rows_length[0].TopList.length-1)/2 && 
-          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2) {
-            row.Image_URL = 'bottoms/' + row.Image_URL ;
-            row.category = 'bottoms';
-          }
-          //Accessories List
-          else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 && 
-          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2) {
-            row.Image_URL = 'accessories/' + row.Image_URL ;
-            row.category = 'accessories';
-          }
-          //Others List
-          else if (num >= (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 && 
-          num < (rows_length[0].TopList.length-1)/2 +(rows_length[0].BottomList.length-1)/2 +(rows_length[0].AccessoriesList.length-1)/2 +(rows_length[0].OthersList.length-1)/2) {
-            row.Image_URL = 'others/' + row.Image_URL ;
-            row.category = 'others';
-          }
-          num++;
-        }
-      }
       //console.log("Updated Rows data:", rows);
 
       if (Array.isArray(rows) && rows.length > 0) {
@@ -92,8 +66,8 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
           name: row.Name,
           sizes: row.Size,
           price: row.Price,
-          images: '/images/products/'+[row.Image_URL],
-          category: row.category,
+          images: JSON.parse(row.Image_URL),
+          category: row.Category,
           stock: row.Quantity,
           liked: true,
         }));

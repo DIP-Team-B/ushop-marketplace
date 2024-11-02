@@ -72,7 +72,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
         setLoveIconClicked(!isLoveIconClicked);
         console.log('Reload');
         // Redirect to the updated wishlist page after successful removal
-        //window.location.reload();
+        window.location.reload();
       } else {
         console.error('Failed to update wishlist:', data.error);
       }
