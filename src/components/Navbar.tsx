@@ -150,6 +150,30 @@ const Navbar = ({ id }: { id: string }) => {
 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminAccount, setIsAdminAccount] = useState(false);
+
+  // Function to check if the user has admin role
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username && data.user.role == 'Admin') {
+          setIsAdminAccount(true); // User is admin role
+          console.log("admin access in " + data.user.role);
+        } else {
+          setIsAdminAccount(false); // User is not admin
+          console.log("admin access" + data.user.role);
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsAdminAccount(false); // Handle error by considering user as non-admin
+      }
+    };
+
+    checkUserRole();
+  }, []);
+
 
     // Function to check if the user is logged in
     useEffect(() => {
@@ -268,16 +292,6 @@ const Navbar = ({ id }: { id: string }) => {
                     </DropdownMenuItem>
                   </Link>
                   <Link
-                    href="/log-in"
-                    className={`${buttonVariants({
-                      variant: "ghost",
-                    })} w-full `}
-                  >
-                    <DropdownMenuItem className="text-mainBlack text-sm">
-                      Change account
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link
                     href={`/history?id=${id}`}
                     className={`${buttonVariants({
                       variant: "ghost",
@@ -287,6 +301,22 @@ const Navbar = ({ id }: { id: string }) => {
                       My purchase
                     </DropdownMenuItem>
                   </Link>
+
+                  {isAdminAccount ? (
+
+                      <Link
+                      href="/admin"
+                      className={`${buttonVariants({
+                        variant: "ghost",
+                      })} w-full `}
+                      >
+                      <DropdownMenuItem className="text-mainBlack text-sm">
+                        Admin Page
+                      </DropdownMenuItem>
+                      </Link>
+                    
+                  ):(null)} 
+                  
                 </>
               ) : (
                 <>
