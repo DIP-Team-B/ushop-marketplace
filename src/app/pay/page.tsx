@@ -59,9 +59,35 @@ function totalPrice(items: any) {
     .toFixed(2); // Rounds the total to 2 decimal places for currency
 }
 
+
+
 const Page = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Function to check if the user is logged in
+  useEffect(() => {
+   const checkUserStatus = async () => {
+     try {
+       const response = await fetch('/api/session'); 
+       const data = await response.json();
+       if (response.ok && data.user.username) {
+         setIsLoggedIn(true); // User is logged in
+       } else {
+         setIsLoggedIn(false); // User is not logged in
+       }
+     } catch (error) {
+       console.error("Error checking user session:", error);
+       setIsLoggedIn(false); // Handle error by considering user as logged out
+     }
+   };
+  
+   checkUserStatus();
+  }, []);
+
+
   return (
-    <div className="justify-center">
+    isLoggedIn ? (
+      <div className="justify-center">
       <div className="flex flex-col h-screen z-10 pb-28"> // or min-h-screen
         <div className="flex w-full h-full items-center justify-center my-16 relative z-10 top-[100px]">
           <div className="flex h-full bg-mainWhite rounded-2xl overflow-hidden border-[1px] border-gray-200 shadow-sm mx-36">
@@ -172,6 +198,12 @@ const Page = () => {
         </div>
       </div>
     </div>
+    ): (
+      <div className="flex justify-center items-center h-screen">
+    <p className="text-center text-black font-bold">Access denied.</p>
+  </div>
+    )
+    
   );
 };
 

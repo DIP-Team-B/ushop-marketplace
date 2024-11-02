@@ -70,8 +70,33 @@ const Page = () => {
     }
   }, []);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+   // Function to check if the user is logged in
+   useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username) {
+          setIsLoggedIn(true); // User is logged in
+        } else {
+          setIsLoggedIn(false); // User is not logged in
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsLoggedIn(false); // Handle error by considering user as logged out
+      }
+    };
+
+    checkUserStatus();
+  }, []);
+
+
+
   return (
-    <div className="justify-center flex flex-col h-screen">
+    isLoggedIn ? (
+      <div className="justify-center flex flex-col h-screen">
         <div className="flex w-full bg-gray-50">
           
           {/* left side */}
@@ -209,6 +234,12 @@ const Page = () => {
         </div>
       </div>
     </div>
+    ): (
+      <div className="flex justify-center items-center h-screen">
+    <p className="text-center text-black font-bold">Access denied.</p>
+  </div>
+    )
+    
   );
 };
 
