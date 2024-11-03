@@ -70,7 +70,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
         body: JSON.stringify({
           cartItemId: productId,
           category: productCat,
-          id: 5,
+          id: 2,
           action: "add"
         }),
       });
@@ -79,7 +79,8 @@ const ProductPage = ({ params }: ProductPageProps) => {
       if (data.success) {
         toast.success(productName + " added to cart!", {
           position: 'top-right',
-          duration: 3000
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
         });
       } else {
         toast.error("Error saving to cart: " + data.error, {

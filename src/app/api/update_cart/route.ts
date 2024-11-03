@@ -6,7 +6,6 @@ export async function POST(request: Request) {
     const { id, cartItemId, category, action } = await request.json();
 
     const connection = await createConnection();
-
     const retrieve_sql = `
       SELECT * FROM shoppingcart_table
       WHERE shoppingcart_table.ID = ?;
@@ -27,7 +26,9 @@ export async function POST(request: Request) {
             if (action == "add") {
                 topList = (topList && topList.length > 0) ? topList + ',' + cartItemId : cartItemId;
             } else {
-                topList = topList.filter((item: number) => item !== cartItemId);
+              const idsArray = topList.split(',').map(id => id.trim()); // Split and trim the IDs
+              topList = idsArray.filter((item: number) => item != cartItemId).join(',');
+              
             }
             console.log("toplist updated" + topList);
 
@@ -46,7 +47,8 @@ export async function POST(request: Request) {
             if (action == "add") {
                 bottomList = (bottomList && bottomList.length > 0) ? bottomList + ',' + cartItemId : cartItemId;
             } else {
-                bottomList = bottomList.filter((item: number) => item !== cartItemId);
+                const idsArray = bottomList.split(',').map(id => id.trim()); // Split and trim the IDs
+                bottomList = idsArray.filter((item: number) => item != cartItemId).join(',');
             }
             console.log("bottomList updated" + bottomList);
 
@@ -65,7 +67,8 @@ export async function POST(request: Request) {
         if (action == "add") {
             accessoriesList = (accessoriesList && accessoriesList.length > 0) ? accessoriesList + ',' + cartItemId : cartItemId;
         } else {
-            accessoriesList = accessoriesList.filter((item: number) => item !== cartItemId);
+            const idsArray = accessoriesList.split(',').map(id => id.trim()); // Split and trim the IDs
+            accessoriesList = idsArray.filter((item: number) => item != cartItemId).join(',');
         }
         console.log("accessoriesList updated" + accessoriesList);
 
@@ -84,8 +87,10 @@ export async function POST(request: Request) {
         if (action == "add") {
             othersList = (othersList && othersList.length > 0) ? othersList + ',' + cartItemId : cartItemId;
         } else {
-            othersList = othersList.filter((item: number) => item !== cartItemId);
-        }console.log("othersList updated" + othersList);
+            const idsArray = othersList.split(',').map(id => id.trim()); // Split and trim the IDs
+            othersList = idsArray.filter((item: number) => item != cartItemId).join(',');
+        }
+        console.log("othersList updated" + othersList);
 
         await connection.execute(update_others_sql, [othersList, id]);
         }
@@ -114,8 +119,7 @@ export async function POST(request: Request) {
             default:
               throw new Error("Invalid category");
             }
-
-
+            
         await connection.execute(insert_cart_sql, insertvalue);
     }
 

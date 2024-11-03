@@ -6,43 +6,15 @@ import { ArrowLeft, Container, Trash, Truck, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast, Toaster } from "sonner";
 
-
-// const checkoutItems = [
-//   {
-//     id: "promo-seasonal-black",
-//     name: "Seasonal Tee - Black",
-//     price: 10.99,
-//     category: "Tops",
-//     images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-//     stock: 20, // Adjust as needed
-//     sizes: ["XS", "S", "M", "L"],
-//     colours: ["Black"],
-//     description: "Comfortable Seasonal Tee in Black",
-//     promo: true,
-//     disc: "5%",
-//   },
-//   {
-//     id: "promo-os-blue",
-//     name: "Oversized - Blue",
-//     price: 10.99,
-//     category: "Tops",
-//     images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-//     stock: 10, // Adjust as needed
-//     sizes: ["M", "L", "XL"],
-//     colours: ["Blue"],
-//     description: "Comfortable Oversized Tee in Blue",
-//     promo: true,
-//     disc: "5%",
-//   },
-// ];
 
 const imageGeneratorNum = Math.floor(Math.random() * 6) + 1;
 
 function totalPrice(items: any) {
   return items
     .reduce(
-      (total: number, item: { promo: any; disc: string; price: number }) => {
+      (total: number, item: { promo: any; disc: string; price: number; count: number }) => {
         let discount = 0;
 
         // Calculate discount if promo is true and discount exists
@@ -53,7 +25,7 @@ function totalPrice(items: any) {
 
         // Subtract discount from price and add to total
         const finalPrice = item.price - discount;
-        return total + finalPrice;
+        return total + (finalPrice * item.count);
       },
       0
     )
@@ -73,7 +45,7 @@ const Page = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: 5,
+            id: 2,
           }),
         });
         const data = await response.json();
@@ -82,6 +54,41 @@ const Page = () => {
           setCartItems(data.result); 
         } else {
           console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    const deleteCartItem = async (productCat: string, productId: number, productName: string) => {
+      console.log('delete cart item!');
+      try {
+        const response = await fetch(`/api/update_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cartItemId: productId,
+            category: productCat,
+            id: 5,
+            action: "delete"
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (data.success) {
+          toast.success(productName + " deleted from cart!", {
+            position: 'top-right',
+            duration: 3000,
+            onAutoClose: () => {window.location.reload()}
+          });
+        } else {
+          toast.error("Error deleting from cart: " + data.error, {
+            position: 'top-right',
+            duration: 3000
+          });
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -163,10 +170,9 @@ const Page = () => {
                               </p>
                             </div>
                           </div>
-                          <XIcon className="w-4 h-4 mr-1 opacity-0"></XIcon>
                         </div>
                       </Link>
-                      <XIcon className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></XIcon>
+                      <XIcon onClick={() => deleteCartItem(product.category, product.id, product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></XIcon>
                     </div>
                   ))}
                 </div>
@@ -236,6 +242,7 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <Toaster/>
     </div>
   );
 };

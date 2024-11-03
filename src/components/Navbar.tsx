@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
 } from "@radix-ui/react-dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { toast, Toaster } from "sonner";
 
 export var globalIsBannerClosed: boolean;
 
@@ -28,7 +29,7 @@ const Navbar = ({ id }: { id: string }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: 5,
+          id: 2,
         }),
       });
       const data = await response.json();
@@ -37,6 +38,41 @@ const Navbar = ({ id }: { id: string }) => {
         setCartItems(data.result); 
       } else {
         console.error(data.error); // Handle error in the response
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  const deleteCartItem = async (productCat: string, productId: number, productName: string) => {
+    console.log('delete cart item!');
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: productId,
+          category: productCat,
+          id: 5,
+          action: "delete"
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(productName + " deleted from cart!", {
+          position: 'top-right',
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
+        });
+      } else {
+        toast.error("Error deleting from cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -71,6 +107,7 @@ const Navbar = ({ id }: { id: string }) => {
     fetchData();
     getCartItems();
   }, [id]);
+  
   console.log(wishlistCount);
   const isStudentStaff = true;
   const isLoggedIn = true;
@@ -81,36 +118,6 @@ const Navbar = ({ id }: { id: string }) => {
   useEffect(() => {
     globalIsBannerClosed = isBannerClosed;
   }, [isBannerClosed]);
-
-
-  // const cartItems = [
-  //   {
-  //     id: "promo-seasonal-black",
-  //     name: "Seasonal Tee - Black",
-  //     price: 10.99,
-  //     category: "Tops",
-  //     images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-  //     stock: 20, // Adjust as needed
-  //     sizes: ["XS", "S", "M", "L"],
-  //     colours: ["Black"],
-  //     description: "Comfortable Seasonal Tee in Black",
-  //     promo: true,
-  //     disc: "5%",
-  //   },
-  //   {
-  //     id: "promo-os-blue",
-  //     name: "Oversized - Blue",
-  //     price: 10.99,
-  //     category: "Tops",
-  //     images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-  //     stock: 10, // Adjust as needed
-  //     sizes: ["M", "L", "XL"],
-  //     colours: ["Blue"],
-  //     description: "Comfortable Oversized Tee in Blue",
-  //     promo: true,
-  //     disc: "5%",
-  //   },
-  // ];
 
   return (
     <div className="flex flex-col gap-0 fixed z-50 w-[100%] top-0">
@@ -313,10 +320,9 @@ const Navbar = ({ id }: { id: string }) => {
                                 </p>
                               </div>
                             </div>
-                            <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
                           </div>
                         </Link>
-                        <Trash className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
+                        <Trash onClick={() => deleteCartItem(product.category, product.id, product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
                       </div>
                     ))}
                   </div>
@@ -421,6 +427,7 @@ const Navbar = ({ id }: { id: string }) => {
           ></XIcon>
         </div>
       )}
+    <Toaster/>
     </div>
   );
 };
