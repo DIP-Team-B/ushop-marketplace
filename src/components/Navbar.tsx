@@ -265,6 +265,14 @@ const Navbar = ({ id }: { id: string }) => {
       }
     };
 
+    const handleIsLoggedInCheckOut = () => {
+      if (isLoggedIn) {
+        router.push('/checkout'); // Redirect to checkout page if logged in
+      } else {
+        router.push("/log-in"); // Redirect to login page if not logged in
+      }
+    };
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/logout', {
@@ -496,14 +504,14 @@ const Navbar = ({ id }: { id: string }) => {
                       </div>
                     ))}
                   </div>
-                  <Link
-                    href="/checkout"
+                  <Button
+                    onClick={handleIsLoggedInCheckOut}
                     className={`${buttonVariants({
                       variant: "default",
                     })} w-full h-12`}
                   >
                     Checkout
-                  </Link>
+                  </Button>
                 </div>
               ) : (
                 <div className="h-full flex flex-col gap-5 items-center justify-center">

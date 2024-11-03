@@ -238,6 +238,7 @@ export default function Page({ searchParams }) {
   };
 
   const [isLoggedInAdminAccount, setIsLoginInAdminAccount] = useState(false);
+  const [loading, setLoading] = useState(true);
   // Function to check if the user is logged in and an admin
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -252,6 +253,8 @@ export default function Page({ searchParams }) {
       } catch (error) {
         console.error("Error checking user session:", error);
         setIsLoginInAdminAccount(false); // Handle error 
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -321,6 +324,14 @@ export default function Page({ searchParams }) {
   useEffect(() => {
     setPromo(false);
   }, [invoices]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-black font-bold">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>

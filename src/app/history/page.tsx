@@ -150,8 +150,42 @@ export default function Page({ searchParams }) {
     setCurrentPage(pageNumber);
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Function to check if the user is logged in
+  useEffect(() => {
+   const checkUserStatus = async () => {
+     try {
+       const response = await fetch('/api/session'); 
+       const data = await response.json();
+       if (response.ok && data.user.username) {
+         setIsLoggedIn(true); // User is logged in
+       } else {
+         setIsLoggedIn(false); // User is not logged in
+       }
+     } catch (error) {
+       console.error("Error checking user session:", error);
+       setIsLoggedIn(false); // Handle error by considering user as logged out
+     } finally {
+      setLoading(false);
+    }
+   };
+  
+   checkUserStatus();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-black font-bold">Loading...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="justify-center">
+    isLoggedIn ? (
+      <div className="justify-center">
       <Navbar id={id}/>
       <div className="container mx-auto p-6 pb-36 relative z-50 top-[130px]">
         <div className="justify-center">
@@ -348,6 +382,12 @@ export default function Page({ searchParams }) {
         </div>
       </div>
     </div>
+    ):(
+      <div className="flex justify-center items-center h-screen">
+    <p className="text-center text-black font-bold">Access denied.</p>
+  </div>
+    )
+    
   );
 }
 
