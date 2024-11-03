@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import ProductCards from "@/components/ProductCards";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { toast, Toaster } from "sonner";
 
 type ProductPageProps = {
   params: { category: string; id: string };
@@ -31,7 +32,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
   const [product, setProduct] = useState([]);
   useEffect(() => {
     // Fetching data from API endpoint
-    const getTops = async () => {
+    const getProductDetails = async () => {
       try {
         const response = await fetch(`/api/get_products_details`, {
           method: "POST",
@@ -56,8 +57,40 @@ const ProductPage = ({ params }: ProductPageProps) => {
       }
     }
 
-    getTops();
+    getProductDetails();
   }, []);
+
+  const updateCart = async (productName: string) => {
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: productId,
+          category: productCat,
+          id: 5,
+          action: "add"
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success(productName + " added to cart!", {
+          position: 'top-right',
+          duration: 3000
+        });
+      } else {
+        toast.error("Error saving to cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
 
   if (!product) {
     return (
@@ -165,7 +198,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             </div>
 
             {/* add to cart button */}
-            <Button className="h-[35px] flex rounded-full" variant="outline">
+            <Button onClick={() => updateCart(product.name)} className="h-[35px] flex rounded-full" variant="outline">
               <svg
                 width="16"
                 height="16"
@@ -354,6 +387,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             />
           ))}
         </div>
+        <Toaster />
       </div>
     </>
   );

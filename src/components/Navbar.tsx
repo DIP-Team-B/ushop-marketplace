@@ -18,6 +18,31 @@ export var globalIsBannerClosed: boolean;
 
 const Navbar = ({ id }: { id: string }) => {
   const [wishlistCount, setwishlistCount] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+
+  const getCartItems = async () => {
+    try {
+      const response = await fetch(`/api/get_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 5,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setCartItems(data.result); 
+      } else {
+        console.error(data.error); // Handle error in the response
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  
   useEffect(() => {
     // Fetching data from API endpoint
     const fetchData = async () => {
@@ -44,6 +69,7 @@ const Navbar = ({ id }: { id: string }) => {
     };
 
     fetchData();
+    getCartItems();
   }, [id]);
   console.log(wishlistCount);
   const isStudentStaff = true;
@@ -57,34 +83,34 @@ const Navbar = ({ id }: { id: string }) => {
   }, [isBannerClosed]);
 
 
-  const cartItems = [
-    {
-      id: "promo-seasonal-black",
-      name: "Seasonal Tee - Black",
-      price: 10.99,
-      category: "Tops",
-      images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-      stock: 20, // Adjust as needed
-      sizes: ["XS", "S", "M", "L"],
-      colours: ["Black"],
-      description: "Comfortable Seasonal Tee in Black",
-      promo: true,
-      disc: "5%",
-    },
-    {
-      id: "promo-os-blue",
-      name: "Oversized - Blue",
-      price: 10.99,
-      category: "Tops",
-      images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-      stock: 10, // Adjust as needed
-      sizes: ["M", "L", "XL"],
-      colours: ["Blue"],
-      description: "Comfortable Oversized Tee in Blue",
-      promo: true,
-      disc: "5%",
-    },
-  ];
+  // const cartItems = [
+  //   {
+  //     id: "promo-seasonal-black",
+  //     name: "Seasonal Tee - Black",
+  //     price: 10.99,
+  //     category: "Tops",
+  //     images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
+  //     stock: 20, // Adjust as needed
+  //     sizes: ["XS", "S", "M", "L"],
+  //     colours: ["Black"],
+  //     description: "Comfortable Seasonal Tee in Black",
+  //     promo: true,
+  //     disc: "5%",
+  //   },
+  //   {
+  //     id: "promo-os-blue",
+  //     name: "Oversized - Blue",
+  //     price: 10.99,
+  //     category: "Tops",
+  //     images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
+  //     stock: 10, // Adjust as needed
+  //     sizes: ["M", "L", "XL"],
+  //     colours: ["Blue"],
+  //     description: "Comfortable Oversized Tee in Blue",
+  //     promo: true,
+  //     disc: "5%",
+  //   },
+  // ];
 
   return (
     <div className="flex flex-col gap-0 fixed z-50 w-[100%] top-0">
@@ -283,7 +309,7 @@ const Navbar = ({ id }: { id: string }) => {
                                   </div>
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  x 1
+                                  x {product.count}
                                 </p>
                               </div>
                             </div>
