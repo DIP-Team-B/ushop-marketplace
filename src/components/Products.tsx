@@ -16,6 +16,7 @@ type Product = {
   colours: string[];
   description: string[],
   liked: boolean,
+  count?: number
 }
 
 type ProductsProps = {

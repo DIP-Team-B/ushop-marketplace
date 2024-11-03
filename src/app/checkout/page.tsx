@@ -6,42 +6,15 @@ import { ArrowLeft, Container, Trash, Truck, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { toast, Toaster } from "sonner";
 
-const checkoutItems = [
-  {
-    id: "promo-seasonal-black",
-    name: "Seasonal Tee - Black",
-    price: 10.99,
-    category: "Tops",
-    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-    stock: 20, // Adjust as needed
-    sizes: ["XS", "S", "M", "L"],
-    colours: ["Black"],
-    description: "Comfortable Seasonal Tee in Black",
-    promo: true,
-    disc: "5%",
-  },
-  {
-    id: "promo-os-blue",
-    name: "Oversized - Blue",
-    price: 10.99,
-    category: "Tops",
-    images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-    stock: 10, // Adjust as needed
-    sizes: ["M", "L", "XL"],
-    colours: ["Blue"],
-    description: "Comfortable Oversized Tee in Blue",
-    promo: true,
-    disc: "5%",
-  },
-];
 
 const imageGeneratorNum = Math.floor(Math.random() * 6) + 1;
 
 function totalPrice(items: any) {
   return items
     .reduce(
-      (total: number, item: { promo: any; disc: string; price: number }) => {
+      (total: number, item: { promo: any; disc: string; price: number; count: number }) => {
         let discount = 0;
 
         // Calculate discount if promo is true and discount exists
@@ -52,15 +25,75 @@ function totalPrice(items: any) {
 
         // Subtract discount from price and add to total
         const finalPrice = item.price - discount;
-        return total + finalPrice;
+        return total + (finalPrice * item.count);
       },
       0
     )
     .toFixed(2); // Rounds the total to 2 decimal places for currency
 }
 
+
 const Page = () => {
     const [navbarHeight, setNavbarHeight] = useState(0);
+    const [cartItems, setCartItems] = useState([]);
+
+    const getCartItems = async () => {
+      try {
+        const response = await fetch(`/api/get_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: 2,
+          }),
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          setCartItems(data.result); 
+        } else {
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    const deleteCartItem = async (productCat: string, productId: number, productName: string) => {
+      console.log('delete cart item!');
+      try {
+        const response = await fetch(`/api/update_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cartItemId: productId,
+            category: productCat,
+            id: 5,
+            action: "delete"
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (data.success) {
+          toast.success(productName + " deleted from cart!", {
+            position: 'top-right',
+            duration: 3000,
+            onAutoClose: () => {window.location.reload()}
+          });
+        } else {
+          toast.error("Error deleting from cart: " + data.error, {
+            position: 'top-right',
+            duration: 3000
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
   useEffect(() => {
     // Get the height of the navbar dynamically
@@ -68,6 +101,8 @@ const Page = () => {
     if (navbarElement) {
       setNavbarHeight(navbarElement.offsetHeight);
     }
+
+    getCartItems();
   }, []);
 
   return (
@@ -87,9 +122,9 @@ const Page = () => {
         <div className={`relative w-5/12 text-mainBlack bg-mainWhite shadow-sm m-4 rounded-2xl overflow-hidden border-[1px] border-gray-100`}>
           <ScrollArea className="absolute z-0 mt-16 flex flex-col px-8 h-[calc(100%-185px)]">
             <div className="flex flex-col gap-2 pt-3">
-              {checkoutItems.length > 0 ? (
+              {cartItems.length > 0 ? (
                 <div className=" ">
-                  {checkoutItems.map((product) => (
+                  {cartItems.map((product) => (
                     <div className="relative">
                       <Link
                         href={`/${product.category?.toLowerCase()}/${
@@ -131,14 +166,13 @@ const Page = () => {
                                 </div>
                               )}
                               <p className="text-xs text-muted-foreground">
-                                x 1
+                                x {product.count ?? 0}
                               </p>
                             </div>
                           </div>
-                          <XIcon className="w-4 h-4 mr-1 opacity-0"></XIcon>
                         </div>
                       </Link>
-                      <XIcon className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></XIcon>
+                      <XIcon onClick={() => deleteCartItem(product.category, product.id, product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></XIcon>
                     </div>
                   ))}
                 </div>
@@ -201,13 +235,14 @@ const Page = () => {
             <div className="flex flex-col text-mainBlack">
               <p className="font-normal">Total Price</p>
               <h2 className="font-bold text-2xl">
-                ${totalPrice(checkoutItems)}
+                ${totalPrice(cartItems)}
               </h2>
             </div>
             <Link href="/pay"><Button className="py-6 px-5 rounded-full">Agree and Pay</Button></Link>
           </div>
         </div>
       </div>
+      <Toaster/>
     </div>
   );
 };

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/carousel";
 import ProductCards from "@/components/ProductCards";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { toast, Toaster } from "sonner";
 
 type ProductPageProps = {
   params: { category: string; id: string };
@@ -77,7 +78,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
     if (isStudentStaff === null) return; // Wait until role is determined
 
     // Fetching data from API endpoint
-    const getTops = async () => {
+    const getProductDetails = async () => {
       try {
         console.log(productCat);
         console.log(productId);
@@ -113,7 +114,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
       }
     }
 
-    getTops();
+    getProductDetails();
   }, [productCat, productId, userid, isStudentStaff]);
   // Function to change the selected size
   const changeSize = async (size) => {
@@ -179,6 +180,39 @@ const ProductPage = ({ params }: ProductPageProps) => {
 
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  const updateCart = async (productName: string) => {
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: productId,
+          category: productCat,
+          id: 2,
+          action: "add"
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success(productName + " added to cart!", {
+          position: 'top-right',
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
+        });
+      } else {
+        toast.error("Error saving to cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }
 
   if (!product) {
@@ -288,7 +322,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             </div>
 
             {/* add to cart button */}
-            <Button className="h-[35px] flex rounded-full" variant="outline">
+            <Button onClick={() => updateCart(product.name)} className="h-[35px] flex rounded-full" variant="outline">
               <svg
                 width="16"
                 height="16"
@@ -477,6 +511,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
             />
           ))}
         </div>
+        <Toaster />
       </div>
     </>
   );

@@ -13,6 +13,7 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { useRouter } from 'next/navigation';
+import { toast, Toaster } from "sonner";
 
 export var globalIsBannerClosed: boolean;
 
@@ -27,7 +28,66 @@ const Navbar = ({ id }: { id: string }) => {
   
   // State for user role
   const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
+  const [cartItems, setCartItems] = useState([]);
 
+  const getCartItems = async () => {
+    try {
+      const response = await fetch(`/api/get_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 2,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setCartItems(data.result); 
+      } else {
+        console.error(data.error); // Handle error in the response
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  const deleteCartItem = async (productCat: string, productId: number, productName: string) => {
+    console.log('delete cart item!');
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: productId,
+          category: productCat,
+          id: 5,
+          action: "delete"
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success(productName + " deleted from cart!", {
+          position: 'top-right',
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
+        });
+      } else {
+        toast.error("Error deleting from cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  
   useEffect(() => {
     // Fetching data from API endpoint
     const fetchWishlistCount = async () => {
@@ -109,8 +169,10 @@ const Navbar = ({ id }: { id: string }) => {
     fetchWishlistCount();
     fetchShoppingCartCount();
     fetchUserRole();
+    getCartItems();
   }, [id]);
 
+  console.log(wishlistCount);
   const [isBannerClosed, setBannerClosed] = useState(false);
 
   // Sync the global variable whenever isBannerClosed changes
@@ -424,14 +486,13 @@ const Navbar = ({ id }: { id: string }) => {
                                   </div>
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  x 1
+                                  x {product.count}
                                 </p>
                               </div>
                             </div>
-                            <Trash className="w-4 h-4 mr-1 opacity-0"></Trash>
                           </div>
                         </Link>
-                        <Trash className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
+                        <Trash onClick={() => deleteCartItem(product.category, product.id, product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
                       </div>
                     ))}
                   </div>
@@ -536,6 +597,7 @@ const Navbar = ({ id }: { id: string }) => {
           ></XIcon>
         </div>
       )}
+    <Toaster/>
     </div>
   );
 };

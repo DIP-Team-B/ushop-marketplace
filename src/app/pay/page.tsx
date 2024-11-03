@@ -8,40 +8,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
-const checkoutItems = [
-  {
-    id: "promo-seasonal-black",
-    name: "Seasonal Tee - Black",
-    price: 10.99,
-    category: "Tops",
-    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-    stock: 20, // Adjust as needed
-    sizes: ["XS", "S", "M", "L"],
-    colours: ["Black"],
-    description: "Comfortable Seasonal Tee in Black",
-    promo: true,
-    disc: "5%",
-  },
-  {
-    id: "promo-os-blue",
-    name: "Oversized - Blue",
-    price: 10.99,
-    category: "Tops",
-    images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-    stock: 10, // Adjust as needed
-    sizes: ["M", "L", "XL"],
-    colours: ["Blue"],
-    description: "Comfortable Oversized Tee in Blue",
-    promo: true,
-    disc: "5%",
-  },
-];
 
 function totalPrice(items: any) {
   return items
     .reduce(
-      (total: number, item: { promo: any; disc: string; price: number }) => {
+      (total: number, item: { promo: any; disc: string; price: number; count: number }) => {
         let discount = 0;
 
         // Calculate discount if promo is true and discount exists
@@ -52,7 +25,7 @@ function totalPrice(items: any) {
 
         // Subtract discount from price and add to total
         const finalPrice = item.price - discount;
-        return total + finalPrice;
+        return total + (finalPrice * item.count);
       },
       0
     )
@@ -60,6 +33,66 @@ function totalPrice(items: any) {
 }
 
 const Page = () => {
+
+  const [cartItems, setCartItems] = useState([]);
+
+  const placeOrder = async () => {
+    try {
+      const response = await fetch(`/api/place_order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderItems: cartItems, 
+          paymentDetail: 'aswin@gmail.com',
+          collectionMode: 'P',
+          cartId: 5
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success("Thank you for your order!", {
+          position: 'top-right',
+          duration: 3000
+        });
+      } else {
+        console.error(data.error); // Handle error in the response
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  const getCartItems = async () => {
+    try {
+      const response = await fetch(`/api/get_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: 2,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        setCartItems(data.result); 
+      } else {
+        console.error(data.error); // Handle error in the response
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  useEffect(() => {
+    // Get cart items
+    getCartItems();
+  }, []);
+
   return (
     <div className="justify-center">
       <div className="flex flex-col h-screen z-10 pb-28"> // or min-h-screen
@@ -126,7 +159,7 @@ const Page = () => {
                   </div>
                 </div>
               </div>
-              <Button className="py-6 px-5 rounded-full"><Lock className="w-3 h-3 mr-2"></Lock>Pay Now</Button>
+              <Button onClick={() => {placeOrder()}} className="py-6 px-5 rounded-full"><Lock className="w-3 h-3 mr-2"></Lock>Pay Now</Button>
             </div>
 
             {/* right side */}
@@ -135,7 +168,7 @@ const Page = () => {
                 Order summary
               </h1>
               <div className="flex flex-col pb-4 gap-2 text-mainBlack w-full border-b-[1px]">
-                {checkoutItems.map((product) => (
+                {cartItems.map((product) => (
                   <div className="flex gap-3 w-full">
                     <Image
                       width={56}
@@ -154,7 +187,7 @@ const Page = () => {
                       <p className="text-sm font-medium">
                         ${product.price}{" "}
                         <span className="text-xs font-light text-muted-foreground">
-                          x 1
+                          x {product.count}
                         </span>
                       </p>
                     </div>
@@ -164,7 +197,7 @@ const Page = () => {
               <div className="flex items-center justify-between w-full pb-3">
                 <p className="text-md font-medium">Total</p>
                 <p className="text-md font-bold">
-                  ${totalPrice(checkoutItems)}
+                  ${totalPrice(cartItems)}
                 </p>
               </div>
             </div>
