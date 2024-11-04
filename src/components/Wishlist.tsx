@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Heart } from "lucide-react"
 import Navbar from "@/components/Navbar";
+import { toast, Toaster } from "sonner";
 
 type Wishlist = {
   id: number;
@@ -44,6 +45,41 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
     router.push(`/wishlist/wishlist_reload?id=${user}&removeItemId=${id}&category=${category}`);
   };
 
+  //console.log("Current URL:", currentURL);
+  const updateCart = async (productID: number, productCat: string, user: number, productName: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: productID,
+          category: productCat,
+          id: user,
+          mode: "add"
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success(productName + " added to cart!", {
+          position: 'top-right',
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
+        });
+      } else {
+        toast.error("Error saving to cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+
   return (
     <div className="justify-center">
       
@@ -75,8 +111,8 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
                 <h2 className="font-semibold text-lg mb-2">{product.name + " " + product.sizes}</h2>
                 {/* row 2 */}
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
-                  <Button variant="destructive" size="sm">
+                  <span className="font-bold text-lg">${((product.price * (1 - parseFloat(product.disc) / 100)).toFixed(2))}</span>
+                  <Button variant="destructive" size="sm" onClick={(e) => updateCart(product.id, product.category, product.user, product.name,e)}>
                     Add to Cart
                   </Button>
                 </div>

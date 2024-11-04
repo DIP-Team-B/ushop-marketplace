@@ -74,7 +74,21 @@ export async function POST(request: Request) {
         break;
       case "others":
         selectQuery = `
-          SELECT * FROM others_table 
+          SELECT 
+            others_table.ID AS ProductID,
+            others_table.*, 
+            'others' AS Category,
+            favourite_table.ID AS userID,
+          CASE 
+            WHEN JSON_CONTAINS(favourite_table.OthersList, CAST(others_table.ID AS JSON), '$') THEN true
+            ELSE false 
+          END AS liked  
+          FROM 
+            others_table
+          LEFT JOIN 
+			      favourite_table 
+		      ON 
+			      favourite_table.ID = ?
         `;
         break;
       default:
@@ -95,7 +109,7 @@ export async function POST(request: Request) {
           images: JSON.parse(product.Image_URL),
           desc: product.Description,
           sizes: product.Size,
-          description: "Comfortable",
+          description: product.Description,
           disc: product.Discount,
           promo: false,
           category: category,
@@ -107,14 +121,14 @@ export async function POST(request: Request) {
       if (Array.isArray(result) && result.length > 0) {
         productList = result.map((product) => ({
           id: product.ID,
-          name: product.Name, 
+          name: product.Name + " " + product.Size, 
           size: product.Size,
           price: product.Price, 
           quantity: product.Quantity, 
           images: JSON.parse(product.Image_URL),
           desc: product.Description,
           sizes: product.Size,
-          description: "Comfortable",
+          description: product.Description,
           disc: '0%',
           promo: false,
           category: category,

@@ -30,29 +30,6 @@ const Navbar = ({ id }: { id: string }) => {
   const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
   const [cartItems, setCartItems] = useState([]);
 
-  const getCartItems = async () => {
-    try {
-      const response = await fetch(`/api/get_cart`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: 2,
-        }),
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        setCartItems(data.result); 
-      } else {
-        console.error(data.error); // Handle error in the response
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-
   const deleteCartItem = async (productCat: string, productId: number, productName: string) => {
     console.log('delete cart item!');
     try {
@@ -64,8 +41,8 @@ const Navbar = ({ id }: { id: string }) => {
         body: JSON.stringify({
           cartItemId: productId,
           category: productCat,
-          id: 5,
-          action: "delete"
+          id: id,
+          mode: "delete"
         }),
       });
 
@@ -74,7 +51,7 @@ const Navbar = ({ id }: { id: string }) => {
       if (data.success) {
         toast.success(productName + " deleted from cart!", {
           position: 'top-right',
-          duration: 3000,
+          duration: 30,
           onAutoClose: () => {window.location.reload()}
         });
       } else {
@@ -166,6 +143,29 @@ const Navbar = ({ id }: { id: string }) => {
       }
     };
 
+    const getCartItems = async () => {
+      try {
+        const response = await fetch(`/api/get_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+          }),
+        });
+        const data = await response.json();
+  
+        if (data.success) {
+          setCartItems(data.result); 
+        } else {
+          console.error(data.error); // Handle error in the response
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
     fetchWishlistCount();
     fetchShoppingCartCount();
     fetchUserRole();
@@ -181,34 +181,34 @@ const Navbar = ({ id }: { id: string }) => {
   }, [isBannerClosed]);
 
 
-  const cartItems = [
-    {
-      id: "promo-seasonal-black",
-      name: "Seasonal Tee - Black",
-      price: 10.99,
-      category: "Tops",
-      images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
-      stock: 20, // Adjust as needed
-      sizes: ["XS", "S", "M", "L"],
-      colours: ["Black"],
-      description: "Comfortable Seasonal Tee in Black",
-      promo: true,
-      disc: "5%",
-    },
-    {
-      id: "promo-os-blue",
-      name: "Oversized - Blue",
-      price: 10.99,
-      category: "Tops",
-      images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
-      stock: 10, // Adjust as needed
-      sizes: ["M", "L", "XL"],
-      colours: ["Blue"],
-      description: "Comfortable Oversized Tee in Blue",
-      promo: true,
-      disc: "5%",
-    },
-  ];
+  //const cartItems = [
+  //  {
+  //    id: "promo-seasonal-black",
+  //    name: "Seasonal Tee - Black",
+  //    price: 10.99,
+  //    category: "Tops",
+  //    images: ["/images/seasonal-black-1.png", "/images/seasonal-black-2.png"],
+  //    stock: 20, // Adjust as needed
+  //    sizes: ["XS", "S", "M", "L"],
+  //    colours: ["Black"],
+  //    description: "Comfortable Seasonal Tee in Black",
+  //    promo: true,
+  //    disc: "5%",
+  //  },
+  //  {
+  //    id: "promo-os-blue",
+  //    name: "Oversized - Blue",
+  //    price: 10.99,
+  //    category: "Tops",
+  //    images: ["/images/os-blue-1.png", "/images/os-blue-2.png"],
+  //    stock: 10, // Adjust as needed
+  //    sizes: ["M", "L", "XL"],
+  //    colours: ["Blue"],
+  //    description: "Comfortable Oversized Tee in Blue",
+  //    promo: true,
+  //    disc: "5%",
+  //  },
+  //];
 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -267,7 +267,7 @@ const Navbar = ({ id }: { id: string }) => {
 
     const handleIsLoggedInCheckOut = () => {
       if (isLoggedIn) {
-        router.push('/checkout'); // Redirect to checkout page if logged in
+        router.push(`/checkout?id=${id}`); // Redirect to checkout page if logged in
       } else {
         router.push("/log-in"); // Redirect to login page if not logged in
       }
@@ -455,9 +455,7 @@ const Navbar = ({ id }: { id: string }) => {
                     {cartItems.map((product) => (
                       <div className="relative">
                         <Link
-                          href={`/${product.category?.toLowerCase()}/${
-                            product.id
-                          }`}
+                          href={`/${product.category?.toLowerCase()}/${product.id}?id=${id}`}
                           className="flex gap-3 w-full p-3 bg-mainWhite rounded-lg border-[1px] border-gray-100 hover:border-gray-200 hover:bg-gray-100"
                         >
                           <Image
@@ -471,7 +469,7 @@ const Navbar = ({ id }: { id: string }) => {
                             <div className="flex flex-col justify-between h-full w-[170px] ">
                               <div className="flex flex-col gap-1 overflow-hidden">
                                 <p className="font-medium text-sm">
-                                  {product.name}
+                                  {product.name+ " " + product.sizes}
                                 </p>
                                 <p className="font-light text-xs text-muted-foreground truncate overflow-hidden ">
                                   {product.description}
@@ -494,13 +492,13 @@ const Navbar = ({ id }: { id: string }) => {
                                   </div>
                                 )}
                                 <p className="text-xs text-muted-foreground">
-                                  x {product.count}
+                                  x {product.quantity} 
                                 </p>
                               </div>
                             </div>
                           </div>
                         </Link>
-                        <Trash onClick={() => deleteCartItem(product.category, product.id, product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
+                        <Trash onClick={() => deleteCartItem(product.category,product.id,product.name)} className="absolute w-4 h-4 right-4 top-[calc(50%-8px)]"></Trash>
                       </div>
                     ))}
                   </div>
@@ -533,7 +531,6 @@ const Navbar = ({ id }: { id: string }) => {
               )}
             </SheetContent>
           </Sheet>
-          <Link href={`/wishlist?id=${id}`}></Link>
             <Button
               variant="special"
               className="flex gap-2 items-center px-[10px] rounded-full"

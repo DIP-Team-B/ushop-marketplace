@@ -538,7 +538,7 @@ export default function Page({ searchParams }) {
                             </div>
                           </TableCell>
                           <TableCell className="font-light">
-                            {invoice.invoice.slice(0,7)}
+                            {invoice.id}
                           </TableCell>
                           <TableCell className="font-light">
                             {invoice.date}

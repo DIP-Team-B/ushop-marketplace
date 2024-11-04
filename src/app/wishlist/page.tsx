@@ -69,6 +69,7 @@ const fetchWishlistItems = async (id: string): Promise<WishlistItem[]> => {
           images: JSON.parse(row.Image_URL),
           category: row.Category,
           stock: row.Quantity,
+          disc: row.Discount,
           liked: true,
         }));
       }

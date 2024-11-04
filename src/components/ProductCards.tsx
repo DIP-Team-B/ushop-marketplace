@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Heart } from "lucide-react";
+import { toast, Toaster } from "sonner";
 
 interface ProductCardsProps {
   name: string;
@@ -42,6 +43,39 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   }, []);
 
   //console.log("Current URL:", currentURL);
+  const updateCart = async (productName: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      const response = await fetch(`/api/update_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItemId: id,
+          category: category,
+          id: userid,
+          mode: "add"
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.success(productName + " added to cart!", {
+          position: 'top-right',
+          duration: 3000,
+          onAutoClose: () => {window.location.reload()}
+        });
+      } else {
+        toast.error("Error saving to cart: " + data.error, {
+          position: 'top-right',
+          duration: 3000
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
 
   const UpdateWishlistList = async (liked: boolean) => {
     // Check if any parameter is undefined
@@ -154,7 +188,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
             </div>
 
             {/* add to cart button */}
-            <Button className="h-[26px] flex rounded-full" variant="outline">
+            <Button onClick={(e) => updateCart(name,e)} className="h-[26px] flex rounded-full" variant="outline">
               <svg
                 width="16"
                 height="16"

@@ -136,7 +136,7 @@ export async function POST(request: Request) {
               name: row.Name,
               invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
               category: row.Category,
-              id: 'NTU000'+row.Invoice+row.Name,
+              id: 'NTU000'+row.Invoice,
               date: row.Date,
               status: row.Status,
               quantity: row.OrderedQuantity,

@@ -8,30 +8,115 @@ export async function POST(request: Request) {
     const connection = await createConnection();
 
     const retrieve_sql = `
-      SELECT * FROM shoppingcart_table
-      WHERE ID = ?;
+      SELECT 
+        top_table.*,
+        'tops' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.TopList, '$[*]' 
+              COLUMNS (
+                TopID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+            top_table
+        ON jt.TopID = top_table.ID
+        WHERE 
+            shoppingcart_table.ID = ?
+            AND JSON_LENGTH(shoppingcart_table.TopList) > 0
+
+      UNION
+
+      SELECT 
+        bottom_table.*,
+        'bottoms' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.BottomList, '$[*]' 
+              COLUMNS (
+                BottomID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          bottom_table
+        ON jt.BottomID = bottom_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.BottomList) > 0
+
+      UNION
+
+      SELECT 
+        accessories_table.*,
+        'accessories' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.AccessoriesList, '$[*]' 
+              COLUMNS (
+                AccessoriesID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          accessories_table
+        ON jt.AccessoriesID = accessories_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.AccessoriesList) > 0
+
+      UNION
+
+      SELECT 
+        others_table.*,
+        'others' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.OthersList, '$[*]' 
+              COLUMNS (
+                OthersID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          others_table
+        ON jt.OthersID = others_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.OthersList) > 0
     `;
 
-    const [rows] = await connection.execute(retrieve_sql, [id]);
+    const [rows] = await connection.execute(retrieve_sql, [id,id,id,id]);
 
-     // If no rows are returned, handle it
-     if (rows.length === 0) {
+    // If no rows are returned, handle it
+    if (rows.length === 0) {
         await connection.end();
-        return NextResponse.json({ success: false, message: 'No records found' });
+        return NextResponse.json({ success: true, count: 0 });
     }
 
-    const topLength = rows[0].TopList ? (rows[0].TopList.length - 1) / 2 : 0;
-    const bottomLength = rows[0].BottomList ? (rows[0].BottomList.length - 1) / 2 : 0;
-    const accessoriesLength = rows[0].AccessoriesList ? (rows[0].AccessoriesList.length - 1) / 2 : 0;
-    const othersLength = rows[0].OthersList ? (rows[0].OthersList.length - 1) / 2 : 0;
+    let count = 0;
 
-    const length = topLength + bottomLength + accessoriesLength + othersLength;
-    console.log(length);
+    if (Array.isArray(rows) && rows.length > 0) {
+      rows.forEach((row) => {
+        count += parseInt(row.OrderedQuantity, 10);
+      });
+
+    }
+    console.log(count);
     await connection.end();
 
     return NextResponse.json({ 
         success: true, 
-        count: length
+        count: count
     });
   } catch (error) {
     console.error("Error fetching order list:", error);

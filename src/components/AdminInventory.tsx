@@ -133,6 +133,7 @@ const AdminInventory = () => {
       const updatedData = {
         Price: newPriceValue,
         Quantity: productToUpdate.Quantity,
+        Discount: productToUpdate.Discount
       };
 
       const response = await fetch('/api/inventory', {

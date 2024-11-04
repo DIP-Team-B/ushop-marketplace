@@ -4,90 +4,128 @@ import { Product } from '@/components/Products';
 
 export async function POST(request: Request) {
   try {
-    const { orderItems, paymentDetail, collectionMode, cartId } = await request.json();
+    const { id , collectionMode, Name , CardNum , expDate , CVCNum , Address , Postal } = await request.json();
 
     const connection = await createConnection();
 
-    let topList = "";
-    let bottomList = "";
-    let accessoriesList = "";
-    let othersList = "";
+    const retrieve_order_sql = `
+        SELECT * FROM shoppingcart_table WHERE ID = ?
+    `;
+    const [rows] = await connection.execute(retrieve_order_sql, [id]);
 
-    if (orderItems && orderItems.length > 0) {
-        orderItems.forEach(async (product: Product) => {
-            switch(product.category) {
-                case "tops": 
-                    topList = (topList.length > 0) ? topList + ',' + product.id.toString() : product.id.toString();
-                    let update_top_sql = `
-                    WITH current_quantity AS (
-                    SELECT Quantity FROM top_table WHERE ID = ?
-                    )
-                    UPDATE top_table
-                    SET Quantity = (SELECT Quantity FROM current_quantity) - ?
-                    WHERE ID = ?;
-                    `;
+    const Expiry_CVC = expDate +" "+ CVCNum;
+    // Get the current date in SQL format (YYYY-MM-DD)
+    const currentDate = new Date().toISOString().slice(0, 10);
 
-                    await connection.execute(update_top_sql, [product.count, product.id, product.id]);
-                    break;
-                case "bottoms": 
-                    bottomList = (bottomList.length > 0) ? bottomList + ',' + product.id.toString() : product.id.toString();
-                    let update_bottom_sql = `
-                    WITH current_quantity AS (
-                    SELECT Quantity FROM bottom_table WHERE ID = ?
-                    )
-                    UPDATE bottom_table
-                    SET Quantity = (SELECT Quantity FROM current_quantity) - ?
-                    WHERE ID = ?;
-                    `;
+    // Set Address and Postal to null if they are empty
+    const addressValue = Address ? Address : null;
+    const postalValue = Postal ? Postal : null;
 
-                    await connection.execute(update_bottom_sql, [product.count, product.id, product.id]);
-                    break;
-                case "accessories": 
-                    accessoriesList = (accessoriesList.length > 0) ? accessoriesList + ',' + product.id.toString() : product.id.toString();
-                    let update_accessories_sql = `
-                    WITH current_quantity AS (
-                    SELECT Quantity FROM accessories_table WHERE ID = ?
-                    )
-                    UPDATE accessories_table
-                    SET Quantity = (SELECT Quantity FROM current_quantity) - ?
-                    WHERE ID = ?;
-                    `;
-
-                    await connection.execute(update_accessories_sql, [product.count, product.id, product.id]);
-
-                    break;
-                case "others": 
-                    othersList = (othersList.length > 0) ? othersList + ',' + product.id.toString() : product.id.toString();
-                    let update_others_sql = `
-                    WITH current_quantity AS (
-                    SELECT Quantity FROM others_table WHERE ID = ?
-                    )
-                    UPDATE others_table
-                    SET Quantity = (SELECT Quantity FROM current_quantity) - ?
-                    WHERE ID = ?;
-                    `;
-
-                    await connection.execute(update_others_sql, [product.count, product.id, product.id]);
-                    break;
-                default:
-                    throw new Error("Invalid category");
-            }
-        });
-    }
-    
     const insert_order_sql = `
         INSERT INTO order_table
-        (TopList, BottomList, AccessoriesList, OthersList, PaymentDetail, CollectionMode)
-        VALUES (?, ?, ?, ?, ?, ?);`;
+        (Account_ID, TopList, BottomList, AccessoriesList, OthersList, CollectionMode, Date, Status, CardName, CardNumber, ExpiryDate_CVC, Address, Postal)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
-    await connection.execute(insert_order_sql, [topList, bottomList, accessoriesList, othersList, paymentDetail, collectionMode]);
+    await connection.execute(insert_order_sql, [id, rows[0].TopList, rows[0].BottomList, rows[0].AccessoriesList, rows[0].OthersList, collectionMode, currentDate, "Pending", Name, CardNum, Expiry_CVC, addressValue, postalValue]);
 
+    if (rows[0].TopList && rows[0].TopList.length > 0) {
+        const topList = typeof rows[0].TopList === 'string' 
+        ? JSON.parse(rows[0].TopList) 
+        : rows[0].TopList;
+        const retrieve_top = `
+            SELECT * FROM top_table WHERE ID = ?;
+        `;
+
+        const update_TopTable = `
+            UPDATE top_table
+            SET Quantity = ?
+            WHERE ID = ?;
+        `;
+
+        for (const [objectid, topData] of topList) {
+            const quantity = topData.Q;
+            const datas = await connection.execute(retrieve_top, [objectid]);
+            const updated_quantity = datas[0].Quantity - parseInt(quantity);
+            await connection.execute(update_TopTable, [updated_quantity, objectid]);
+        }
+    }
+
+    if (rows[0].BottomList && rows[0].BottomList.length > 0) {
+        const bottomList = typeof rows[0].BottomList === 'string' 
+        ? JSON.parse(rows[0].BottomList) 
+        : rows[0].BottomList;
+        const retrieve_bottom = `
+            SELECT * FROM bottom_table WHERE ID = ?;
+        `;
+
+        const update_BottomTable = `
+            UPDATE bottom_table
+            SET Quantity = ?
+            WHERE ID = ?;
+        `;
+
+        for (const [objectid, bottomData] of bottomList) {
+            const quantity = bottomData.Q;
+            const datas = await connection.execute(retrieve_bottom, [objectid]);
+            const updated_quantity = datas[0].Quantity - parseInt(quantity);
+            await connection.execute(update_BottomTable, [updated_quantity, objectid]);
+        }
+    }
+
+    if (rows[0].AccessoriesList && rows[0].AccessoriesList.length > 0) {
+        const accessoriesList = typeof rows[0].AccessoriesList === 'string' 
+        ? JSON.parse(rows[0].AccessoriesList) 
+        : rows[0].AccessoriesList;
+
+        const retrieve_accessories = `
+            SELECT * FROM accessories_table WHERE ID = ?;
+        `;
+
+        const update_AccessoriesTable = `
+            UPDATE accessories_table
+            SET Quantity = ?
+            WHERE ID = ?;
+        `;
+
+        for (const [objectid, accessoryData] of accessoriesList) {
+
+            const quantity = accessoryData.Q;
+            const [datas] = await connection.execute(retrieve_accessories, [objectid]);
+            const updated_quantity = parseInt(datas[0].Quantity, 10) - parseInt(quantity, 10);
+            await connection.execute(update_AccessoriesTable, [updated_quantity, objectid]);
+        }
+    }
+
+    if (rows[0].OthersList && rows[0].OthersList.length > 0) {
+        const othersList = typeof rows[0].OthersList === 'string' 
+        ? JSON.parse(rows[0].OthersList) 
+        : rows[0].OthersList;
+
+        const retrieve_others = `
+            SELECT * FROM others_table WHERE ID = ?;
+        `;
+
+        const update_OthersTable = `
+            UPDATE others_table
+            SET Quantity = ?
+            WHERE ID = ?;
+        `;
+
+        for (const [objectid, othersData] of othersList) {
+            const quantity = othersData.Q;
+            const datas = await connection.execute(retrieve_others, [id]);
+            const updated_quantity = datas[0].Quantity - parseInt(quantity);
+            await connection.execute(update_OthersTable, [updated_quantity, id]);
+        }
+    }
+    
     const update_shoppingcart_sql = `
-        DELETE from shoppingcart_table 
+        UPDATE shoppingcart_table 
+        SET TopList = null, BottomList = null, AccessoriesList = null, OthersList = null
         where ID = ?;
     `;
 
-    await connection.execute(update_shoppingcart_sql, [cartId]);
+    await connection.execute(update_shoppingcart_sql, [id]);
 
     await connection.end();
     return NextResponse.json({ success: true });

@@ -11,161 +11,138 @@ export async function POST(request: Request) {
     const connection = await createConnection();
     console.log("Database connection established");
 
-    const retrieve_sql = `
+    const check_sql = `
       SELECT * FROM shoppingcart_table
       WHERE shoppingcart_table.ID = ?;
     `;
 
-    const [rows] = await connection.execute(retrieve_sql, [id]);
-    if (rows && rows.length > 0 ) {
-        let topList = rows[0].TopList;
-        let bottomList = rows[0].BottomList;
-        let accessoriesList = rows[0].AccessoriesList;
-        let othersList = rows[0].OthersList;
-        
-        if (topList && topList.length > 0) {
+    // Execute the check query
+    const [existingRows] = await connection.execute(check_sql, [id]);
 
-            const idsArray = topList.split(',').map(id => id.trim()); // Split and trim the IDs
-            // Create placeholders based on the number of IDs
-            const placeholders = idsArray.map(() => '?').join(', ');
+    console.log(id);
+    if (existingRows.length === 0) {
+      // If no rows are found, insert the new ID
+      const insert_sql = `
+        INSERT INTO shoppingcart_table (ID)
+        VALUES (?);
+      `;
+      await connection.execute(insert_sql, [id]);
+    
+      console.log(`Inserted new ID ${id} into shoppingcart_table`);
+    }
 
-            let selectQuery = `
-            SELECT * 
-            FROM top_table
-            WHERE ID IN (${placeholders});
-            `;
+    const retrieve_sql = `
+      SELECT 
+        top_table.*,
+        'tops' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.TopList, '$[*]' 
+              COLUMNS (
+                TopID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+            top_table
+        ON jt.TopID = top_table.ID
+        WHERE 
+            shoppingcart_table.ID = ?
+            AND JSON_LENGTH(shoppingcart_table.TopList) > 0
 
-            const [tops] = await connection.execute(selectQuery, idsArray);
-            if (Array.isArray(tops) && tops.length > 0) {
-                tops.forEach((product) => {
-                    cartList.push({
-                        id: product.ID,
-                        name: product.Name, 
-                        size: product.Size,
-                        price: product.Price, 
-                        quantity: 10, 
-                        images: ["/images/anni_shorts/annishorts.jpg"],
-                        stock: 9,
-                        sizes: ["XS", "S", "M", "L"],
-                        colours: ["Black", "Red", "Navy", "Green"],
-                        description: product.Description,
-                        disc: "0%",
-                        promo: false,
-                        category: 'tops',
-                        liked: false,
-                        count: idsArray.filter(id => id == product.ID).length
-                    });
-                }); 
-            }
-        }
+      UNION
 
-        if (bottomList && bottomList.length > 0) {
+      SELECT 
+        bottom_table.*,
+        'bottoms' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.BottomList, '$[*]' 
+              COLUMNS (
+                BottomID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          bottom_table
+        ON jt.BottomID = bottom_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.BottomList) > 0
 
-            const idsArray = bottomList.split(',').map(id => id.trim()); // Split and trim the IDs
-            // Create placeholders based on the number of IDs
-            const placeholders = idsArray.map(() => '?').join(', ');
+      UNION
 
-            let selectQuery = `
-            SELECT * 
-            FROM bottom_table
-            WHERE ID IN (${placeholders});
-            `;
+      SELECT 
+        accessories_table.*,
+        'accessories' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.AccessoriesList, '$[*]' 
+              COLUMNS (
+                AccessoriesID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          accessories_table
+        ON jt.AccessoriesID = accessories_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.AccessoriesList) > 0
 
-            const [bottoms] = await connection.execute(selectQuery, idsArray);
-            if (Array.isArray(bottoms) && bottoms.length > 0) {
-                bottoms.forEach((product) => {
-                    cartList.push({
-                        id: product.ID,
-                        name: product.Name, 
-                        size: product.Size,
-                        price: product.Price, 
-                        quantity: 10, 
-                        images: ["/images/anni_shorts/annishorts.jpg"],
-                        stock: 9,
-                        sizes: ["XS", "S", "M", "L"],
-                        colours: ["Black", "Red", "Navy", "Green"],
-                        description: product.Description,
-                        disc: "0%",
-                        promo: false,
-                        category: 'bottoms',
-                        liked: false,
-                        count: idsArray.filter(id => id == product.ID).length
-                    });
-                }); 
-            }
-        }
+      UNION
 
-        if (accessoriesList && accessoriesList.length > 0) {
+      SELECT 
+        others_table.*,
+        'others' AS Category,
+        jt.OrderedQuantity
+      FROM 
+        shoppingcart_table
+      JOIN 
+        JSON_TABLE(shoppingcart_table.OthersList, '$[*]' 
+              COLUMNS (
+                OthersID INT PATH '$[0]',
+                OrderedQuantity VARCHAR(10) PATH '$[1].Q'
+              )
+            ) AS jt
+        JOIN 
+          others_table
+        ON jt.OthersID = others_table.ID
+        WHERE 
+          shoppingcart_table.ID = ?
+          AND JSON_LENGTH(shoppingcart_table.OthersList) > 0
+    `;
 
-            const idsArray = accessoriesList.split(',').map(id => id.trim()); // Split and trim the IDs
-            // Create placeholders based on the number of IDs
-            const placeholders = idsArray.map(() => '?').join(', ');
+    const [rows] = await connection.execute(retrieve_sql, [id,id,id,id]);
 
-            let selectQuery = `
-            SELECT * 
-            FROM accessories_table
-            WHERE ID in (${placeholders});
-            `;
+    console.log(rows);
 
-            const [accessories] = await connection.execute(selectQuery, idsArray);
-            if (Array.isArray(accessories) && accessories.length > 0) {
-                accessories.forEach((product) => {
-                    cartList.push({
-                        id: product.ID,
-                        name: product.Name, 
-                        size: product.Size,
-                        price: product.Price, 
-                        quantity: 10, 
-                        images: ["/images/anni_shorts/annishorts.jpg"],
-                        stock: 9,
-                        sizes: ["XS", "S", "M", "L"],
-                        colours: ["Black", "Red", "Navy", "Green"],
-                        description: product.Description,
-                        disc: "0%",
-                        promo: false,
-                        category: 'accessories',
-                        liked: false,
-                        count: idsArray.filter(id => id == product.ID).length
-                    });
-                }); 
-            }
-        }
+    if (check_sql[0] === null)  {
+        return Response.json({  });
+      }
+    else {
+      //console.log("Updated Rows data:", rows);
 
-        if (othersList && othersList.length > 0) {
-
-            const idsArray = othersList.split(',').map(id => id.trim()); // Split and trim the IDs
-            // Create placeholders based on the number of IDs
-            const placeholders = idsArray.map(() => '?').join(', ');
-
-            let selectQuery = `
-            SELECT * 
-            FROM others_table
-            WHERE ID in (${placeholders});
-            `;
-
-            const [others] = await connection.execute(selectQuery, idsArray);
-            if (Array.isArray(others) && others.length > 0) {
-                others.forEach((product) => {
-                    cartList.push({
-                        id: product.ID,
-                        name: product.Name, 
-                        size: product.Size,
-                        price: product.Price, 
-                        quantity: 10, 
-                        images: ["/images/anni_shorts/annishorts.jpg"],
-                        stock: 9,
-                        sizes: ["XS", "S", "M", "L"],
-                        colours: ["Black", "Red", "Navy", "Green"],
-                        description: product.Description,
-                        disc: "0%",
-                        promo: false,
-                        category: 'others',
-                        liked: false,
-                        count: idsArray.filter(id => id == product.ID).length
-                    });
-                }); 
-            }
-        }
+      if (Array.isArray(rows) && rows.length > 0) {
+          cartList = rows.map((row) => ({
+              user: id,
+              id: row.ID,
+              name: row.Name,
+              sizes: row.Size,
+              price: (row.Price.toFixed(2) * row.OrderedQuantity * (1 - parseFloat(row.Discount) / 100).toFixed(2)),
+              images: JSON.parse(row.Image_URL),
+              category: row.Category,
+              disc: row.Discount,
+              quantity: row.OrderedQuantity,
+              liked: false,
+        }));
+      }
     }
 
     await connection.end();

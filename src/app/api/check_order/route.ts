@@ -117,11 +117,11 @@ export async function GET(request: Request) {
     console.log("Orders fetched successfully", rows);
     if (Array.isArray(rows) && rows.length > 0) {
       InvoiceItems = rows.map((row) => ({
-        images: '/images/products/'+[row.ImageURL],
+        images: JSON.parse(row.Image_URL),
         name: row.Name,
         invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
         category: row.Category,
-        id: 'NTU000'+row.Invoice+row.Name,
+        id: 'NTU000'+row.Invoice,
         date: row.Date,
         status: row.Status,
         quantity: row.OrderedQuantity,

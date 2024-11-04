@@ -185,8 +185,20 @@ export default function Page({ searchParams }) {
 
   return (
     isLoggedIn ? (
-      <div className="justify-center">
+      <>
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+        }}
+      >
       <Navbar id={id}/>
+      </div>
+      <div className="justify-center">
+      
       <div className="container mx-auto p-6 pb-36 relative z-50 top-[130px]">
         <div className="justify-center">
           
@@ -316,7 +328,7 @@ export default function Page({ searchParams }) {
                             </div>
                           </TableCell>
                           <TableCell className="font-light">
-                            {invoice.invoice.slice(0,7)}
+                            {invoice.id}
                           </TableCell>
                           <TableCell className="font-light">{invoice.date}</TableCell>
                           <TableCell
@@ -382,6 +394,7 @@ export default function Page({ searchParams }) {
         </div>
       </div>
     </div>
+    </>
     ):(
       <div className="flex justify-center items-center h-screen">
     <p className="text-center text-black font-bold">Access denied.</p>

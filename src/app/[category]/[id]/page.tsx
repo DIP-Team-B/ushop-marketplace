@@ -190,10 +190,10 @@ const ProductPage = ({ params }: ProductPageProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cartItemId: productId,
-          category: productCat,
-          id: 2,
-          action: "add"
+          cartItemId: product.id,
+          category: product.category,
+          id: userid,
+          mode: "add"
         }),
       });
 

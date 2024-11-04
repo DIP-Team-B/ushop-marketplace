@@ -7,6 +7,25 @@ export async function POST(request: Request) {
 
     const connection = await createConnection();
 
+    const check_sql = `
+      SELECT * FROM favourite_table
+      WHERE favourite_table.ID = ?;
+    `;
+
+    // Execute the check query
+    const [existingRows] = await connection.execute(check_sql, [id]);
+
+    if (existingRows.length === 0) {
+      // If no rows are found, insert the new ID
+      const insert_sql = `
+        INSERT INTO favourite_table (ID)
+        VALUES (?);
+      `;
+      await connection.execute(insert_sql, [id]);
+    
+      console.log(`Inserted new ID ${id} into favourite_table`);
+    }
+
     const retrieve_sql = `
       SELECT * FROM favourite_table
       WHERE ID = ?;
