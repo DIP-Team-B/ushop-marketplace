@@ -5,7 +5,7 @@ import { Product } from '@/components/Products';
 export async function POST(request: Request) {
 
   try {
-    const { id } = await request.json();
+    const { id , role } = await request.json();
     let cartList: Product[] = [];
 
     const connection = await createConnection();
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
 
     const [rows] = await connection.execute(retrieve_sql, [id,id,id,id]);
 
-    console.log(rows);
+    //console.log(rows);
 
     if (check_sql[0] === null)  {
         return Response.json({  });
@@ -129,7 +129,8 @@ export async function POST(request: Request) {
     else {
       //console.log("Updated Rows data:", rows);
 
-      if (Array.isArray(rows) && rows.length > 0) {
+      if (role) {
+        if (Array.isArray(rows) && rows.length > 0) {
           cartList = rows.map((row) => ({
               user: id,
               id: row.ID,
@@ -141,8 +142,27 @@ export async function POST(request: Request) {
               disc: row.Discount,
               quantity: row.OrderedQuantity,
               liked: false,
-        }));
+          }));
+        }
       }
+      else {
+        if (Array.isArray(rows) && rows.length > 0) {
+          cartList = rows.map((row) => ({
+              user: id,
+              id: row.ID,
+              name: row.Name,
+              sizes: row.Size,
+              price: (row.Price.toFixed(2) * row.OrderedQuantity),
+              images: JSON.parse(row.Image_URL),
+              category: row.Category,
+              disc: "0%",
+              quantity: row.OrderedQuantity,
+              liked: false,
+          }));
+        }
+      }
+
+        
     }
 
     await connection.end();

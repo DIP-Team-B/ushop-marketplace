@@ -152,6 +152,7 @@ const Navbar = ({ id }: { id: string }) => {
           },
           body: JSON.stringify({
             id: id,
+            rold: isStudentStaff,
           }),
         });
         const data = await response.json();

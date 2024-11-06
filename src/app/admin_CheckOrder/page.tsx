@@ -66,6 +66,7 @@ interface Invoice {
   status: string;
   quantity: number;
   price: number;
+  invoice_id: string;
 }
 
 //const adminEmail = "admin@gmail.com";
@@ -557,7 +558,7 @@ export default function Page({ searchParams }) {
                                     key={status}
                                     onClick={() =>
                                       handleStatusChange(
-                                        invoice.invoice.slice(6,7),
+                                        invoice.invoice_id,
                                         status
                                       )
                                     }

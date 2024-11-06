@@ -5,7 +5,7 @@ let InvoiceItems = [];
 
 export async function POST(request: Request) {
     try {
-        const { id } = await request.json();
+        const { id , role } = await request.json();
         
         const connection = await createConnection();
         
@@ -130,19 +130,38 @@ export async function POST(request: Request) {
           return NextResponse.json({  });
         }
         else {
-          if (Array.isArray(rows) && rows.length > 0) {
-            InvoiceItems = rows.map((row) => ({
-              images: JSON.parse(row.Image_URL),
-              name: row.Name,
-              invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
-              category: row.Category,
-              id: 'NTU000'+row.Invoice,
-              date: row.Date,
-              status: row.Status,
-              quantity: row.OrderedQuantity,
-              price: (row.Price.toFixed(2) * (1 - parseFloat(row.Discount) / 100).toFixed(2)),
-            }));
+          if (role) {
+            if (Array.isArray(rows) && rows.length > 0) {
+              InvoiceItems = rows.map((row) => ({
+                images: JSON.parse(row.Image_URL),
+                name: row.Name + " " + row.Size,
+                invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
+                category: row.Category,
+                id: 'NTU000'+row.Invoice,
+                date: row.Date,
+                status: row.Status,
+                quantity: row.OrderedQuantity,
+                price: (row.Price.toFixed(2) * (1 - parseFloat(row.Discount) / 100).toFixed(2)),
+              }));
+            }
           }
+          else {
+            if (Array.isArray(rows) && rows.length > 0) {
+              InvoiceItems = rows.map((row) => ({
+                images: JSON.parse(row.Image_URL),
+                name: row.Name + " " + row.Size,
+                invoice: 'NTU000'+row.Invoice+row.Category+row.ID,
+                category: row.Category,
+                id: 'NTU000'+row.Invoice,
+                date: row.Date,
+                status: row.Status,
+                quantity: row.OrderedQuantity,
+                price: (row.Price.toFixed(2)),
+              }));
+            }
+          }
+
+            
           console.log("InvoiceItems data:", InvoiceItems);
           return NextResponse.json(InvoiceItems);
         }
