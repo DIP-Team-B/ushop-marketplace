@@ -25,8 +25,9 @@ export default function Page({ searchParams }) {
           }),
         });
         const data = await response.json();
-        console.log("role: ", data);
+        console.log("role: ", data.rows[0].Role);
         if (data.success) {
+          console.log("role: ", data.rows[0].Role);
           if (data.rows[0].Role === "Student" || data.rows[0].Role === "Staff") {
             setIsStudentStaff(true);
           } else {

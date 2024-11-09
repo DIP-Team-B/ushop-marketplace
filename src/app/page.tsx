@@ -46,6 +46,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    console.log(isStudentStaff);
     if (isStudentStaff === null) return; // Wait until role is determined
     
     // Fetching data from API endpoint
@@ -159,6 +160,7 @@ export default function Home() {
                 disc={product.disc}
                 category={product.category}
                 quantity={product.quantity}
+                userid={id}
                 liked={product.liked}
               />
             ))}

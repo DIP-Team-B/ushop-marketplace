@@ -35,8 +35,29 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   const [isHovered, setHovered] = useState(false);
   const [isLoveIconClicked, setLoveIconClicked] = useState(liked);
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [currentURL, setCurrentURL] = useState("");
+
+  // Function to check if the user is logged in
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const response = await fetch('/api/session'); 
+        const data = await response.json();
+        if (response.ok && data.user.username) {
+          setIsLoggedIn(true); // User is logged in
+        } else {
+          setIsLoggedIn(false); // User is not logged in
+        }
+      } catch (error) {
+        console.error("Error checking user session:", error);
+        setIsLoggedIn(false); // Handle error by considering user as logged out
+      }
+    };
+
+    checkUserStatus();
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,18 +98,18 @@ const ProductCards: React.FC<ProductCardsProps> = ({
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+
   }
 
   const UpdateWishlistList = async (liked: boolean) => {
+  
     // Check if any parameter is undefined
     if (userid === undefined || id === undefined || category === undefined) {
       console.error("Parameters cannot be undefined:", { userid, id, category });
       return; // Exit the function early if any required parameter is missing
     }
-
     const mode = liked ? "add" : "delete";
     setLoading(true);
-    
     try {
       const response = await fetch('/api/update-wishlist', {
         method: 'POST',
@@ -123,12 +144,24 @@ const ProductCards: React.FC<ProductCardsProps> = ({
     <div className="relative ">
       {/* heart */}
       <div className="w-7 h-7 rounded-full flex items-center justify-center bg-mainWhite bg-opacity-65 absolute top-4 right-4 z-20">
-        <Heart
-          className={`w-5 h-5 ${
-            isLoveIconClicked && `stroke-none fill-primaryRed-600`
-          }`}
-          onClick={() => UpdateWishlistList(!isLoveIconClicked)}
-        ></Heart>
+        {isLoggedIn ? (
+          <Heart
+            className={`w-5 h-5 ${
+              isLoveIconClicked && `stroke-none fill-primaryRed-600`
+            }`}
+            onClick={() => UpdateWishlistList(!isLoveIconClicked)}
+          ></Heart>
+        ):(
+          <Link href="/log-in">
+          <Heart
+            className={`w-5 h-5 ${
+              isLoveIconClicked && `stroke-none fill-primaryRed-600`
+            }`}
+            onClick={() => UpdateWishlistList(!isLoveIconClicked)}
+          ></Heart>
+          </Link>
+        )}
+        
       </div>
       
       <Link
@@ -191,35 +224,69 @@ const ProductCards: React.FC<ProductCardsProps> = ({
 
             {/* add to cart button */}
             {quantity > 0 ? (
+              isLoggedIn ? (
               <Button onClick={(e) => updateCart(name,e)} className="h-[26px] flex rounded-full" variant="outline">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M3.33333 4.66667L4.452 10.2613C4.51244 10.5637 4.67581 10.8358 4.9143 11.0312C5.15278 11.2267 5.45165 11.3335 5.76 11.3333H12.1267C12.4573 11.3333 12.7762 11.2105 13.0213 10.9886C13.2665 10.7667 13.4204 10.4617 13.4533 10.1327L13.8533 6.13267"
-                  stroke="black"
-                  stroke-width="1.33333"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M3.33333 4.66667L2.79333 2.50467C2.75722 2.3605 2.67397 2.23254 2.5568 2.1411C2.43964 2.04967 2.29528 2 2.14667 2H1.33333M5.33333 14H6.66667M10.6667 14H12"
-                  stroke="black"
-                  stroke-width="1.33333"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M11.5714 6.42857H9.42857V8.57143C9.42857 8.80714 9.23571 9 9 9C8.76429 9 8.57143 8.80714 8.57143 8.57143V6.42857H6.42857C6.19286 6.42857 6 6.23571 6 6C6 5.76429 6.19286 5.57143 6.42857 5.57143H8.57143V3.42857C8.57143 3.19286 8.76429 3 9 3C9.23571 3 9.42857 3.19286 9.42857 3.42857V5.57143H11.5714C11.8071 5.57143 12 5.76429 12 6C12 6.23571 11.8071 6.42857 11.5714 6.42857Z"
-                  fill="black"
-                  stroke="black"
-                  stroke-width="0.2"
-                />
-              </svg>
-            </Button>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.33333 4.66667L4.452 10.2613C4.51244 10.5637 4.67581 10.8358 4.9143 11.0312C5.15278 11.2267 5.45165 11.3335 5.76 11.3333H12.1267C12.4573 11.3333 12.7762 11.2105 13.0213 10.9886C13.2665 10.7667 13.4204 10.4617 13.4533 10.1327L13.8533 6.13267"
+                    stroke="black"
+                    stroke-width="1.33333"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3.33333 4.66667L2.79333 2.50467C2.75722 2.3605 2.67397 2.23254 2.5568 2.1411C2.43964 2.04967 2.29528 2 2.14667 2H1.33333M5.33333 14H6.66667M10.6667 14H12"
+                    stroke="black"
+                    stroke-width="1.33333"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M11.5714 6.42857H9.42857V8.57143C9.42857 8.80714 9.23571 9 9 9C8.76429 9 8.57143 8.80714 8.57143 8.57143V6.42857H6.42857C6.19286 6.42857 6 6.23571 6 6C6 5.76429 6.19286 5.57143 6.42857 5.57143H8.57143V3.42857C8.57143 3.19286 8.76429 3 9 3C9.23571 3 9.42857 3.19286 9.42857 3.42857V5.57143H11.5714C11.8071 5.57143 12 5.76429 12 6C12 6.23571 11.8071 6.42857 11.5714 6.42857Z"
+                    fill="black"
+                    stroke="black"
+                    stroke-width="0.2"
+                  />
+                </svg>
+              </Button>
+              ) : (
+                <Link href="/log-in">
+                <Button className="h-[26px] flex rounded-full" variant="outline">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.33333 4.66667L4.452 10.2613C4.51244 10.5637 4.67581 10.8358 4.9143 11.0312C5.15278 11.2267 5.45165 11.3335 5.76 11.3333H12.1267C12.4573 11.3333 12.7762 11.2105 13.0213 10.9886C13.2665 10.7667 13.4204 10.4617 13.4533 10.1327L13.8533 6.13267"
+                    stroke="black"
+                    stroke-width="1.33333"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3.33333 4.66667L2.79333 2.50467C2.75722 2.3605 2.67397 2.23254 2.5568 2.1411C2.43964 2.04967 2.29528 2 2.14667 2H1.33333M5.33333 14H6.66667M10.6667 14H12"
+                    stroke="black"
+                    stroke-width="1.33333"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M11.5714 6.42857H9.42857V8.57143C9.42857 8.80714 9.23571 9 9 9C8.76429 9 8.57143 8.80714 8.57143 8.57143V6.42857H6.42857C6.19286 6.42857 6 6.23571 6 6C6 5.76429 6.19286 5.57143 6.42857 5.57143H8.57143V3.42857C8.57143 3.19286 8.76429 3 9 3C9.23571 3 9.42857 3.19286 9.42857 3.42857V5.57143H11.5714C11.8071 5.57143 12 5.76429 12 6C12 6.23571 11.8071 6.42857 11.5714 6.42857Z"
+                    fill="black"
+                    stroke="black"
+                    stroke-width="0.2"
+                  />
+                </svg>
+              </Button>
+              </Link>
+              )
             ):(
               <p>Out of stock</p>
             )}

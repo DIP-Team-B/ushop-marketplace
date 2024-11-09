@@ -5,9 +5,21 @@ export async function POST(request: Request) {
   try {
     const { id } = await request.json();
     const connection = await createConnection();
+    let rows = [];
+
+    if (id === "") {
+      rows = [{
+        ID: null,
+        email: null,
+        Username: "Guest",
+        Password: null,
+        Role: "Guest"
+      }]
+      return NextResponse.json({ success: true, rows });
+    }
 
     const query = `SELECT * FROM account_table WHERE ID = ?`;
-    const [rows] = await connection.execute(query, [id]);
+    [rows] = await connection.execute(query, [id]);
 
     await connection.end();
     
