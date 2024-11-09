@@ -44,8 +44,8 @@ export async function POST(request: Request) {
 
         for (const [objectid, topData] of topList) {
             const quantity = topData.Q;
-            const datas = await connection.execute(retrieve_top, [objectid]);
-            const updated_quantity = datas[0].Quantity - parseInt(quantity);
+            const [datas] = await connection.execute(retrieve_top, [objectid]);
+            const updated_quantity = parseInt(datas[0].Quantity, 10) - parseInt(quantity, 10);
             await connection.execute(update_TopTable, [updated_quantity, objectid]);
         }
     }
@@ -66,8 +66,8 @@ export async function POST(request: Request) {
 
         for (const [objectid, bottomData] of bottomList) {
             const quantity = bottomData.Q;
-            const datas = await connection.execute(retrieve_bottom, [objectid]);
-            const updated_quantity = datas[0].Quantity - parseInt(quantity);
+            const [datas] = await connection.execute(retrieve_bottom, [objectid]);
+            const updated_quantity = parseInt(datas[0].Quantity, 10) - parseInt(quantity, 10);
             await connection.execute(update_BottomTable, [updated_quantity, objectid]);
         }
     }
@@ -113,9 +113,9 @@ export async function POST(request: Request) {
 
         for (const [objectid, othersData] of othersList) {
             const quantity = othersData.Q;
-            const datas = await connection.execute(retrieve_others, [objectid]);
-            const updated_quantity = datas[0].Quantity - parseInt(quantity);
-            await connection.execute(update_OthersTable, [updated_quantity, id]);
+            const [datas] = await connection.execute(retrieve_others, [objectid]);
+            const updated_quantity = parseInt(datas[0].Quantity, 10) - parseInt(quantity, 10);
+            await connection.execute(update_OthersTable, [updated_quantity, objectid]);
         }
     }
     
