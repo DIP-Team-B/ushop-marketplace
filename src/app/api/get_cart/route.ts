@@ -20,7 +20,8 @@ export async function POST(request: Request) {
     const [existingRows] = await connection.execute(check_sql, [id]);
 
     console.log(id);
-    if (existingRows.length === 0) {
+    console.log(existingRows);
+    if (existingRows === null) {
       // If no rows are found, insert the new ID
       const insert_sql = `
         INSERT INTO shoppingcart_table (ID)

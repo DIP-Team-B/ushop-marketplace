@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function Page({ searchParams }) {
   const [allItems, setAllItems] = useState([]);
-  const { id } = searchParams;  // Fetch the ID from the search params
+  const { id ,  search } = searchParams;  // Fetch the ID from the search params
   // State for user role
   const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
   useEffect(() => {
@@ -47,9 +47,9 @@ export default function Page({ searchParams }) {
     if (isStudentStaff === null) return; // Wait until role is determined
     
     // Fetching data from API endpoint
-    const getAll = async () => {
+    const getSearch = async () => {
       try {
-        const response = await fetch(`/api/get_products_all`, {
+        const response = await fetch(`/api/get_search`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -57,6 +57,7 @@ export default function Page({ searchParams }) {
           body: JSON.stringify({
             id,
             role: isStudentStaff,
+            search,
           }),
         });
         const data = await response.json();
@@ -74,10 +75,10 @@ export default function Page({ searchParams }) {
       }
     }
 
-    getAll();
-  }, [id,isStudentStaff]);
+    getSearch();
+  }, [id,isStudentStaff,search]);
 
-  //console.log(allItems);
+  console.log(allItems);
 
   return (
     <>
@@ -87,32 +88,35 @@ export default function Page({ searchParams }) {
           <Link href={`./?id=${id}`} className="underline hover:color-darkRed">
             Home
           </Link>
-          &nbsp;&nbsp; &gt; &nbsp;&nbsp;
-          <Link href="" className="underline hover:color-darkRed">
-            All Products
-          </Link>
         </div>
         <div className="text-left text-5xl font-bold text-darkRed">
-          All Products
+          Search Result
         </div>
       </div>
 
       <hr />
       <div className="w-full px-40 py-36 gap-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
-        {allItems.map((product) => (
-          <ProductCards
-            key={product.id+product.name+product.category}
-            name={product.name + " " + product.size}
-            id={product.id}
-            images={product.images}
-            price={product.price}
-            disc={product.disc}
-            category={product.category}
-            liked={product.liked}
-            userid={product.userID}
-            quantity={product.quantity}
-          />
-        ))}
+        {allItems.length > 0 ? (
+            allItems.map((product) => (
+                <ProductCards
+                  key={product.id+product.name+product.category}
+                  name={product.name + " " + product.size}
+                  id={product.id}
+                  images={product.images}
+                  price={product.price}
+                  disc={product.disc}
+                  category={product.category}
+                  liked={product.liked}
+                  userid={product.userID}
+                  quantity={product.quantity}
+                />
+              ))
+            ) : (
+                <p className="text-muted-foreground text-center text-sm">
+                    Unable to find related product.
+                </p>
+            )
+        }
       </div>
     </>
   );

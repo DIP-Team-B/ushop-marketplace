@@ -17,6 +17,7 @@ interface ProductCardsProps {
   category: string;
   userid: string;
   liked: boolean;
+  quantity: number;
 }
 
 const ProductCards: React.FC<ProductCardsProps> = ({
@@ -28,6 +29,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
   category,
   userid,
   liked,
+  quantity,
 }) => {
   const router = useRouter();  // Initialize the router
   const [isHovered, setHovered] = useState(false);
@@ -188,7 +190,8 @@ const ProductCards: React.FC<ProductCardsProps> = ({
             </div>
 
             {/* add to cart button */}
-            <Button onClick={(e) => updateCart(name,e)} className="h-[26px] flex rounded-full" variant="outline">
+            {quantity > 0 ? (
+              <Button onClick={(e) => updateCart(name,e)} className="h-[26px] flex rounded-full" variant="outline">
               <svg
                 width="16"
                 height="16"
@@ -217,6 +220,9 @@ const ProductCards: React.FC<ProductCardsProps> = ({
                 />
               </svg>
             </Button>
+            ):(
+              <p>Out of stock</p>
+            )}
           </div>
         </div>
       </Link>

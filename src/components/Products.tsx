@@ -92,6 +92,7 @@ const Products: React.FC<ProductsProps> = ({ title, products, userid }) => {
                 category={product.category}
                 liked={product.liked}
                 userid={userid}
+                quantity={product.quantity}
               />
             ))}
         </div>

@@ -112,9 +112,14 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
                 {/* row 2 */}
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg">${((product.price * (1 - parseFloat(product.disc) / 100)).toFixed(2))}</span>
-                  <Button variant="destructive" size="sm" onClick={(e) => updateCart(product.id, product.category, product.user, product.name,e)}>
+                  {product.stock > 0 ? (
+                    <Button variant="destructive" size="sm" onClick={(e) => updateCart(product.id, product.category, product.user, product.name,e)}>
                     Add to Cart
-                  </Button>
+                    </Button>
+                  ):(
+                    <p>Out of Stock</p>
+                  )}
+                  
                 </div>
 
                 {/* row 3 */}

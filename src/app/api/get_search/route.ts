@@ -7,12 +7,12 @@ export async function POST(request: Request) {
 
 
   try {
-    const { id, role } = await request.json();
-    //console.log(id);
+    const { id, role, search } = await request.json();
+    console.log(id);
     let productsList = [];
     let disc = "";
 
-    //console.log(disc);
+    console.log(disc);
 
     const connection = await createConnection();
     console.log("Database connection established");
@@ -33,6 +33,8 @@ export async function POST(request: Request) {
 			favourite_table 
 		ON 
 			favourite_table.ID = ?
+        WHERE 
+			top_table.Name LIKE CONCAT('%', ? , '%')
 
         UNION
 
@@ -51,6 +53,8 @@ export async function POST(request: Request) {
 			favourite_table 
 		ON 
 			favourite_table.ID = ?
+        WHERE 
+			bottom_table.Name LIKE CONCAT('%', ? , '%')
 
         UNION
 
@@ -69,6 +73,8 @@ export async function POST(request: Request) {
 			favourite_table 
 		ON 
 			favourite_table.ID = ?
+        WHERE 
+			accessories_table.Name LIKE CONCAT('%', ? , '%')
 
         UNION
 
@@ -86,12 +92,14 @@ export async function POST(request: Request) {
         LEFT JOIN 
 			favourite_table 
 		ON 
-			favourite_table.ID = ?;
+			favourite_table.ID = ?
+        WHERE 
+			others_table.Name LIKE CONCAT('%', ? , '%');
     `;
 
-    const [result] = await connection.execute(sql, [id,id,id,id]);
+    const [result] = await connection.execute(sql, [id,search,id,search,id,search,id,search]);
     await connection.end();
-    //console.log("Query executed successfully", result);
+    console.log("Query executed successfully", result);
     if(role) {
         if (Array.isArray(result) && result.length > 0) {
             productsList = result.map(item => ({
@@ -130,7 +138,7 @@ export async function POST(request: Request) {
     }
     
 
-    //console.log(productsList);
+    console.log(productsList);
 
     return NextResponse.json({ success: true, result: productsList });
   } catch (error) {

@@ -25,6 +25,7 @@ const Navbar = ({ id }: { id: string }) => {
   const [wishlistCount, setwishlistCount] = useState(0);
   // State for shoppingcart count
   const [shoppingcartCount, setshoppingcartCount] = useState(0);
+  const [Search, setSearch] = useState('');
   
   // State for user role
   const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
@@ -63,6 +64,10 @@ const Navbar = ({ id }: { id: string }) => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
+  }
+
+  const SearchProduct = async () => {
+    router.push(`/search?id=${id}&search=${Search}`);
   }
   
   useEffect(() => {
@@ -306,11 +311,17 @@ const Navbar = ({ id }: { id: string }) => {
         </Link>
         <div className="flex gap-0 rounded-sm overflow-hidden border-mainBlack border-[1px]">
           <Input
-            type="email"
+            type="search"
             placeholder="Search your favourites products"
             className="w-[500px] rounded-none shadow-none border-none font-light"
+            value={Search}
+                        onChange={(e) => {
+                          let value = e.target.value; // Remove non-numeric characters
+                        
+                          setSearch(value); // Update the state with the formatted value
+                        }}
           ></Input>
-          <Button className="bg-mainBlack p-2 rounded-none flex">
+          <Button onClick={() => {SearchProduct()}} className="bg-mainBlack p-2 rounded-none flex">
             <SearchIcon className="text-white h-fill w-6"></SearchIcon>
           </Button>
         </div>

@@ -14,10 +14,13 @@ import { ArrowDown } from "lucide-react";
 import Image from "next/image";
 
 export default function Home() {
+  const [allItems, setAllItems] = useState([]);
   const [email, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
   const [role, setUserRole] = useState("");
   const [id, setUserId] = useState("");
+  // State for user role
+  const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
   
   // Function to retrieve the username from the JWT token stored in the cookie
   useEffect(() => {
@@ -26,17 +29,55 @@ export default function Home() {
       const data = await response.json();
 
       if (data.success) {
-        setUserEmail(data.user.email)
+        setUserEmail(data.user.email);
         setUsername(data.user.username);  // Set the username from the response
         setUserRole(data.user.role);
         setUserId(data.user.id);
-       ;
+        if (data.user.role === "Student" || data.user.role === "Staff") {
+          setIsStudentStaff(true);
+        } else {
+          setIsStudentStaff(false);
+        }
 
       }
     };
 
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (isStudentStaff === null) return; // Wait until role is determined
+    
+    // Fetching data from API endpoint
+    const getAll = async () => {
+      try {
+        const response = await fetch(`/api/get_products_all`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+            role: isStudentStaff,
+          }),
+        });
+        const data = await response.json();
+        //console.log(data);
+        // Assuming data is in the format { success: true, count: 5 }
+        if (data.success && Array.isArray(data.result)) {
+          setAllItems(data.result); // Extracting the count from the response
+        } else {
+          console.error("Unexpected response format:", data);
+          setAllItems([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setAllItems([]);
+      }
+    }
+
+    getAll();
+  }, [id,isStudentStaff]);
 
   const categoryItems = [
     { title: "Tops", id: "tops" },
@@ -87,6 +128,7 @@ export default function Home() {
         </div>
 
         {/* promo */}
+        {/*
         <div className="flex flex-col gap-2 w-[1350px] px-40 items-center pt-6">
           <div className="flex items-center gap-1">
             <p className="animate-bounce mr-1 font-semibold text-xl text-mainBlack">
@@ -97,6 +139,8 @@ export default function Home() {
 
           <PromoCardCarousel />
         </div>
+        */}
+        
 
         {/* show all items */}
         <div className="flex flex-col gap-2 w-full items-center pt-6 mb-[150px]">
@@ -105,19 +149,21 @@ export default function Home() {
           </p>
 
           <div className="screen-size-wrapper w-[1350px] px-40 py-6 gap-2 grid grid-cols-4">
-            {products.slice(0, visibleProducts).map((product) => (
+            {allItems.map((product) => (
               <ProductCards
                 key={product.id}
-                name={product.name}
+                name={product.name + " " + product.size}
                 id={product.id}
                 images={product.images}
                 price={product.price}
                 disc={product.disc}
                 category={product.category}
+                quantity={product.quantity}
+                liked={product.liked}
               />
             ))}
           </div>
-          {visibleProducts < products.length && (
+          {visibleProducts < allItems.length && (
             <div
               className="flex items-center justify-center"
               onClick={handleShowMore}

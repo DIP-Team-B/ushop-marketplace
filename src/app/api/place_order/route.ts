@@ -113,7 +113,7 @@ export async function POST(request: Request) {
 
         for (const [objectid, othersData] of othersList) {
             const quantity = othersData.Q;
-            const datas = await connection.execute(retrieve_others, [id]);
+            const datas = await connection.execute(retrieve_others, [objectid]);
             const updated_quantity = datas[0].Quantity - parseInt(quantity);
             await connection.execute(update_OthersTable, [updated_quantity, id]);
         }

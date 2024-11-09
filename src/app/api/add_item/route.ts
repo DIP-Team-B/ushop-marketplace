@@ -37,8 +37,9 @@ export async function POST(request: Request) {
     console.log("Database connection established");
 
     let insertQuery = "";
-    let result;
+    let result = [];
     let foldername = "";
+    let checkproduct = "";
 
     // Construct SQL query based on category
     switch (category) {
@@ -48,6 +49,9 @@ export async function POST(request: Request) {
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         foldername = '/images/tops/';
+        checkproduct = `
+          SELECT * FROM top_table WHERE Name = ? AND Size = ?
+        `
         break;
       case "bottom":
         insertQuery = `
@@ -55,6 +59,9 @@ export async function POST(request: Request) {
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         foldername = '/images/bottoms/';
+        checkproduct = `
+          SELECT * FROM bottom_table WHERE Name = ? AND Size = ?
+        `
         break;
       case "accessories":
         insertQuery = `
@@ -62,6 +69,9 @@ export async function POST(request: Request) {
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         foldername = '/images/accessories/';
+        checkproduct = `
+          SELECT * FROM accessories_table WHERE Name = ? AND Size = ?
+        `
         break;
       case "other":
         insertQuery = `
@@ -69,6 +79,9 @@ export async function POST(request: Request) {
           VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
         foldername = '/images/others/';
+        checkproduct = `
+          SELECT * FROM others_table WHERE Name = ? AND Size = ?
+        `
         break;
       default:
         throw new Error(`Invalid category. Must be one of: ${validCategories.join(", ")}`);
@@ -79,11 +92,19 @@ export async function POST(request: Request) {
 
     // Loop through sizes and insert each size as a new row
     for (const size of sizes) {
-      const queryParams = [name, size, parseFloat(price), parseInt(quantity), JSON.stringify(imageurl), description, disc || null];
-      [result] = await connection.execute(insertQuery, queryParams);
-      console.log(`Inserted size ${size} successfully`, result);
+      const [checkresult] = await connection.execute(checkproduct, [name, size]);
+      console.log(checkresult);
+      if (checkresult.length === 0) {
+        const queryParams = [name, size, parseFloat(price), parseInt(quantity), JSON.stringify(imageurl), description, disc || null];
+        [result] = await connection.execute(insertQuery, queryParams);
+        console.log(`Inserted size ${size} successfully`, result);
+      }
+      else {
+        console.log(`Size ${size} not inserted`);
+      }
+      
     }
-    console.log("Query executed successfully", result);
+    
 
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
