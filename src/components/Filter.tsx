@@ -50,13 +50,13 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
 
   return (
     <div className="w-full lg:w-64 p-4">
-      <Accordion type="multiple" className="space-y-4">
+      <Accordion type="multiple" className="space-y-4 text-black font">
 
         {/* Price Filter */}
         <AccordionItem value="price">
           <AccordionTrigger>Price</AccordionTrigger>
           <AccordionContent>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2 text-black font">
               <label>Price Range: ${selectedPrice[0]} - ${selectedPrice[1]}</label>
               <Slider
                 value={[maxPrice]}
@@ -65,7 +65,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
                 onValueChange={handleSliderChange}
                 className="w-full"
               />
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 text-black font">
                 <div className="flex-1">
                   <Label htmlFor="min-price">Min Price</Label>
                   <Input
@@ -76,7 +76,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
                     className="bg-muted"
                   />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 text-black font">
                   <Label htmlFor="max-price">Max Price</Label>
                   <Input
                     id="max-price"
@@ -88,7 +88,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
                   />
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground text-black font">
                 Showing items priced $0 - ${maxPrice}
               </p>
             </div>
@@ -99,7 +99,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
         <AccordionItem value="size">
           <AccordionTrigger>Size</AccordionTrigger>
           <AccordionContent>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-2 text-black font">
               {["XS", "S", "M", "L", "XL", "One Size"].map((size) => (
                 <label key={size}>
                 <Checkbox
@@ -143,7 +143,7 @@ const Filter: React.FC<FilterAccordionProps> = ({ onFilterChange }) => {
 
         {/* Clear Filter Button */}
         <Button 
-          className="mt-10 bg-beige"
+          className="mt-10 bg-beige text-black font"
           variant="outline"
           onClick={() => {
             setSelectedPrice([0, 100]);

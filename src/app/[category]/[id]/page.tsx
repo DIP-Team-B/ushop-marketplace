@@ -218,19 +218,19 @@ const ProductPage = ({ params }: ProductPageProps) => {
   if (!product) {
     return (
       <>
-        <div className="h-screen">
-          <div className="flex flex-col gap-8 items-center justify-center h-full pb-32 pt-32">  
+        <div className="h-screen text-black font">
+          <div className="flex flex-col gap-8 items-center justify-center h-full pb-32 pt-32 text-black font">  
             <Image
               src="/images/page-not-found.svg"
               width="500"
               height="690"
               alt="not-found"
             ></Image>
-            <div className="flex flex-col gap-2 items-center">
-              <h1 className="text-mainBlack text-2xl font-bold">
+            <div className="flex flex-col gap-2 items-center text-black font">
+              <h1 className="text-mainBlack text-2xl font-bold text-black font">
                 Oops! This page doesn&apos;t exist.
               </h1>
-              <p className="text-mainBlack font-light w-[500px] text-center">
+              <p className="text-mainBlack font-light w-[500px] text-center text-black font">
                 It looks like the link you followed may be broken or the page
                 has been moved. Double-check the URL or head back to the
                 homepage.
@@ -245,9 +245,9 @@ const ProductPage = ({ params }: ProductPageProps) => {
   return (
     <>
     <Navbar id={userid}/>
-      <div className="container mx-auto p-6 mb-20 py-32">
+      <div className="container mx-auto p-6 mb-20 py-32 text-black font">
         {/* Header Section */}
-        <div className="text-left py-9 pl-16 text-sm text-mainGrey">
+        <div className="text-left py-9 pl-16 text-sm text-mainGrey text-black font">
           <Link href={`./?id=${userid}`} className="underline hover:color-darkRed">
             Home
           </Link>

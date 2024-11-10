@@ -313,7 +313,7 @@ const Navbar = ({ id }: { id: string }) => {
           <Input
             type="search"
             placeholder="Search your favourites products"
-            className="w-[500px] rounded-none shadow-none border-none font-light"
+            className="w-[500px] rounded-none shadow-none border-none font-light text-black font"
             value={Search}
                         onChange={(e) => {
                           let value = e.target.value; // Remove non-numeric characters
