@@ -353,7 +353,7 @@ const ProductPage = ({ params }: ProductPageProps) => {
                 </svg>
               </Button>
               ):(
-              <p>Out of stock</p>
+              <p className="text-black font">Out of stock</p>
             )}
             
 

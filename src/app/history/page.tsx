@@ -197,12 +197,12 @@ export default function Page({ searchParams }) {
       >
       <Navbar id={id}/>
       </div>
-      <div className="justify-center">
+      <div className="justify-center text-black font">
       
-      <div className="container mx-auto p-6 pb-36 relative z-50 top-[130px]">
-        <div className="justify-center">
+      <div className="container mx-auto p-6 pb-36 relative z-50 top-[130px] text-black font">
+        <div className="justify-center text-black font">
           
-            <h1 className="text-2xl text-mainBlack font-bold">My purchase</h1>
+            <h1 className="text-2xl text-main black font-bold">My purchase</h1>
             <hr></hr>
             <br></br>
             { invoicesData === null || invoicesData.length === 0 ?(

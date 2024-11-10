@@ -117,7 +117,7 @@ const Wishlist: React.FC<ProductsProps> = ({ title, products = [], id }) => {
                     Add to Cart
                     </Button>
                   ):(
-                    <p>Out of Stock</p>
+                    <p className="text-black font">Out of Stock</p>
                   )}
                   
                 </div>

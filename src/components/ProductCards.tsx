@@ -288,7 +288,7 @@ const ProductCards: React.FC<ProductCardsProps> = ({
               </Link>
               )
             ):(
-              <p>Out of stock</p>
+              <p className="text-black font">Out of stock</p>
             )}
           </div>
         </div>
