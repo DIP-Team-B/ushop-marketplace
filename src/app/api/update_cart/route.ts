@@ -4,6 +4,7 @@ import { createConnection } from '@/lib/db';  // Assuming you have this helper f
 export async function POST(request: Request) {
   try {
     const { id, cartItemId, category, mode } = await request.json();
+    console.log(id + " " + cartItemId + " " + category + " " + mode);
 
     const connection = await createConnection();
     const retrieve_sql = `

@@ -290,9 +290,9 @@ export async function PUT(request: Request) {
 
       // Loop through each item in the order to generate order details
       email.forEach((item) => {
-        console.log(item.Name);
+        //console.log(item.Name);
         details += `
-        Product Name: ${item.Name}\n
+        Product Name: ${item.Name + " " + item.Size}\n
         Quantity: ${item.OrderedQuantity}\n
         -----------------------------------\n`;
       });

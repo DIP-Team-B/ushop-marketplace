@@ -26,8 +26,6 @@ function totalPrice(items: any, mode: string) {
   else {
     return (totalprice+5).toFixed(2);
   }
-
-  
 }
 
 

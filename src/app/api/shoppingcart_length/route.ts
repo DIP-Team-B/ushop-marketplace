@@ -12,6 +12,25 @@ export async function POST(request: Request) {
     } 
     else {
 
+      const check_sql = `
+        SELECT * FROM shoppingcart_table
+        WHERE shoppingcart_table.ID = ?;
+      `;
+      
+      // Execute the check query
+      const [existingRows] = await connection.execute(check_sql, [id]);
+      
+      if (existingRows.length === 0) {
+        // If no rows are found, insert the new ID
+        const insert_sql = `
+          INSERT INTO shoppingcart_table (ID)
+          VALUES (?);
+        `;
+        await connection.execute(insert_sql, [id]);
+      
+        console.log(`Inserted new ID ${id} into shoppingcart_table`);
+      }
+
       const retrieve_sql = `
         SELECT 
           top_table.*,

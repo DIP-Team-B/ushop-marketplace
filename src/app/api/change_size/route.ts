@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         name: result[0].Name, 
         size: result[0].Size,
         price: result[0].Price, 
-        images: ["/images/anni_shorts/annishorts.jpg", "/images/anni_shorts/annishorts.jpg"],
+        images: JSON.parse(result[0].Image_URL),
         description: result[0].Description,
         stock: result[0].Quantity,
         sizes: size_result.map(item => item.Size),
