@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     let cartList: Product[] = [];
 
     const connection = await createConnection();
-    console.log("Database connection established");
+    console.log("Database connection established, "+role);
 
     if (id === "") {
       return Response.json({  });

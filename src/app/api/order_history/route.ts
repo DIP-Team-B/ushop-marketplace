@@ -122,7 +122,7 @@ export async function POST(request: Request) {
         const [rows_length] = await connection.execute(length_sql, [id]);
         //console.log(rows_length);
         const [rows] = await connection.execute(sql, [id,id,id,id]);
-        //console.log(rows);
+        console.log(rows);
 
         await connection.end();
 
@@ -130,6 +130,7 @@ export async function POST(request: Request) {
           return NextResponse.json({  });
         }
         else {
+          console.log(role);
           if (role) {
             if (Array.isArray(rows) && rows.length > 0) {
               InvoiceItems = rows.map((row) => ({

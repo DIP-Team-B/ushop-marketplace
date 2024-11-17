@@ -94,8 +94,10 @@ export default function Page({ searchParams }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterUp, setFilterUp] = useState(false);
   const [invoicesData, setInvoices] = useState([]);
+  const [isStudentStaff, setIsStudentStaff] = useState<boolean | null>(null); // Initialize as null for loading state
 
   useEffect(() => {
+    if (isStudentStaff === null) return; // Wait until role is determined
     // Fetching data from API endpoint
     const fetchData = async () => {
       try {
@@ -105,7 +107,8 @@ export default function Page({ searchParams }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id,
+            id: id,
+            role: isStudentStaff,
           }),
         });
         const data = await response.json();
@@ -117,7 +120,7 @@ export default function Page({ searchParams }) {
     };
 
     fetchData();
-  }, [id]);
+  }, [id,isStudentStaff]);
 
   console.log("Data: ", invoicesData);
 
@@ -161,6 +164,11 @@ export default function Page({ searchParams }) {
        const data = await response.json();
        if (response.ok && data.user.username) {
          setIsLoggedIn(true); // User is logged in
+         if (data.user.role === "Student" || data.user.role === "Staff") {
+          setIsStudentStaff(true);
+        } else {
+          setIsStudentStaff(false);
+        }
        } else {
          setIsLoggedIn(false); // User is not logged in
        }

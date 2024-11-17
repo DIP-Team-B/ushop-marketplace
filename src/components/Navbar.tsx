@@ -148,6 +148,26 @@ const Navbar = ({ id }: { id: string }) => {
       }
     };
 
+    
+
+    fetchWishlistCount();
+    fetchShoppingCartCount();
+    fetchUserRole();
+    
+  }, [id]);
+
+  console.log(wishlistCount);
+  const [isBannerClosed, setBannerClosed] = useState(false);
+
+  // Sync the global variable whenever isBannerClosed changes
+  useEffect(() => {
+    globalIsBannerClosed = isBannerClosed;
+  }, [isBannerClosed]);
+
+  useEffect(() => {
+    console.log(isStudentStaff);
+    if (isStudentStaff === null) return; // Wait until role is determined
+    
     const getCartItems = async () => {
       try {
         const response = await fetch(`/api/get_cart`, {
@@ -157,7 +177,7 @@ const Navbar = ({ id }: { id: string }) => {
           },
           body: JSON.stringify({
             id: id,
-            rold: isStudentStaff,
+            role: isStudentStaff,
           }),
         });
         const data = await response.json();
@@ -172,19 +192,8 @@ const Navbar = ({ id }: { id: string }) => {
       }
     }
 
-    fetchWishlistCount();
-    fetchShoppingCartCount();
-    fetchUserRole();
     getCartItems();
-  }, [id]);
-
-  console.log(wishlistCount);
-  const [isBannerClosed, setBannerClosed] = useState(false);
-
-  // Sync the global variable whenever isBannerClosed changes
-  useEffect(() => {
-    globalIsBannerClosed = isBannerClosed;
-  }, [isBannerClosed]);
+  }, [id,isStudentStaff]);
 
 
   //const cartItems = [
